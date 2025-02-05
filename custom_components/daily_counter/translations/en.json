@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Daily Counter",
+        "description": "Enter a name for the counter and select the sensor that will trigger it.",
+        "data": {
+          "name": "Counter name",
+          "sensor": "Trigger sensor"
+        }
+      }
+    },
+    "error": {
+      "invalid_sensor": "The specified sensor is invalid.",
+      "duplicate_name": "A counter with this name already exists."
+    },
+    "abort": {
+      "already_configured": "This counter is already configured."
+    }
+  },
+  "services": {
+    "reset_counter": {
+      "name": "Reset counter",
+      "description": "Resets the daily counter to zero.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity",
+          "description": "The entity ID of the counter to reset."
+        }
+      }
+    }
+  }
+}
