@@ -5,5 +5,6 @@
   "documentation": "https://github.com/jeroenterheerdt/HADailySensor",
   "dependencies": [],
   "codeowners": ["@tu_usuario"],
-  "requirements": []
+  "requirements": [],
+  "config_flow": true
 }
