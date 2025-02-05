@@ -12,18 +12,25 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Daily Counter sensor from a config entry."""
     name = config_entry.data[CONF_NAME]
     sensor_id = config_entry.data[CONF_SENSOR]
-    async_add_entities([DailyCounterSensor(hass, name, sensor_id)])
+    unique_id = f"daily_counter_{name.lower().replace(' ', '_')}"  # Crear un unique_id basado en el nombre
+    async_add_entities([DailyCounterSensor(hass, name, sensor_id, unique_id)])
 
 class DailyCounterSensor(RestoreEntity):
     """Representation of a Daily Counter sensor."""
 
-    def __init__(self, hass, name, sensor_id):
+    def __init__(self, hass, name, sensor_id, unique_id):
         """Initialize the sensor."""
         self._hass = hass
         self._name = name
         self._sensor_id = sensor_id
+        self._unique_id = unique_id  # Asignar el unique_id
         self._state = 0
         self._last_reset = dt_util.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    @property
+    def unique_id(self):
+        """Return a unique ID for the sensor."""
+        return self._unique_id
 
     async def async_added_to_hass(self):
         """Restore state and set up listeners."""
