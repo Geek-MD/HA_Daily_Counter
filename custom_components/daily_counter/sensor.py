@@ -4,6 +4,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers.service import async_register_admin_service
 from .const import DOMAIN, CONF_NAME, CONF_SENSOR
 
 _LOGGER = logging.getLogger(__name__)
@@ -13,6 +14,23 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     name = config_entry.data[CONF_NAME]
     sensor_id = config_entry.data[CONF_SENSOR]
     async_add_entities([DailyCounterSensor(hass, name, sensor_id)])
+
+    # Registrar el servicio reset_counter
+    async def async_reset_counter(call):
+        """Handle the reset_counter service call."""
+        entity_id = call.data.get("entity_id")
+        entity = next((entity for entity in hass.data[DOMAIN] if entity.entity_id == entity_id), None)
+        if entity:
+            await entity.async_reset_counter()
+        else:
+            _LOGGER.error(f"Entity {entity_id} not found.")
+
+    async_register_admin_service(
+        hass,
+        DOMAIN,
+        "reset_counter",
+        async_reset_counter,
+    )
 
 class DailyCounterSensor(RestoreEntity):
     """Representation of a Daily Counter sensor."""
@@ -70,4 +88,10 @@ class DailyCounterSensor(RestoreEntity):
             self._state = 0
             self._last_reset = now.replace(hour=0, minute=0, second=0, microsecond=0)
         self._state += 1
+        self.async_write_ha_state()
+
+    async def async_reset_counter(self):
+        """Reset the counter."""
+        self._state = 0
+        self._last_reset = dt_util.now().replace(hour=0, minute=0, second=0, microsecond=0)
         self.async_write_ha_state()
