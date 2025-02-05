@@ -15,7 +15,11 @@ class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(user_input[CONF_NAME])
             self._abort_if_unique_id_configured()
 
-            return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
+            # Validar que el sensor exista
+            if not self.hass.states.get(user_input[CONF_SENSOR]):
+                errors["base"] = "invalid_sensor"
+            else:
+                return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
 
         # Mostrar el formulario en la UI
         return self.async_show_form(
