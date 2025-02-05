@@ -1,0 +1,8 @@
+reset_counter:
+  name: Reset counter
+  description: Resets the daily counter to zero.
+  fields:
+    entity_id:
+      name: Entity
+      description: The entity ID of the counter to reset.
+      example: sensor.puerta_principal
