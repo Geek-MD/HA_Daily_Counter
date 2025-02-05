@@ -1,12 +1,9 @@
-manifest = {
-    "domain": DOMAIN,
-    "name": "Daily Counter",
-    "version": "1.0.0",
-    "documentation": "https://github.com/tu-usuario/homeassistant-daily-counter",
-    "dependencies": [],
-    "codeowners": ["@tu-usuario"],
-    "requirements": [],
-    "config_flow": True
+{
+  "domain": "daily_counter",
+  "name": "Daily Counter",
+  "version": "1.0",
+  "documentation": "https://github.com/jeroenterheerdt/HADailySensor",
+  "dependencies": [],
+  "codeowners": ["@tu_usuario"],
+  "requirements": []
 }
-with open("manifest.json", "w") as f:
-    json.dump(manifest, f, indent=2)
