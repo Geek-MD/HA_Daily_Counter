@@ -10,6 +10,3 @@ This is a Home Assistant integration that provides daily resettable counters.
 - Navigate to Integrations in Home Assistant.
 - Click on Add Integration and search for Daily Counter.
 - Set the name and select the trigger sensor.
-"""
-with open("README.md", "w") as f:
-    f.write(readme_content)
