@@ -1,7 +1,7 @@
 {
   "domain": "daily_counter",
   "name": "Daily Counter",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "documentation": "https://github.com/tu_usuario/tu_repositorio",
   "dependencies": [],
   "codeowners": ["@tu_usuario"],
