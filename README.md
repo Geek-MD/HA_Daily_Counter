@@ -2,6 +2,7 @@
 [![stars - HADailyCounter](https://img.shields.io/github/stars/Geek-MD/HADailyCounter?style=social)](https://github.com/Geek-MD/HADailyCounter)
 [![forks - HADailyCounter](https://img.shields.io/github/forks/Geek-MD/HADailyCounter?style=social)](https://github.com/Geek-MD/HADailyCounter)
 
+![Static Badge](https://img.shields.io/badge/custom_repository-HACS-blue)
 [![GitHub release](https://img.shields.io/github/release/Geek-MD/HADailyCounter?include_prereleases=&sort=semver&color=blue)](https://github.com/Geek-MD/HADailyCounter/releases/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
