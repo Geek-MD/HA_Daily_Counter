@@ -2,7 +2,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
-from .const import DOMAIN, CONF_NAME, CONF_SENSORS
+from .const import DOMAIN, CONF_NAME, CONF_SENSOR
 
 class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Daily Counter."""
@@ -16,13 +16,9 @@ class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(user_input[CONF_NAME])
             self._abort_if_unique_id_configured()
 
-            # Validar que todos los sensores existan
-            invalid_sensors = [
-                sensor for sensor in user_input[CONF_SENSORS]
-                if not self.hass.states.get(sensor)
-            ]
-            if invalid_sensors:
-                errors["base"] = "invalid_sensors"
+            # Validar que el sensor exista
+            if not self.hass.states.get(user_input[CONF_SENSOR]):
+                errors["base"] = "invalid_sensor"
             else:
                 return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
 
@@ -31,7 +27,7 @@ class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema({
                 vol.Required(CONF_NAME): str,
-                vol.Required(CONF_SENSORS): cv.ensure_list,  # Aceptar una lista de sensores
+                vol.Required(CONF_SENSOR): str,  # Un solo sensor
             }),
             errors=errors,
             description_placeholders={
@@ -60,6 +56,6 @@ class DailyCounterOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Required(CONF_SENSORS, default=self.config_entry.data[CONF_SENSORS]): cv.ensure_list,
+                vol.Required(CONF_SENSOR, default=self.config_entry.data[CONF_SENSOR]): str,
             }),
         )
