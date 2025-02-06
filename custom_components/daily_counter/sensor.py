@@ -11,7 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Daily Counter sensor from a config entry."""
     name = config_entry.data[CONF_NAME]
-    sensor_ids = config_entry.data[CONF_SENSORS]  # Ahora es una lista de sensores
+    sensor_ids = config_entry.data[CONF_SENSORS]  # Lista de sensores
     unique_id = f"daily_counter_{name.lower().replace(' ', '_')}"
     async_add_entities([DailyCounterSensor(hass, name, sensor_ids, unique_id)])
 
