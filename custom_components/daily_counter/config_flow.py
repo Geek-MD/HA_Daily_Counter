@@ -1,85 +1,42 @@
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import callback
-from homeassistant.helpers import config_validation as cv
-from .const import DOMAIN, CONF_NAME, CONF_SENSOR
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
+from homeassistant.helpers.selector import selector
+
+from .const import DOMAIN, CONF_NAME, CONF_TRIGGER_SENSOR
 
 class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Daily Counter."""
+    VERSION = 1
 
     async def async_step_user(self, user_input=None):
-        """Handle the initial step."""
         errors = {}
-
+        hass: HomeAssistant = self.hass
+        entity_registry = async_get_entity_registry(hass)
+        
+        sensor_options = {
+            entity.entity_id: entity.original_name or entity.entity_id
+            for entity in entity_registry.entities.values()
+            if entity.entity_id.startswith("binary_sensor.") or entity.entity_id.startswith("sensor.")
+        }
+        
         if user_input is not None:
-            # Validar que el nombre no esté duplicado
-            await self.async_set_unique_id(user_input[CONF_NAME])
-            self._abort_if_unique_id_configured()
+            return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
 
-            # Validar que el sensor exista
-            if not self.hass.states.get(user_input[CONF_SENSOR]):
-                errors["base"] = "invalid_sensor"
-            else:
-                return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
-
-        # Obtener una lista de sensores disponibles con su friendly_name
-        sensor_list = self._get_sensor_list()
-
-        # Mostrar el formulario en la UI con una lista desplegable
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({
-                vol.Required(CONF_NAME): str,
-                vol.Required(CONF_SENSOR): vol.In(sensor_list),  # Lista desplegable de sensores
-            }),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_NAME): str,
+                    vol.Required(CONF_TRIGGER_SENSOR): selector({
+                        "select": {
+                            "options": [
+                                {"value": eid, "label": name} for eid, name in sensor_options.items()
+                            ],
+                            "mode": "dropdown"
+                        }
+                    })
+                }
+            ),
             errors=errors,
-            description_placeholders={
-                "sensor_example": "binary_sensor.puerta_principal"
-            }
         )
-
-    def _get_sensor_list(self):
-        """Obtener una lista de sensores disponibles en Home Assistant con su friendly_name."""
-        sensor_list = {}
-        for entity_id, state in self.hass.states.async_all():
-            if entity_id.startswith("binary_sensor."):  # Filtra solo sensores binarios
-                friendly_name = state.attributes.get("friendly_name", entity_id)
-                sensor_list[friendly_name] = entity_id
-        return sensor_list
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        """Get the options flow for this handler."""
-        return DailyCounterOptionsFlow(config_entry)
-
-class DailyCounterOptionsFlow(config_entries.OptionsFlow):
-    """Handle options flow for Daily Counter."""
-
-    def __init__(self, config_entry):
-        """Initialize options flow."""
-        self.config_entry = config_entry
-
-    async def async_step_init(self, user_input=None):
-        """Manage the options."""
-        if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
-
-        # Obtener una lista de sensores disponibles con su friendly_name
-        sensor_list = self._get_sensor_list()
-
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema({
-                vol.Required(CONF_SENSOR, default=self.config_entry.data[CONF_SENSOR]): vol.In(sensor_list),
-            }),
-        )
-
-    def _get_sensor_list(self):
-        """Obtener una lista de sensores disponibles en Home Assistant con su friendly_name."""
-        sensor_list = {}
-        for entity_id, state in self.hass.states.async_all():
-            if entity_id.startswith("binary_sensor."):  # Filtra solo sensores binarios
-                friendly_name = state.attributes.get("friendly_name", entity_id)
-                sensor_list[friendly_name] = entity_id
-        return sensor_list
