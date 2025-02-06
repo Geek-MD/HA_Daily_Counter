@@ -31,10 +31,7 @@ class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema({
                 vol.Required(CONF_NAME): str,
-                vol.Required(CONF_SENSORS): vol.All(  # Aceptar una lista de sensores
-                    cv.ensure_list,
-                    [str]
-                ),
+                vol.Required(CONF_SENSORS): cv.ensure_list,  # Aceptar una lista de sensores
             }),
             errors=errors,
             description_placeholders={
@@ -63,9 +60,6 @@ class DailyCounterOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Required(CONF_SENSORS, default=self.config_entry.data[CONF_SENSORS]): vol.All(
-                    cv.ensure_list,
-                    [str]
-                ),
+                vol.Required(CONF_SENSORS, default=self.config_entry.data[CONF_SENSORS]): cv.ensure_list,
             }),
         )
