@@ -4,26 +4,26 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.restore_state import RestoreEntity
-from .const import DOMAIN, CONF_NAME, CONF_SENSOR
+from .const import DOMAIN, CONF_NAME, CONF_SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Daily Counter sensor from a config entry."""
     name = config_entry.data[CONF_NAME]
-    sensor_id = config_entry.data[CONF_SENSOR]
-    unique_id = f"daily_counter_{name.lower().replace(' ', '_')}"  # Crear un unique_id basado en el nombre
-    async_add_entities([DailyCounterSensor(hass, name, sensor_id, unique_id)])
+    sensor_ids = config_entry.data[CONF_SENSORS]  # Ahora es una lista de sensores
+    unique_id = f"daily_counter_{name.lower().replace(' ', '_')}"
+    async_add_entities([DailyCounterSensor(hass, name, sensor_ids, unique_id)])
 
 class DailyCounterSensor(RestoreEntity):
     """Representation of a Daily Counter sensor."""
 
-    def __init__(self, hass, name, sensor_id, unique_id):
+    def __init__(self, hass, name, sensor_ids, unique_id):
         """Initialize the sensor."""
         self._hass = hass
         self._name = name
-        self._sensor_id = sensor_id
-        self._unique_id = unique_id  # Asignar el unique_id
+        self._sensor_ids = sensor_ids  # Lista de sensores
+        self._unique_id = unique_id
         self._state = 0
         self._last_reset = dt_util.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -40,7 +40,9 @@ class DailyCounterSensor(RestoreEntity):
             self._state = int(state.state)
             self._last_reset = dt_util.parse_datetime(state.attributes.get("last_reset"))
 
-        async_track_state_change(self._hass, self._sensor_id, self._sensor_changed)
+        # Configurar listeners para todos los sensores
+        for sensor_id in self._sensor_ids:
+            async_track_state_change(self._hass, sensor_id, self._sensor_changed)
 
     @property
     def name(self):
@@ -62,7 +64,7 @@ class DailyCounterSensor(RestoreEntity):
         """Return the state attributes."""
         return {
             "last_reset": self._last_reset.isoformat(),
-            "sensor": self._sensor_id
+            "sensors": self._sensor_ids  # Mostrar la lista de sensores en los atributos
         }
 
     async def _sensor_changed(self, entity_id, old_state, new_state):
