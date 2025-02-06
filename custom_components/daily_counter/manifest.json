@@ -7,7 +7,7 @@
   "codeowners": ["@Geek-MD"],
   "requirements": [],
   "config_flow": true,
-  "iot_class": "local_polling"
+  "iot_class": "local_polling",
   "icons": [
     {
       "src": "icon.png",
