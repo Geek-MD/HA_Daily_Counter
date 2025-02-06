@@ -1,3 +1,10 @@
+[![Geek-MD - HADailyCounter](https://img.shields.io/static/v1?label=Geek-MD&message=HADailyCounter&color=blue&logo=github)](https://github.com/Geek-MD/HADailyCounter "Go to GitHub repo")
+[![stars - HADailyCounter](https://img.shields.io/github/stars/Geek-MD/HADailyCounter?style=social)](https://github.com/Geek-MD/HADailyCounter)
+[![forks - HADailyCounter](https://img.shields.io/github/forks/Geek-MD/HADailyCounter?style=social)](https://github.com/Geek-MD/HADailyCounter)
+
+[![GitHub release](https://img.shields.io/github/release/Geek-MD/HADailyCounter?include_prereleases=&sort=semver&color=blue)](https://github.com/Geek-MD/HADailyCounter/releases/)
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
+
 # HADailyCounter
 This is a Home Assistant integration that provides daily resettable counters.
 
