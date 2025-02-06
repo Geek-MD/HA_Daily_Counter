@@ -3,15 +3,15 @@
     "step": {
       "user": {
         "title": "Configurar Contador Diario",
-        "description": "Introduce un nombre para el contador y selecciona el sensor que lo activará.",
+        "description": "Introduce un nombre para el contador y selecciona los sensores que lo activarán.",
         "data": {
           "name": "Nombre del contador",
-          "sensor": "Sensor que activa el contador"
+          "sensors": "Sensores que activan el contador"
         }
       }
     },
     "error": {
-      "invalid_sensor": "El sensor especificado no es válido.",
+      "invalid_sensors": "Uno o más sensores especificados no son válidos.",
       "duplicate_name": "Ya existe un contador con este nombre."
     },
     "abort": {
