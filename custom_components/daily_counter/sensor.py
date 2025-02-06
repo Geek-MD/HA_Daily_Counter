@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_state_change
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     hass.helpers.event.async_track_time_change(reset_counter_at_midnight, hour=0, minute=0, second=0)
 
-class CustomCounter(SensorEntity):
+class CustomCounter(SensorEntity, RestoreEntity):
     """Representación de un contador personalizado."""
 
     def __init__(self, hass, unique_id, name):
@@ -63,6 +64,14 @@ class CustomCounter(SensorEntity):
 
     async def async_added_to_hass(self):
         """Ejecutar cuando la entidad es añadida a Home Assistant."""
+        await super().async_added_to_hass()
+
+        # Restaurar el estado guardado
+        state = await self.async_get_last_state()
+        if state:
+            self._state = int(float(state.state))  # Convertir el estado a entero
+
+        # Configurar el seguimiento del sensor
         if self._sensor_entity_id:
             async_track_state_change(self._hass, self._sensor_entity_id, self._handle_sensor_change)
 
