@@ -22,18 +22,30 @@ class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
 
-        # Mostrar el formulario en la UI
+        # Obtener una lista de sensores disponibles con su friendly_name
+        sensor_list = self._get_sensor_list()
+
+        # Mostrar el formulario en la UI con una lista desplegable
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
                 vol.Required(CONF_NAME): str,
-                vol.Required(CONF_SENSOR): str,  # Un solo sensor
+                vol.Required(CONF_SENSOR): vol.In(sensor_list),  # Lista desplegable de sensores
             }),
             errors=errors,
             description_placeholders={
                 "sensor_example": "binary_sensor.puerta_principal"
             }
         )
+
+    def _get_sensor_list(self):
+        """Obtener una lista de sensores disponibles en Home Assistant con su friendly_name."""
+        sensor_list = {}
+        for entity_id, state in self.hass.states.async_all():
+            if entity_id.startswith("binary_sensor."):  # Filtra solo sensores binarios
+                friendly_name = state.attributes.get("friendly_name", entity_id)
+                sensor_list[friendly_name] = entity_id
+        return sensor_list
 
     @staticmethod
     @callback
@@ -53,9 +65,21 @@ class DailyCounterOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
+        # Obtener una lista de sensores disponibles con su friendly_name
+        sensor_list = self._get_sensor_list()
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Required(CONF_SENSOR, default=self.config_entry.data[CONF_SENSOR]): str,
+                vol.Required(CONF_SENSOR, default=self.config_entry.data[CONF_SENSOR]): vol.In(sensor_list),
             }),
         )
+
+    def _get_sensor_list(self):
+        """Obtener una lista de sensores disponibles en Home Assistant con su friendly_name."""
+        sensor_list = {}
+        for entity_id, state in self.hass.states.async_all():
+            if entity_id.startswith("binary_sensor."):  # Filtra solo sensores binarios
+                friendly_name = state.attributes.get("friendly_name", entity_id)
+                sensor_list[friendly_name] = entity_id
+        return sensor_list
