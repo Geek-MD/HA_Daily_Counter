@@ -1,8 +1,10 @@
-reset_counter:
-  name: Reset counter
-  description: Resets the daily counter to zero.
+increment_counter:
+  description: "Incrementa el contador manualmente."
   fields:
     entity_id:
-      name: Entity
-      description: The entity ID of the counter to reset.
-      example: sensor.puerta_principal
+      description: "ID de la entidad del contador."
+      example: "sensor.daily_counter"
+      required: true
+      selector:
+        entity:
+          domain: sensor
