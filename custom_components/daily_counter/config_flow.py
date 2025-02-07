@@ -1,3 +1,4 @@
+# custom_components/daily_counter/config_flow.py
 from homeassistant import config_entries
 from homeassistant.core import callback
 import voluptuous as vol
@@ -11,13 +12,14 @@ class DailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Manejar el flujo de configuración inicial."""
         if user_input is not None:
             # Guardar la configuración
-            return self.async_create_entry(title="Daily Counter", data=user_input)
+            return self.async_create_entry(title=user_input["name"], data=user_input)
 
         # Mostrar el formulario de configuración
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
+                    vol.Required("name"): str,  # Campo para el nombre del contador
                     vol.Required("sensor"): str,  # Campo para seleccionar el sensor
                 }
             ),
