@@ -1,7 +1,7 @@
 {
   "domain": "daily_counter",
   "name": "Daily Counter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "documentation": "https://github.com/Geek-MD/HADailyCounter",
   "dependencies": [],
   "codeowners": ["@Geek-MD"],
