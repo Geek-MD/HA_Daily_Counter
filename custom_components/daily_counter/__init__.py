@@ -4,7 +4,7 @@ from homeassistant.helpers.typing import ConfigType
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAIN = "dailycounter"
+DOMAIN = "daily_counter"
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the HA Daily Counter integration."""
