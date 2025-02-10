@@ -1,57 +1,44 @@
-# custom_components/daily_counter/sensor.py
 import logging
-from homeassistant.components.sensor import SensorEntity
-from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers.entity import Entity
+from homeassistant.core import callback
+from homeassistant.helpers.event import async_track_state_change
 
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "daily_counter"
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    """Configurar el sensor desde una entrada de configuración."""
-    # Obtener los datos de configuración
-    name = entry.data.get("name", "Daily Counter")
-    sensor_entity_id = entry.data.get("sensor")
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up the counter from a config entry."""
+    sensor_entity = config_entry.data["sensor_entity"]
 
-    # Crear la entidad del contador
-    async_add_entities([DailyCounterSensor(name, sensor_entity_id)])
+    # Crear el contador
+    contador = DailyCounter(sensor_entity)
+    async_add_entities([contador])
 
-class DailyCounterSensor(SensorEntity, RestoreEntity):
-    """Representación de un sensor de contador diario."""
+    # Escuchar cambios en el sensor
+    async_track_state_change(hass, sensor_entity, contador.async_update_counter)
 
-    def __init__(self, name, sensor_entity_id):
-        """Inicializar el sensor."""
-        self._name = name
-        self._sensor_entity_id = sensor_entity_id
+class DailyCounter(Entity):
+    """Representación del contador."""
+
+    def __init__(self, sensor_entity):
+        """Inicializar el contador."""
+        self._sensor_entity = sensor_entity
         self._state = 0
 
     @property
     def name(self):
-        """Nombre del sensor."""
-        return self._name
+        """Nombre del contador."""
+        return "Daily Counter"
 
     @property
     def state(self):
-        """Estado actual del sensor."""
+        """Estado actual del contador."""
         return self._state
 
-    async def async_added_to_hass(self):
-        """Restaurar el estado al iniciar."""
-        await super().async_added_to_hass()
-        state = await self.async_get_last_state()
-        if state:
-            self._state = int(float(state.state))
-
-        # Escuchar cambios en el sensor asociado
-        async_track_state_change(self.hass, self._sensor_entity_id, self._handle_sensor_change)
-
-    async def _handle_sensor_change(self, entity_id, old_state, new_state):
-        """Manejar cambios en el sensor."""
-        if new_state.state == "on":  # Cambia "on" por el estado que desees detectar
+    @callback
+    def async_update_counter(self, entity, old_state, new_state):
+        """Actualizar el contador cuando el sensor cambie."""
+        if old_state != new_state:
             self._state += 1
-            self.schedule_update_ha_state()
-
-    def reset(self):
-        """Reiniciar el contador."""
-        self._state = 0
-        self.schedule_update_ha_state()
+            self.async_write_ha_state()
