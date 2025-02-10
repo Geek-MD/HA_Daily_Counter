@@ -1,13 +1,12 @@
-# custom_components/daily_counter/__init__.py
+import logging
 from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.typing import ConfigType
 
-DOMAIN = "daily_counter"
+_LOGGER = logging.getLogger(__name__)
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Configurar una entrada de configuración."""
-    # Inicializar la plataforma "sensor"
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
-    )
+DOMAIN = "dailycounter"
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up the HA Daily Counter integration."""
+    _LOGGER.info("HA Daily Counter está siendo configurado")
     return True
