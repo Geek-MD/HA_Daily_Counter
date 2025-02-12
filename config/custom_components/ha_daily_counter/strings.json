@@ -1,0 +1,46 @@
+{
+  "title": "HA Daily Counter",
+  "description": "Creates daily counters based on Home Assistant events.",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Daily Counter",
+        "description": "Assign a name and select an event to activate the counter.",
+        "data": {
+          "name": "Counter Name",
+          "event_type": "Event Type",
+          "entity_id": "Entity ID (Optional)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Counter Options",
+        "description": "Modify the counter configuration.",
+        "data": {
+          "name": "Counter Name",
+          "event_type": "Event Type",
+          "entity_id": "Entity ID"
+        }
+      }
+    }
+  },
+  "services": {
+    "increment": {
+      "name": "Increment Counter",
+      "description": "Increase the specified counter by 1.",
+      "fields": {
+        "name": {
+          "name": "Counter Name",
+          "description": "Name of the counter to increment."
+        }
+      }
+    }
+  },
+  "state": {
+    "reset": "Reset",
+    "incremented": "Incremented"
+  }
+}
