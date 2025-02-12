@@ -1,0 +1,7 @@
+increment:
+  name: Incrementar Contador
+  description: Incrementa el contador especificado.
+  fields:
+    name:
+      description: Nombre del contador a incrementar.
+      example: "puerta_principal"
