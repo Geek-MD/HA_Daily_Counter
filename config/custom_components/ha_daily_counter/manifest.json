@@ -1,0 +1,9 @@
+{
+  "domain": "ha_daily_counter",
+  "name": "HA Daily Counter",
+  "version": "1.0.0",
+  "documentation": "https://github.com/Geek-MD/ha_daily_counter",
+  "requirements": [],
+  "codeowners": ["@Geek-MD"],
+  "config_flow": true
+}
