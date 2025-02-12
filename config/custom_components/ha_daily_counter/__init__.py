@@ -20,20 +20,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     event_type = entry.data["event_type"]
     entity_id = entry.data["entity_id"]
 
+    # Crear el contador con el valor almacenado
     counter = DailyCounter(hass, counter_name, data.get(counter_name, 0))
     hass.data[DOMAIN][entry.entry_id] = {"counter": counter, "store": store}
 
     async def handle_event(event: Event):
-        """Incrementar el contador cuando se detecte el evento configurado."""
-        if event.event_type == event_type and entity_id in event.data.get("entity_id", ""):
+        """Incrementar automáticamente el contador cuando ocurra el evento."""
+        event_entity = event.data.get("entity_id", "")
+
+        if event.event_type == event_type and (not entity_id or entity_id == event_entity):
             counter.increment()
             await store.async_save({counter_name: counter.value})
             _LOGGER.info(f"Contador '{counter_name}' incrementado por evento '{event_type}'.")
 
+    # Escuchar eventos en Home Assistant
     hass.bus.async_listen(event_type, handle_event)
 
     async def reset_counters(event_time):
-        """Restablece el contador a las 00:00."""
+        """Restablece el contador automáticamente a las 00:00."""
         counter.reset()
         await store.async_save({counter_name: counter.value})
         _LOGGER.info(f"Contador '{counter_name}' reiniciado a las 00:00.")
@@ -44,6 +48,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Desinstalar la integración."""
-    hass.bus.async_remove_listener(entry.data["event_type"], hass.data[DOMAIN][entry.entry_id]["listener"])
-    hass.data[DOMAIN].pop(entry.entry_id)
+    if entry.entry_id in hass.data[DOMAIN]:
+        hass.data[DOMAIN].pop(entry.entry_id)
     return True
