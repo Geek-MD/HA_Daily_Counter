@@ -3,32 +3,11 @@
     "step": {
       "user": {
         "title": "Configuración de HA Daily Counter",
-        "description": "Configura uno o más contadores.",
+        "description": "Configura un contador con un nombre personalizado y un evento de activación.",
         "data": {
-          "counters": "Nombres de los contadores"
-        }
-      }
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Configurar Contadores",
-        "description": "Modifica la configuración de los contadores.",
-        "data": {
-          "counters": "Nombres de los contadores"
-        }
-      }
-    }
-  },
-  "services": {
-    "increment": {
-      "name": "Incrementar Contador",
-      "description": "Incrementa en 1 el contador especificado.",
-      "fields": {
-        "name": {
           "name": "Nombre del Contador",
-          "description": "Nombre del contador a incrementar."
+          "event_type": "Tipo de Evento (ej., state_changed)",
+          "entity_id": "ID de la Entidad (opcional, ej., binary_sensor.puerta)"
         }
       }
     }
