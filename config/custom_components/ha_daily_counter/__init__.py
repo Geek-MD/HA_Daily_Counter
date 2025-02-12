@@ -1,7 +1,6 @@
 import logging
 import asyncio
-from datetime import datetime, time, timedelta
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, Event
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.storage import Store
@@ -17,19 +16,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     store = Store(hass, STORAGE_VERSION, STORAGE_KEY)
     data = await store.async_load() or {}
 
-    counters = {
-        name: DailyCounter(hass, name, data.get(name, 0))
-        for name in entry.data.get("counters", [])
-    }
+    counter_name = entry.data["name"]
+    event_type = entry.data["event_type"]
+    entity_id = entry.data["entity_id"]
 
-    hass.data[DOMAIN] = {"counters": counters, "store": store}
+    counter = DailyCounter(hass, counter_name, data.get(counter_name, 0))
+    hass.data[DOMAIN][entry.entry_id] = {"counter": counter, "store": store}
+
+    async def handle_event(event: Event):
+        """Incrementar el contador cuando se detecte el evento configurado."""
+        if event.event_type == event_type and entity_id in event.data.get("entity_id", ""):
+            counter.increment()
+            await store.async_save({counter_name: counter.value})
+            _LOGGER.info(f"Contador '{counter_name}' incrementado por evento '{event_type}'.")
+
+    hass.bus.async_listen(event_type, handle_event)
 
     async def reset_counters(event_time):
-        """Restablece los contadores a las 00:00."""
-        for counter in counters.values():
-            counter.reset()
-        await store.async_save({name: counter.value for name, counter in counters.items()})
-        _LOGGER.info("Contadores reiniciados a las 00:00")
+        """Restablece el contador a las 00:00."""
+        counter.reset()
+        await store.async_save({counter_name: counter.value})
+        _LOGGER.info(f"Contador '{counter_name}' reiniciado a las 00:00.")
 
     async_track_time_change(hass, reset_counters, hour=0, minute=0, second=0)
 
@@ -37,6 +44,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Desinstalar la integración."""
-    if DOMAIN in hass.data:
-        hass.data.pop(DOMAIN)
+    hass.bus.async_remove_listener(entry.data["event_type"], hass.data[DOMAIN][entry.entry_id]["listener"])
+    hass.data[DOMAIN].pop(entry.entry_id)
     return True
