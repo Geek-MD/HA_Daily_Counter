@@ -3,32 +3,11 @@
     "step": {
       "user": {
         "title": "HA Daily Counter Configuration",
-        "description": "Set up one or more counters.",
+        "description": "Set up a counter with a custom name and trigger.",
         "data": {
-          "counters": "Counter names"
-        }
-      }
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Configure Counters",
-        "description": "Modify the counter settings.",
-        "data": {
-          "counters": "Counter names"
-        }
-      }
-    }
-  },
-  "services": {
-    "increment": {
-      "name": "Increment Counter",
-      "description": "Increases the specified counter by 1.",
-      "fields": {
-        "name": {
           "name": "Counter Name",
-          "description": "Name of the counter to increment."
+          "event_type": "Event Type (e.g., state_changed)",
+          "entity_id": "Entity ID (optional, e.g., binary_sensor.door)"
         }
       }
     }
