@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuración de HA Daily Counter",
+        "description": "Configura uno o más contadores.",
+        "data": {
+          "counters": "Nombres de los contadores"
+        }
+      }
+    }
+  }
+}
