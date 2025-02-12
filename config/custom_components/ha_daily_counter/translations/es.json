@@ -9,5 +9,32 @@
         }
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configurar Contadores",
+        "description": "Modifica la configuración de los contadores.",
+        "data": {
+          "counters": "Nombres de los contadores"
+        }
+      }
+    }
+  },
+  "services": {
+    "increment": {
+      "name": "Incrementar Contador",
+      "description": "Incrementa en 1 el contador especificado.",
+      "fields": {
+        "name": {
+          "name": "Nombre del Contador",
+          "description": "Nombre del contador a incrementar."
+        }
+      }
+    }
+  },
+  "state": {
+    "reset": "Reiniciado",
+    "incremented": "Incrementado"
   }
 }
