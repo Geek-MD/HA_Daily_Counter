@@ -1,0 +1,15 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar Contador Diario",
+        "description": "Proporcione un nombre y un evento para el contador.",
+        "data": {
+          "name": "Nombre del Contador",
+          "event_type": "Tipo de Evento",
+          "entity_id": "ID de la Entidad (Opcional)"
+        }
+      }
+    }
+  }
+}
