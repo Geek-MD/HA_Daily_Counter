@@ -1,0 +1,15 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Daily Counter",
+        "description": "Provide a name and event for the counter.",
+        "data": {
+          "name": "Counter Name",
+          "event_type": "Event Type",
+          "entity_id": "Entity ID (Optional)"
+        }
+      }
+    }
+  }
+}
