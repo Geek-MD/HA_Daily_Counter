@@ -11,9 +11,5 @@
         }
       }
     }
-  },
-  "state": {
-    "reset": "Reset",
-    "incremented": "Incremented"
   }
 }
