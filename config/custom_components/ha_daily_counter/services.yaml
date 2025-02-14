@@ -1,7 +1,7 @@
 increment:
-  name: Incrementar Contador
-  description: Incrementa el contador especificado.
+  name: Increment Counter
+  description: Increases the specified counter.
   fields:
     name:
-      description: Nombre del contador a incrementar.
-      example: "puerta_principal"
+      name: Counter Name
+      description: Name of the counter to increment.
