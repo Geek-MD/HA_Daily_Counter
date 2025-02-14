@@ -2,18 +2,14 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configuración de HA Daily Counter",
-        "description": "Configura un contador con un nombre personalizado y un evento de activación.",
+        "title": "HA Daily Counter Configuration",
+        "description": "Set up a counter with a custom name and trigger.",
         "data": {
-          "name": "Nombre del Contador",
-          "event_type": "Tipo de Evento (ej., state_changed)",
-          "entity_id": "ID de la Entidad (opcional, ej., binary_sensor.puerta)"
+          "name": "Counter Name",
+          "event_type": "Event Type",
+          "entity_id": "Entity ID (Optional)"
         }
       }
     }
-  },
-  "state": {
-    "reset": "Reiniciado",
-    "incremented": "Incrementado"
   }
 }
