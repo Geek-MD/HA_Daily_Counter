@@ -1,7 +1,0 @@
-increment:
-  name: Increment Counter
-  description: Increases the specified counter.
-  fields:
-    name:
-      name: Counter Name
-      description: Name of the counter to increment.
