@@ -13,34 +13,5 @@
         }
       }
     }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Counter Options",
-        "description": "Modify the counter configuration.",
-        "data": {
-          "name": "Counter Name",
-          "event_type": "Event Type",
-          "entity_id": "Entity ID"
-        }
-      }
-    }
-  },
-  "services": {
-    "increment": {
-      "name": "Increment Counter",
-      "description": "Increase the specified counter by 1.",
-      "fields": {
-        "name": {
-          "name": "Counter Name",
-          "description": "Name of the counter to increment."
-        }
-      }
-    }
-  },
-  "state": {
-    "reset": "Reset",
-    "incremented": "Incremented"
   }
 }
