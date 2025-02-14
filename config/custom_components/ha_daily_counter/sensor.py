@@ -11,7 +11,7 @@ class DailyCounterSensor(Entity):
 
     @property
     def name(self):
-        return f"Contador {self._counter.name}"
+        return f"Counter {self._counter.name}"
 
     @property
     def state(self):
@@ -19,4 +19,4 @@ class DailyCounterSensor(Entity):
 
     @property
     def unit_of_measurement(self):
-        return "eventos"
+        return "events"
