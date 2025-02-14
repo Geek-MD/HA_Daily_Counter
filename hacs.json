@@ -1,0 +1,9 @@
+{
+  "name": "HA Daily Counter",
+  "description": "Daily counters triggered by events",
+  "domain": "ha_daily_counter",
+  "documentation": "https://github.com/Geek-MD/HADailyCounter",
+  "codeowners": ["@Geek-MD"],
+  "requirements": [],
+  "version": "1.0.0"
+}
