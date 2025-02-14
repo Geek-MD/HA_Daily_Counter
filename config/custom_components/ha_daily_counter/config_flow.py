@@ -3,10 +3,7 @@ from homeassistant import config_entries
 from .const import DOMAIN
 
 class CounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Flujo de configuración de HA Daily Counter."""
-
     async def async_step_user(self, user_input=None):
-        """Paso de configuración inicial."""
         if user_input is not None:
             return self.async_create_entry(title=user_input["name"], data=user_input)
 
@@ -17,5 +14,4 @@ class CounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required("event_type", default="state_changed"): str,
                 vol.Required("entity_id", default=""): str
             }),
-            errors={}
         )
