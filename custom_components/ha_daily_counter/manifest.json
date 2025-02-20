@@ -1,7 +1,7 @@
 {
   "domain": "ha_daily_counter",
   "name": "HA Daily Counter",
-  "version": "1.0.0",
+  "version": "1.1",
   "documentation": "https://github.com/Geek-MD/HADailyCounter",
   "requirements": [],
   "codeowners": ["@Geek-MD"],

@@ -2,12 +2,24 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configure Daily Counter",
-        "description": "Provide a name and event for the counter.",
+        "title": "Select Sensor Domain",
+        "description": "Choose the type of sensor to monitor.",
         "data": {
-          "name": "Counter Name",
-          "event_type": "Event Type",
-          "entity_id": "Entity ID (Optional)"
+          "entity_domain": "Sensor Domain"
+        }
+      },
+      "select_entity": {
+        "title": "Select Sensor",
+        "description": "Choose the sensor to monitor.",
+        "data": {
+          "entity_id": "Sensor"
+        }
+      },
+      "select_state": {
+        "title": "Select State",
+        "description": "Choose the state to monitor for the selected sensor.",
+        "data": {
+          "state": "State"
         }
       }
     }
