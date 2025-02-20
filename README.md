@@ -9,14 +9,17 @@
 ![](https://github.com/Geek-MD/HADailyCounter/blob/develop/icon.png?raw=true)
 
 # HADailyCounter
-This is a Home Assistant integration that provides daily resettable counters.
+
+This Home Assistant custom integration provides counters that automatically reset daily.
 
 ## Installation
-1. Add this repository to HACS as a custom repository.
-2. Install the integration from HACS.
-3. Restart Home Assistant.
+
+1. Add this repository to HACS as a custom repository.  
+2. Install the **HADailyCounter** integration from HACS.  
+3. Restart Home Assistant.  
 
 ## Configuration
-- Navigate to Integrations in Home Assistant.
-- Click on Add Integration and search for Daily Counter.
-- Set the name and select the trigger sensor.
+
+1. Go to **Integrations** in Home Assistant.  
+2. Click **Add Integration** and search for **HADailyCounter**.  
+3. Set a name and select the trigger sensor.  
