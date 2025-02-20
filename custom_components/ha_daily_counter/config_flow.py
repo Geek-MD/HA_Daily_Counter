@@ -8,8 +8,8 @@ class CounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             return self.async_create_entry(title=user_input["name"], data=user_input)
 
-        device_registry = await get_device_registry(self.hass)
-        devices = {device.id: device.name or device.identifiers for device in device_registry.devices.values()}
+        device_registry = get_device_registry(self.hass)  # ✅ Fixed: Removed 'await'
+        devices = {device.id: device.name or "Unnamed Device" for device in device_registry.devices.values()}
 
         return self.async_show_form(
             step_id="user",
