@@ -2,12 +2,24 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configurar Contador Diario",
-        "description": "Proporcione un nombre y un evento para el contador.",
+        "title": "Seleccionar Dominio del Sensor",
+        "description": "Elige el tipo de sensor a monitorear.",
         "data": {
-          "name": "Nombre del Contador",
-          "event_type": "Tipo de Evento",
-          "entity_id": "ID de la Entidad (Opcional)"
+          "entity_domain": "Dominio del Sensor"
+        }
+      },
+      "select_entity": {
+        "title": "Seleccionar Sensor",
+        "description": "Elige el sensor que quieres monitorear.",
+        "data": {
+          "entity_id": "Sensor"
+        }
+      },
+      "select_state": {
+        "title": "Seleccionar Estado",
+        "description": "Elige el estado que deseas monitorear para el sensor seleccionado.",
+        "data": {
+          "state": "Estado"
         }
       }
     }
