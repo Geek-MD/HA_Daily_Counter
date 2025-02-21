@@ -2,17 +2,12 @@
   "config": {
     "step": {
       "user": {
-        "title": "Seleccionar Sensor de Puerta o Ventana",
-        "description": "Elige el sensor de puerta o ventana que deseas monitorear.",
+        "title": "Configurar Contador Diario",
+        "description": "Proporcione un nombre y un evento para el contador.",
         "data": {
-          "entity_id": "Sensor"
-        }
-      },
-      "select_state": {
-        "title": "Seleccionar Estado a Monitorear",
-        "description": "Elige el estado que activará el contador.",
-        "data": {
-          "state": "Estado"
+          "name": "Nombre del Contador",
+          "event_type": "Tipo de Evento",
+          "entity_id": "ID de la Entidad (Opcional)"
         }
       }
     }
