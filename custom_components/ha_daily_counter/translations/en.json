@@ -2,12 +2,17 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configure Daily Counter",
-        "description": "Provide a name and event for the counter.",
+        "title": "Select Door or Window Sensor",
+        "description": "Choose the door or window sensor to monitor.",
         "data": {
-          "name": "Counter Name",
-          "event_type": "Event Type",
-          "entity_id": "Entity ID (Optional)"
+          "entity_id": "Sensor"
+        }
+      },
+      "select_state": {
+        "title": "Select State to Monitor",
+        "description": "Choose the state that will trigger the counter.",
+        "data": {
+          "state": "State"
         }
       }
     }
