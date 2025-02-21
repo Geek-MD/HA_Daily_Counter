@@ -2,22 +2,15 @@
   "config": {
     "step": {
       "user": {
-        "title": "Seleccionar Dominio del Sensor",
-        "description": "Elige el tipo de sensor a monitorear.",
-        "data": {
-          "entity_domain": "Dominio del Sensor"
-        }
-      },
-      "select_entity": {
-        "title": "Seleccionar Sensor",
-        "description": "Elige el sensor que quieres monitorear.",
+        "title": "Seleccionar Sensor de Puerta o Ventana",
+        "description": "Elige el sensor de puerta o ventana que deseas monitorear.",
         "data": {
           "entity_id": "Sensor"
         }
       },
       "select_state": {
-        "title": "Seleccionar Estado",
-        "description": "Elige el estado que deseas monitorear para el sensor seleccionado.",
+        "title": "Seleccionar Estado a Monitorear",
+        "description": "Elige el estado que activará el contador.",
         "data": {
           "state": "Estado"
         }

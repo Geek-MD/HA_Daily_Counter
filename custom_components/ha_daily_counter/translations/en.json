@@ -2,22 +2,15 @@
   "config": {
     "step": {
       "user": {
-        "title": "Select Sensor Domain",
-        "description": "Choose the type of sensor to monitor.",
-        "data": {
-          "entity_domain": "Sensor Domain"
-        }
-      },
-      "select_entity": {
-        "title": "Select Sensor",
-        "description": "Choose the sensor to monitor.",
+        "title": "Select Door or Window Sensor",
+        "description": "Choose the door or window sensor to monitor.",
         "data": {
           "entity_id": "Sensor"
         }
       },
       "select_state": {
-        "title": "Select State",
-        "description": "Choose the state to monitor for the selected sensor.",
+        "title": "Select State to Monitor",
+        "description": "Choose the state that will trigger the counter.",
         "data": {
           "state": "State"
         }
