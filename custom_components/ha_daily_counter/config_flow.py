@@ -22,32 +22,19 @@ class CounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             for entity in entity_registry.entities.values()
             if entity.domain in ALLOWED_DOMAINS and entity.device_class in ALLOWED_DEVICE_CLASSES
         }
-        
+
         if user_input is not None:
             self.entity_selected = user_input["entity_id"]
             return await self.async_step_select_state()
+
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required("entity_domain", default="binary_sensor"): vol.In(ENTITY_DOMAINS.keys())
+                vol.Required("entity_id"): vol.In(entities)
             })
         )
 
-    async def async_step_select_entity(self, user_input=None):
-        entity_registry = get_entity_registry(self.hass)
-        entities = {
-            entity.entity_id: entity.original_name or entity.entity_id
-            for entity in entity_registry.entities.values()
-            if entity.entity_id.startswith(self.domain_selected)
-        }
-
-        if user_input is not None:
-            self.entity_selected = user_input["entity_id"]
-            return await self.async_step_select_state()
-
-        return self.async_show_form(
-            step_id="select_entity",
-            data_schema=vol.Schema({
+    async def async_step_select_state(self, user_input=None):
         """Step 2: Select the state to monitor."""
         states = SENSOR_STATES.get("binary_sensor", ["on", "off"])
 
