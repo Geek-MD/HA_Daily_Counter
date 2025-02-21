@@ -1,49 +1,21 @@
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.helpers.entity_registry import async_get as get_entity_registry
+from homeassistant.helpers.device_registry import async_get as get_device_registry
 from .const import DOMAIN
 
-ALLOWED_DOMAINS = ["binary_sensor"]
-ALLOWED_DEVICE_CLASSES = ["door", "window"]
-
-SENSOR_STATES = {
-    "binary_sensor": ["on", "off", "open", "close"]
-}
-
 class CounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    VERSION = 1
-
     async def async_step_user(self, user_input=None):
-        entity_registry = get_entity_registry(self.hass)
-        entities = {
-            entity.entity_id: entity.original_name or entity.entity_id
-            for entity in entity_registry.entities.values()
-            if entity.domain in ALLOWED_DOMAINS and entity.device_class in ALLOWED_DEVICE_CLASSES
-        }
-
         if user_input is not None:
-            self.entity_selected = user_input["entity_id"]
-            return await self.async_step_select_state()
+            return self.async_create_entry(title=user_input["name"], data=user_input)
+
+        device_registry = get_device_registry(self.hass)  # ✅ Fixed: Removed 'await'
+        devices = {device.id: device.name or "Unnamed Device" for device in device_registry.devices.values()}
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required("entity_id"): vol.In(entities)
-            })
-        )
-
-    async def async_step_select_state(self, user_input=None):
-        states = SENSOR_STATES.get("binary_sensor", ["on", "off"])
-
-        if user_input is not None:
-            return self.async_create_entry(title=self.entity_selected, data={
-                "entity_id": self.entity_selected,
-                "state": user_input["state"]
-            })
-
-        return self.async_show_form(
-            step_id="select_state",
-            data_schema=vol.Schema({
-                vol.Required("state", default=states[0]): vol.In(states)
+                vol.Required("name", default="Daily Counter"): str,
+                vol.Required("device_id"): vol.In(devices),
+                vol.Required("event_type", default="state_changed"): str
             })
         )
