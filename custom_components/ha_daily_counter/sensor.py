@@ -14,9 +14,13 @@ class DailyCounterSensor(Entity):
         self.hass = hass
         self._entry = entry
         self._attr_unique_id = entry.entry_id
-        self._attr_name = entry.data["name"]
+        self._attr_name = entry.data["entity_id"]
         self._attr_device_class = "counter"
         self._state = 0
+
+        # Store device attributes
+        self._device_id = entry.data.get("device_id")
+        self._friendly_name = entry.data.get("friendly_name", self._attr_name)
 
     @property
     def state(self):
@@ -24,13 +28,11 @@ class DailyCounterSensor(Entity):
         return self._state
 
     @property
-    def device_info(self):
-        """Return device information for this sensor."""
+    def extra_state_attributes(self):
+        """Return additional attributes of the entity."""
         return {
-            "identifiers": {(DOMAIN, self._entry.data["device_id"])},
-            "name": self._entry.data["name"],
-            "manufacturer": "HA Daily Counter",
-            "model": "Virtual Counter"
+            "device_id": self._device_id,
+            "friendly_name": self._friendly_name
         }
 
     def increment(self):
