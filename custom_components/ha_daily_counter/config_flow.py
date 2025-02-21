@@ -3,7 +3,6 @@ from homeassistant import config_entries
 from homeassistant.helpers.entity_registry import async_get as get_entity_registry
 from .const import DOMAIN
 
-# Only allow binary sensors for doors and windows
 ALLOWED_DOMAINS = ["binary_sensor"]
 ALLOWED_DEVICE_CLASSES = ["door", "window"]
 
@@ -15,7 +14,6 @@ class CounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
-        """Step 1: Select a sensor from allowed domains and device classes."""
         entity_registry = get_entity_registry(self.hass)
         entities = {
             entity.entity_id: entity.original_name or entity.entity_id
@@ -35,7 +33,6 @@ class CounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_select_state(self, user_input=None):
-        """Step 2: Select the state to monitor."""
         states = SENSOR_STATES.get("binary_sensor", ["on", "off"])
 
         if user_input is not None:
