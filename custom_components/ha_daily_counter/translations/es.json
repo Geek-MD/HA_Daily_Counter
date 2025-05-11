@@ -1,0 +1,15 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar Contador Diario",
+        "description": "Crea un contador diario que se incrementa cuando un disparador alcanza un estado específico.",
+        "data": {
+          "name": "Nombre",
+          "trigger_entity": "Entidad Disparadora",
+          "trigger_state": "Estado del Disparador"
+        }
+      }
+    }
+  }
+}
