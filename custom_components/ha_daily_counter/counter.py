@@ -17,6 +17,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
     trigger_entity = entry.data[ATTR_TRIGGER_ENTITY]
     trigger_state = entry.data[ATTR_TRIGGER_STATE]
 
+    _LOGGER.debug("Setting up HA Daily Counter: name=%s, entity=%s, state=%s", name, trigger_entity, trigger_state)
+
     entity = HADailyCounter(name, trigger_entity, trigger_state)
     async_add_entities([entity], True)
 
@@ -35,8 +37,15 @@ class HADailyCounter(SensorEntity, RestoreEntity):
         # Restaurar estado si existe
         last_state = await self.async_get_last_state()
         if last_state and last_state.state != STATE_UNKNOWN:
-            self._state = int(last_state.state)
-            self.async_write_ha_state()
+            try:
+                self._state = int(last_state.state)
+                _LOGGER.debug("Restored state for %s: %s", self._attr_name, self._state)
+            except ValueError:
+                _LOGGER.warning("Invalid state value on restore for %s: %s", self._attr_name, last_state.state)
+        else:
+            _LOGGER.debug("No previous state found for %s, starting at 0", self._attr_name)
+
+        self.async_write_ha_state()
 
         # Escuchar cambios en el disparador
         async_track_state_change(
@@ -53,12 +62,16 @@ class HADailyCounter(SensorEntity, RestoreEntity):
         if new_state is None:
             return
 
+        _LOGGER.debug("Trigger entity %s changed from %s to %s", entity_id, old_state.state if old_state else "None", new_state.state)
+
         if new_state.state == self._trigger_state:
             self._state += 1
+            _LOGGER.debug("Counter %s incremented to %d", self._attr_name, self._state)
             self.async_write_ha_state()
 
     @callback
     def _reset_counter(self, now=None):
+        _LOGGER.debug("Resetting counter %s to 0", self._attr_name)
         self._state = 0
         self.async_write_ha_state()
 
