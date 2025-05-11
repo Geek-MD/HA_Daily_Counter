@@ -1,9 +1,7 @@
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
 import voluptuous as vol
-from homeassistant.helpers.selector import (
-    selector,
-)
+from homeassistant.helpers.selector import selector
 
 from .const import (
     DOMAIN,
@@ -11,6 +9,8 @@ from .const import (
     ATTR_TRIGGER_STATE,
     DEFAULT_NAME,
 )
+from .options_flow import HADailyCounterOptionsFlowHandler
+
 
 class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for HA Daily Counter."""
@@ -18,6 +18,7 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
+        """Handle the initial step."""
         if user_input is not None:
             return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
 
@@ -33,3 +34,7 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(ATTR_TRIGGER_STATE): str,
             })
         )
+
+
+def async_get_options_flow(config_entry):
+    return HADailyCounterOptionsFlowHandler(config_entry)
