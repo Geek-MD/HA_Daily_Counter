@@ -1,9 +1,9 @@
-[![Geek-MD - HADailyCounter](https://img.shields.io/static/v1?label=Geek-MD&message=HADailyCounter&color=blue&logo=github)](https://github.com/Geek-MD/HADailyCounter "Go to GitHub repo")
-[![stars - HADailyCounter](https://img.shields.io/github/stars/Geek-MD/HADailyCounter?style=social)](https://github.com/Geek-MD/HADailyCounter)
-[![forks - HADailyCounter](https://img.shields.io/github/forks/Geek-MD/HADailyCounter?style=social)](https://github.com/Geek-MD/HADailyCounter)
+[![Geek-MD - HA Daily Counter](https://img.shields.io/static/v1?label=Geek-MD&message=HA_Daily_Counter&color=blue&logo=github)](https://github.com/Geek-MD/HA_Daily_Counter "Go to GitHub repo")
+[![stars - HA_Daily_Counter](https://img.shields.io/github/stars/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
+[![forks - HA_Daily_Counter](https://img.shields.io/github/forks/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
 
 ![Static Badge](https://img.shields.io/badge/custom_repository-HACS-blue)
-[![GitHub release](https://img.shields.io/github/release/Geek-MD/HADailyCounter?include_prereleases=&sort=semver&color=blue)](https://github.com/Geek-MD/HADailyCounter/releases/)
+[![GitHub release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases=&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
 ![](https://github.com/Geek-MD/HADailyCounter/blob/develop/icon.png)
