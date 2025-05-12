@@ -1,26 +1,15 @@
-from datetime import datetime, time
 import logging
+from datetime import datetime, time
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
+from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change, async_track_time_change
 from homeassistant.helpers.restore_state import RestoreEntity
-from homeassistant.core import callback
 
 from .const import DOMAIN, DEFAULT_NAME, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 
 _LOGGER = logging.getLogger(__name__)
-
-async def async_setup_entry(hass, entry, async_add_entities):
-    """Set up HA Daily Counter based on config entry."""
-    name = entry.data.get("name", DEFAULT_NAME)
-    trigger_entity = entry.data[ATTR_TRIGGER_ENTITY]
-    trigger_state = entry.data[ATTR_TRIGGER_STATE]
-
-    _LOGGER.debug("Setting up HA Daily Counter: name=%s, entity=%s, state=%s", name, trigger_entity, trigger_state)
-
-    entity = HADailyCounter(name, trigger_entity, trigger_state)
-    async_add_entities([entity], True)
 
 class HADailyCounter(SensorEntity, RestoreEntity):
     def __init__(self, name, trigger_entity, trigger_state):
@@ -78,3 +67,13 @@ class HADailyCounter(SensorEntity, RestoreEntity):
     @property
     def native_value(self):
         return self._state
+
+    @property
+    def device_info(self):
+        """Return device info to group entities under a device."""
+        return {
+            "identifiers": {(DOMAIN, f"counter_{self._attr_name.lower().replace(' ', '_')}")},
+            "name": f"{self._attr_name} Counter",
+            "manufacturer": "HA Daily Counter",
+            "model": "Daily Increment Counter"
+        }
