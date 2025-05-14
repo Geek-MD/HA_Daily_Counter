@@ -4,7 +4,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .counter import HADailyCounter
-from .const import DOMAIN, DEFAULT_NAME, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
+from .const import DEFAULT_NAME, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -13,8 +13,6 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up HA Daily Counter sensor from a config entry."""
-    
     _LOGGER.info("HADailyCounter: sensor.py async_setup_entry called for entry: %s", entry.entry_id)
     
     name = entry.data.get("name", DEFAULT_NAME)
