@@ -1,4 +1,4 @@
-.PHONY: lint typecheck hassfest clean ci
+.PHONY: lint typecheck hassfest ci
 
 PACKAGE=custom_components/ha_daily_counter
 
@@ -12,17 +12,7 @@ typecheck:
 
 hassfest:
 	@echo "🔍 Running Hassfest validation..."
-	@if [ ! -d "hassfest-core" ]; then \
-		echo "📥 Downloading Home Assistant core repo..."; \
-		git clone --depth 1 --single-branch --branch dev https://github.com/home-assistant/core hassfest-core; \
-	else \
-		echo "✅ Using cached hassfest-core"; \
-	fi
-	cd hassfest-core && python3 -m script.hassfest --integration ../$(PACKAGE)
-
-clean:
-	@echo "🧹 Cleaning hassfest-core folder (if exists)..."
-	rm -rf hassfest-core
+	hassfest --integration $(PACKAGE)
 
 ci: lint typecheck hassfest
 	@echo "✅ CI pipeline completed successfully."
