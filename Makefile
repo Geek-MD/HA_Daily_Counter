@@ -28,19 +28,16 @@ hassfest:
 	rm -rf hassfest-core
 
 ## -----------------------------------
-## 🚀 Create GitHub Release from Tag (requires GH_TOKEN)
+## 🚀 Create GitHub Release from Tag
 release:
 ifndef VERSION
 	$(error VERSION is not set. Usage: make release VERSION=v1.0.5)
 endif
-ifndef GH_TOKEN
-	$(error GH_TOKEN is not set. Usage: env GH_TOKEN=xxx make release VERSION=v1.0.5)
-endif
 	@echo "🚀 Creating GitHub release $(VERSION)..."
-	GH_TOKEN=$(GH_TOKEN) gh release create $(VERSION) --generate-notes --title "$(VERSION)" || true
+	gh release create $(VERSION) --generate-notes --title "$(VERSION)"
 
 ## -----------------------------------
-## 🗑️ Clean hassfest-core manually (if needed)
+## 🗑️ Clean hassfest-core manually
 clean:
 	@echo "🧹 Cleaning hassfest-core folder (if exists)..."
 	rm -rf hassfest-core
