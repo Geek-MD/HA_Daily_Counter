@@ -16,14 +16,14 @@ typecheck:
 	mypy --config-file mypy.ini $(PACKAGE)
 
 ## -----------------------------------
-## 🔍 Validate manifest & structure with Hassfest
+## 🔍 Validate manifest & structure with Hassfest (corrected)
 hassfest:
 	@echo "🔍 Running Hassfest validation..."
 	@if [ ! -d "hassfest-core" ]; then \
 		echo "📥 Downloading Home Assistant core repo..."; \
 		git clone --depth 1 --single-branch --branch dev https://github.com/home-assistant/core hassfest-core; \
 	fi
-	python3 hassfest-core/script/hassfest --integration $(PACKAGE)
+	cd hassfest-core && python3 -m script.hassfest --integration ../$(PACKAGE)
 	@echo "🧹 Cleaning up hassfest-core..."
 	rm -rf hassfest-core
 
