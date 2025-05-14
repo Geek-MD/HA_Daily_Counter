@@ -36,21 +36,9 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies (ruff, mypy, hassfest-related)
+      - name: Install Home Assistant test dependencies
         run: |
-          pip install \
-            ruff \
-            mypy \
-            voluptuous \
-            pyyaml \
-            requests \
-            propcache \
-            slugify \
-            awesomeversion \
-            aiozoneinfo \
-            types-setuptools \
-            types-pyyaml \
-            types-requests
+          pip install -r https://raw.githubusercontent.com/home-assistant/core/dev/requirements_test_all.txt
 
       - name: Run Makefile CI tasks (lint, typecheck, hassfest)
         run: make ci
