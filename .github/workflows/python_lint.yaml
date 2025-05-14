@@ -43,10 +43,9 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Mypy and Home Assistant stubs
+      - name: Install Mypy and Types
         run: |
           pip install mypy types-setuptools types-pyyaml types-requests
-          pip install "homeassistant-stubs>=2023.11.0"
 
       - name: Run Mypy Type Checker
-        run: mypy custom_components/ha_daily_counter/
+        run: mypy --namespace-packages --install-types --non-interactive custom_components/ha_daily_counter/
