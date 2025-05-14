@@ -17,6 +17,7 @@ packaging
 tqdm
 ulid-transform
 jinja2
+python-lru
 types-setuptools
 types-pyyaml
 types-requests
