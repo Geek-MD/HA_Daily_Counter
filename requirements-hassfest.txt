@@ -17,7 +17,7 @@ packaging
 tqdm
 ulid-transform
 jinja2
-git+https://github.com/bmustill/python-lru.git@master
+git+https://github.com/bebound/python-lru.git@master
 types-setuptools
 types-pyyaml
 types-requests
