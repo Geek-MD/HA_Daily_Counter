@@ -28,13 +28,13 @@ hassfest:
 	rm -rf hassfest-core
 
 ## -----------------------------------
-## 🚀 Create GitHub Release from Tag
+## 🚀 Create GitHub Release from Tag (fix GH_TOKEN passing)
 release:
 ifndef VERSION
 	$(error VERSION is not set. Usage: make release VERSION=v1.0.5)
 endif
 	@echo "🚀 Creating GitHub release $(VERSION)..."
-	gh release create $(VERSION) --generate-notes --title "$(VERSION)"
+	GH_TOKEN=$$GH_TOKEN gh release create $(VERSION) --generate-notes --title "$(VERSION)"
 
 ## -----------------------------------
 ## 🗑️ Clean hassfest-core manually
