@@ -30,7 +30,7 @@ async def async_setup_entry(
         name, trigger_entity, trigger_state
     )
 
-    entity = HADailyCounter(name, trigger_entity, trigger_state)
+    entity = HADailyCounter(name, trigger_entity, trigger_state, entry.entry_id)
     async_add_entities([entity], True)
 
     _LOGGER.info("HADailyCounter: Entity %s successfully added", name)
