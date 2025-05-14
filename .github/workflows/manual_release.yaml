@@ -42,6 +42,7 @@ jobs:
             ruff \
             mypy \
             voluptuous \
+            voluptuous_serialize \
             pyyaml \
             requests \
             propcache \
