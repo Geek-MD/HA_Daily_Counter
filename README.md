@@ -1,48 +1,57 @@
-[![Geek-MD - HA Daily Counter](https://img.shields.io/static/v1?label=Geek-MD&message=HA_Daily_Counter&color=blue&logo=github)](https://github.com/Geek-MD/HA_Daily_Counter "Go to GitHub repo")
-[![stars - HA_Daily_Counter](https://img.shields.io/github/stars/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
-[![forks - HA_Daily_Counter](https://img.shields.io/github/forks/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
+[![Geek-MD - HADailyCounter](https://img.shields.io/static/v1?label=Geek-MD&message=HADailyCounter&color=blue&logo=github)](https://github.com/Geek-MD/HA_Daily_Counter)
+[![stars - HADailyCounter](https://img.shields.io/github/stars/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
+[![forks - HADailyCounter](https://img.shields.io/github/forks/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
 
-![Static Badge](https://img.shields.io/badge/custom_repository-HACS-blue)
-[![GitHub release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases=&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases/)
+![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)
+[![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
-![](https://github.com/Geek-MD/HADailyCounter/blob/develop/icon.png)
+![HADailyCounter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/develop/icon.png)
 
-# HADailyCounter
+# HA Daily Counter
 
-**HADailyCounter** is a custom Home Assistant integration that provides resettable counters that increment on specific triggers and automatically reset daily.
+**HA Daily Counter** is a custom integration for Home Assistant that provides **daily resettable counters**, perfect for tracking repetitive actions like door openings, light switches, or sensor triggers.
 
-## Features
-- Increment counter when a trigger entity reaches a defined state.
-- Reset counter to 0 every day at midnight.
-- Persist counter value across Home Assistant restarts.
-- Configure entirely via the UI (no YAML required).
+## 🛠️ Features
+- Create one or more counters with custom names.
+- Increment counters when a trigger entity reaches a specific state.
+- Auto-reset counters daily at midnight.
+- Persistent counter values across HA restarts.
+- Fully manageable via the UI (no YAML required).
+- Entities linked to devices for easy management in Home Assistant.
+- Compatible with dashboards, automations, and statistics.
 
-## Installation
+## 📦 Installation
 
-1. Add this repository to HACS as a **custom repository**.
-2. Install the **HADailyCounter** integration from HACS.
+1. Add this repository as a **custom repository in HACS**.
+2. Install **HA Daily Counter** from HACS.
 3. Restart Home Assistant.
 
-## Configuration
+## ⚙️ Configuration
 
 1. Navigate to **Settings → Devices & Services**.
-2. Click **Add Integration** and search for **HADailyCounter**.
-3. Set the following:
+2. Click **Add Integration** and search for **HA Daily Counter**.
+3. Configure:
    - **Name**: Friendly name for your counter.
-   - **Trigger Entity**: The entity to monitor (e.g., binary_sensor.door).
-   - **Trigger State**: The state that will increment the counter (e.g., `on`, `open`).
+   - **Trigger Entity**: Entity to monitor (e.g., `binary_sensor.door`).
+   - **Trigger State**: State that will increment the counter (e.g., `on`, `open`).
 
-## Usage Example
+### 📝 Example Use Cases
+- Count how many times a door was opened today.
+- Track how often a light has been switched on.
+- Monitor motion detections or button presses daily.
+- Combine with automations to notify when thresholds are reached.
 
-- Count how many times a door has been opened during the day.
-- Track how often a light is turned on.
-- Monitor sensor activations (motion, switches, etc.) with a daily reset.
+## 🔎 How it Works
+- The counter increases by 1 when the trigger entity changes to the defined state.
+- Automatically resets to 0 every day at midnight.
+- Remembers its value even after Home Assistant restarts.
+- Visible as a **sensor entity** linked to a virtual device in the UI.
 
-## Development Notes
+## 🧑‍💻 Development & Support
+This integration is maintained by [Geek-MD](https://github.com/Geek-MD).
 
-This integration is based on `HADailySensor`, adapted to provide counters with reset logic and dynamic configuration.
+Pull requests, feature requests and contributions are welcome!
 
-## License
-
-This project is licensed under the MIT License.
+## 📄 License
+MIT License
