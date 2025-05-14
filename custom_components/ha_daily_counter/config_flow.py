@@ -9,8 +9,7 @@ from .options_flow import HADailyCounterOptionsFlowHandler
 class HADailyCounterConfigFlow(config_entries.ConfigFlow):
     """Handle a config flow for HA Daily Counter."""
 
-    DOMAIN = DOMAIN  # <- ✅ Se define como atributo de clase
-
+    DOMAIN = DOMAIN
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
