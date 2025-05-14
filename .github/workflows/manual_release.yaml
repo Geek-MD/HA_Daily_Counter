@@ -59,7 +59,8 @@ jobs:
             types-setuptools \
             types-pyyaml \
             types-requests \
-            ulid_transform
+            ulid_transform \
+            jinja2
 
       - name: Cache hassfest-core
         uses: actions/cache@v4
