@@ -38,7 +38,18 @@ jobs:
 
       - name: Install dependencies (ruff, mypy, hassfest-related)
         run: |
-          pip install ruff mypy voluptuous pyyaml requests propcache types-setuptools types-pyyaml types-requests
+          pip install \
+            ruff \
+            mypy \
+            voluptuous \
+            pyyaml \
+            requests \
+            propcache \
+            slugify \
+            awesomeversion \
+            types-setuptools \
+            types-pyyaml \
+            types-requests
 
       - name: Run Makefile CI tasks (lint, typecheck, hassfest)
         run: make ci
