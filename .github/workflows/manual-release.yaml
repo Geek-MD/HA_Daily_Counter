@@ -1,0 +1,50 @@
+name: Manual Release Process
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g., v1.0.5)"
+        required: true
+
+jobs:
+  release:
+    name: Manual Version Bump & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update version in manifest.json
+        run: |
+          sed -i 's/"version": *".*"/"version": "${{ github.event.inputs.version }}"/' custom_components/ha_daily_counter/manifest.json
+
+      - name: Update version in hacs.json
+        run: |
+          sed -i 's/"version": *".*"/"version": "${{ github.event.inputs.version }}"/' hacs.json
+
+      - name: Commit version updates
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update version references to ${{ github.event.inputs.version }}" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies (ruff, mypy, etc.)
+        run: |
+          pip install ruff mypy types-setuptools types-pyyaml types-requests
+
+      - name: Run Makefile CI tasks (lint, typecheck, hassfest)
+        run: make ci
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.event.inputs.version }} --generate-notes --title "${{ github.event.inputs.version }}"
