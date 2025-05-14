@@ -1,4 +1,4 @@
-.PHONY: lint typecheck hassfest release clean ci
+.PHONY: lint typecheck hassfest clean ci
 
 # Variables
 PACKAGE=custom_components/ha_daily_counter
@@ -28,16 +28,7 @@ hassfest:
 	rm -rf hassfest-core
 
 ## -----------------------------------
-## 🚀 Create GitHub Release from Tag (fix GH_TOKEN passing)
-release:
-ifndef VERSION
-	$(error VERSION is not set. Usage: make release VERSION=v1.0.5)
-endif
-	@echo "🚀 Creating GitHub release $(VERSION)..."
-	GH_TOKEN=$$GH_TOKEN gh release create $(VERSION) --generate-notes --title "$(VERSION)"
-
-## -----------------------------------
-## 🗑️ Clean hassfest-core manually
+## 🗑️ Clean hassfest-core manually (if needed)
 clean:
 	@echo "🧹 Cleaning hassfest-core folder (if exists)..."
 	rm -rf hassfest-core
