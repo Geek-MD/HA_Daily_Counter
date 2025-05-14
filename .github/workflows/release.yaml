@@ -1,4 +1,4 @@
-name: Release and Update Version References
+name: Release and Version Bump
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
         run: |
           sed -i 's/"version": *".*"/"version": "${{ env.VERSION }}"/' hacs.json
 
-      - name: Commit updated version references
+      - name: Commit version updates
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -45,6 +45,6 @@ jobs:
           pip install ruff mypy types-setuptools types-pyyaml types-requests
 
       - name: Run Makefile Release
-        run: make release VERSION=${{ env.VERSION }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export GH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          make release VERSION=${{ env.VERSION }}
