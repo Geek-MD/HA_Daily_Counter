@@ -1,0 +1,52 @@
+name: Python Lint & Type Check
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  lint:
+    name: Ruff Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff Linter
+        run: ruff check custom_components/ha_daily_counter/
+
+  typing:
+    name: Mypy Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Mypy and Home Assistant stubs
+        run: |
+          pip install mypy types-setuptools types-pyyaml types-requests
+          pip install "homeassistant-stubs>=2023.11.0"
+
+      - name: Run Mypy Type Checker
+        run: mypy custom_components/ha_daily_counter/
