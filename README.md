@@ -6,7 +6,7 @@
 [![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
-![HA Daily Counter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/develop/icon.png)
+![HA Daily Counter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/icon.png?raw=true)
 
 # HA Daily Counter
 
