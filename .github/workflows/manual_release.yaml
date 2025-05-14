@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies (ruff, mypy, helpers)
+      - name: Install dependencies (ruff, mypy, hassfest-related)
         run: |
           pip install \
             ruff \
@@ -49,6 +49,7 @@ jobs:
             awesomeversion \
             aiozoneinfo \
             ciso8601 \
+            yarl \
             types-setuptools \
             types-pyyaml \
             types-requests
