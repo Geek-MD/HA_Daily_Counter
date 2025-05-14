@@ -12,8 +12,9 @@ from .const import DOMAIN, DEFAULT_NAME, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 _LOGGER = logging.getLogger(__name__)
 
 class HADailyCounter(SensorEntity, RestoreEntity):
-    def __init__(self, name, trigger_entity, trigger_state):
+    def __init__(self, name, trigger_entity, trigger_state, entry_id):
         self._attr_name = name
+        self._attr_unique_id = f"{entry_id}_counter"
         self._attr_native_unit_of_measurement = "count"
         self._attr_icon = "mdi:counter"
         self._attr_should_poll = False
@@ -72,7 +73,7 @@ class HADailyCounter(SensorEntity, RestoreEntity):
     def device_info(self):
         """Return device info to group entities under a device."""
         return {
-            "identifiers": {(DOMAIN, f"counter_{self._attr_name.lower().replace(' ', '_')}")},
+            "identifiers": {(DOMAIN, f"counter_{self._attr_unique_id}")},
             "name": f"{self._attr_name} Counter",
             "manufacturer": "HA Daily Counter",
             "model": "Daily Increment Counter"
