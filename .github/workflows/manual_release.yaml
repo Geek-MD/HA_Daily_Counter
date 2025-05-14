@@ -36,12 +36,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies (ruff, mypy, hassfest and helpers)
+      - name: Install dependencies (ruff, mypy, helpers)
         run: |
           pip install \
             ruff \
             mypy \
-            hassfest \
             voluptuous \
             pyyaml \
             requests \
@@ -53,6 +52,19 @@ jobs:
             types-setuptools \
             types-pyyaml \
             types-requests
+
+      - name: Cache hassfest-core
+        uses: actions/cache@v4
+        with:
+          path: hassfest-core
+          key: hassfest-core-${{ runner.os }}-v2024.5.3
+          restore-keys: |
+            hassfest-core-${{ runner.os }}-
+
+      - name: Clone Home Assistant core (stable version)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch 2024.5.3 https://github.com/home-assistant/core hassfest-core
 
       - name: Run Makefile CI tasks (lint, typecheck, hassfest)
         run: make ci
