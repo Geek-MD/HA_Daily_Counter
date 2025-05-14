@@ -36,11 +36,12 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies (ruff, mypy, hassfest-related)
+      - name: Install dependencies (ruff, mypy, hassfest and helpers)
         run: |
           pip install \
             ruff \
             mypy \
+            hassfest \
             voluptuous \
             pyyaml \
             requests \
@@ -52,14 +53,6 @@ jobs:
             types-setuptools \
             types-pyyaml \
             types-requests
-
-      - name: Cache hassfest-core
-        uses: actions/cache@v4
-        with:
-          path: hassfest-core
-          key: hassfest-core-${{ runner.os }}-${{ hashFiles('**/manual_release.yaml') }}
-          restore-keys: |
-            hassfest-core-${{ runner.os }}-
 
       - name: Run Makefile CI tasks (lint, typecheck, hassfest)
         run: make ci
