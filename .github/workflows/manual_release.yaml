@@ -31,12 +31,12 @@ jobs:
           git commit -am "Update version references to ${{ github.event.inputs.version }}" || echo "No changes to commit"
           git push || echo "Nothing to push"
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
-      - name: Install dependencies (ruff, mypy, hassfest related)
+      - name: Install dependencies (ruff, mypy, hassfest-related)
         run: |
           pip install ruff mypy voluptuous pyyaml requests types-setuptools types-pyyaml types-requests
 
