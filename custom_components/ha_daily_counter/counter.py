@@ -1,13 +1,11 @@
 import logging
-from datetime import datetime, time
-
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change, async_track_time_change
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import DOMAIN, DEFAULT_NAME, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,7 +22,6 @@ class HADailyCounter(SensorEntity, RestoreEntity):
         self._trigger_state = trigger_state
 
     async def async_added_to_hass(self):
-        # Restaurar estado si existe
         last_state = await self.async_get_last_state()
         if last_state and last_state.state != STATE_UNKNOWN:
             try:
@@ -37,12 +34,10 @@ class HADailyCounter(SensorEntity, RestoreEntity):
 
         self.async_write_ha_state()
 
-        # Escuchar cambios en el disparador
         async_track_state_change(
             self.hass, self._trigger_entity, self._handle_trigger_change
         )
 
-        # Programar reinicio a medianoche
         async_track_time_change(
             self.hass, self._reset_counter, hour=0, minute=0, second=0
         )
@@ -71,7 +66,6 @@ class HADailyCounter(SensorEntity, RestoreEntity):
 
     @property
     def device_info(self):
-        """Return device info to group entities under a device."""
         return {
             "identifiers": {(DOMAIN, f"counter_{self._attr_unique_id}")},
             "name": f"{self._attr_name} Counter",
