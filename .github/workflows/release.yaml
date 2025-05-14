@@ -1,4 +1,4 @@
-name: Create GitHub Release
+name: Release and Update Version References
 
 on:
   push:
@@ -7,12 +7,33 @@ on:
 
 jobs:
   release:
-    name: Generate GitHub Release
+    name: Update Version & Create Release
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "🔢 Version extracted: ${GITHUB_REF_NAME}"
+
+      - name: Update version in manifest.json
+        run: |
+          sed -i 's/"version": *".*"/"version": "${{ env.VERSION }}"/' custom_components/ha_daily_counter/manifest.json
+
+      - name: Update version in hacs.json
+        run: |
+          sed -i 's/"version": *".*"/"version": "${{ env.VERSION }}"/' hacs.json
+
+      - name: Commit updated version references
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update version references to ${{ env.VERSION }}" || echo "No changes to commit"
+          git push || echo "Nothing to push"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -24,6 +45,6 @@ jobs:
           pip install ruff mypy types-setuptools types-pyyaml types-requests
 
       - name: Run Makefile Release
-        run: make release VERSION=${{ github.ref_name }}
+        run: make release VERSION=${{ env.VERSION }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
