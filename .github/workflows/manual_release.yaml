@@ -53,6 +53,7 @@ jobs:
             orjson \
             atomicwrites \
             aiohttp \
+            packaging \
             types-setuptools \
             types-pyyaml \
             types-requests \
