@@ -1,0 +1,12 @@
+{
+  "name": "HA Daily Counter",
+  "content_in_root": true,
+  "domains": ["sensor"],
+  "country": "global",
+  "render_readme": true,
+  "documentation": "https://github.com/Geek-MD/HA_Daily_Counter",
+  "homeassistant": "2024.6.0",
+  "iot_class": "local_push",
+  "version": "1.0.4",
+  "category": "integration"
+}
