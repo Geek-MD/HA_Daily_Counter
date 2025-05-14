@@ -36,10 +36,10 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies (ruff, mypy, etc.)
+      - name: Install dependencies (ruff, mypy, voluptuous, etc.)
         run: |
-          pip install ruff mypy types-setuptools types-pyyaml types-requests
-
+          pip install ruff mypy voluptuous types-setuptools types-pyyaml types-requests
+          
       - name: Run Makefile CI tasks (lint, typecheck, hassfest)
         run: make ci
 
