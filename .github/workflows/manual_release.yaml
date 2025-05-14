@@ -53,6 +53,14 @@ jobs:
             types-pyyaml \
             types-requests
 
+      - name: Cache hassfest-core
+        uses: actions/cache@v4
+        with:
+          path: hassfest-core
+          key: hassfest-core-${{ runner.os }}-${{ hashFiles('**/manual_release.yaml') }}
+          restore-keys: |
+            hassfest-core-${{ runner.os }}-
+
       - name: Run Makefile CI tasks (lint, typecheck, hassfest)
         run: make ci
 
