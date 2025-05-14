@@ -44,7 +44,11 @@ jobs:
         run: |
           pip install ruff mypy types-setuptools types-pyyaml types-requests
 
-      - name: Run Makefile Release (with GH_TOKEN)
+      - name: Run CI tasks (lint, typecheck, hassfest)
+        run: make ci
+
+      - name: Create GitHub Release (gh CLI)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: make release VERSION=${{ env.VERSION }}
+        run: |
+          gh release create ${{ github.ref_name }} --generate-notes --title "${{ github.ref_name }}"
