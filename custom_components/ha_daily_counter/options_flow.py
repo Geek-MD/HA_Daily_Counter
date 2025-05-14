@@ -3,12 +3,7 @@ from homeassistant.const import CONF_NAME
 import voluptuous as vol
 from homeassistant.helpers.selector import selector
 
-from .const import (
-    DOMAIN,
-    ATTR_TRIGGER_ENTITY,
-    ATTR_TRIGGER_STATE,
-    DEFAULT_NAME,
-)
+from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DEFAULT_NAME
 
 class HADailyCounterOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry):
