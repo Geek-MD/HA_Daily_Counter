@@ -51,6 +51,7 @@ jobs:
             ciso8601 \
             yarl \
             orjson \
+            atomicwrites \
             types-setuptools \
             types-pyyaml \
             types-requests
