@@ -1,4 +1,4 @@
-name: Manual Release Process
+name: Manual Release Process & Hassfest Validation
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    name: Manual Version Bump & Release
+    name: Validate & Release HA Daily Counter
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +40,7 @@ jobs:
         run: |
           pip install -r requirements-hassfest.txt
 
-      - name: Cache hassfest-core
+      - name: Cache hassfest-core (v2024.5.3)
         uses: actions/cache@v4
         with:
           path: hassfest-core
@@ -48,13 +48,24 @@ jobs:
           restore-keys: |
             hassfest-core-${{ runner.os }}-
 
-      - name: Clone Home Assistant core (stable version)
+      - name: Clone Home Assistant core (v2024.5.3)
         if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth 1 --branch 2024.5.3 https://github.com/home-assistant/core hassfest-core
+        run: git clone --depth 1 --branch 2024.5.3 https://github.com/home-assistant/core hassfest-core
 
-      - name: Run Makefile CI tasks (lint, typecheck, hassfest)
-        run: make ci
+      - name: Ruff - Lint code
+        run: ruff check custom_components/ha_daily_counter
+
+      - name: Mypy - Type check code
+        run: mypy --config-file mypy.ini custom_components/ha_daily_counter
+
+      - name: Patch lru.py for hassfest
+        run: |
+          cp lru.py hassfest-core/homeassistant/lru.py
+
+      - name: Run Hassfest validation
+        run: |
+          cd hassfest-core
+          python3 -m script.hassfest --integration ../custom_components/ha_daily_counter
 
       - name: Create GitHub Release
         env:
