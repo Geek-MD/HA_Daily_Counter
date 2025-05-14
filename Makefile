@@ -12,7 +12,13 @@ typecheck:
 
 hassfest:
 	@echo "🔍 Running Hassfest validation..."
-	hassfest --integration $(PACKAGE)
+	@if [ ! -d "hassfest-core" ]; then \
+		echo "📥 Downloading Home Assistant core stable release..."; \
+		git clone --depth 1 --branch 2024.5.3 https://github.com/home-assistant/core hassfest-core; \
+	else \
+		echo "✅ Using cached hassfest-core"; \
+	fi
+	cd hassfest-core && python3 -m script.hassfest --integration ../$(PACKAGE)
 
 ci: lint typecheck hassfest
 	@echo "✅ CI pipeline completed successfully."
