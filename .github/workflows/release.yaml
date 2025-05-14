@@ -44,7 +44,7 @@ jobs:
         run: |
           pip install ruff mypy types-setuptools types-pyyaml types-requests
 
-      - name: Run Makefile Release
-        run: |
-          export GH_TOKEN=${{ secrets.GITHUB_TOKEN }}
-          make release VERSION=${{ env.VERSION }}
+      - name: Run Makefile Release (with GH_TOKEN)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: make release VERSION=${{ env.VERSION }}
