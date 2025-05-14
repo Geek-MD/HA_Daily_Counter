@@ -36,32 +36,9 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies (ruff, mypy, hassfest-related)
+      - name: Install hassfest dependencies
         run: |
-          pip install \
-            ruff \
-            mypy \
-            voluptuous \
-            voluptuous_serialize \
-            pyyaml \
-            requests \
-            propcache \
-            slugify \
-            awesomeversion \
-            aiozoneinfo \
-            ciso8601 \
-            yarl \
-            orjson \
-            atomicwrites \
-            aiohttp \
-            packaging \
-            tqdm \
-            types-setuptools \
-            types-pyyaml \
-            types-requests \
-            ulid_transform \
-            jinja2 \
-            lru
+          pip install -r requirements-hassfest.txt
 
       - name: Cache hassfest-core
         uses: actions/cache@v4
