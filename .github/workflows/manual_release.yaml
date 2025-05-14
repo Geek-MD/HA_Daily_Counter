@@ -55,7 +55,8 @@ jobs:
             aiohttp \
             types-setuptools \
             types-pyyaml \
-            types-requests
+            types-requests \
+            ulid_transform
 
       - name: Cache hassfest-core
         uses: actions/cache@v4
