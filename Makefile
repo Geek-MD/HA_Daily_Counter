@@ -1,6 +1,6 @@
 # Makefile for HA Daily Counter CI tasks
 
-.PHONY: lint typecheck hassfest release clean
+.PHONY: lint typecheck hassfest release clean ci
 
 # Variables
 PACKAGE=custom_components/ha_daily_counter
@@ -39,7 +39,12 @@ endif
 	gh release create $(VERSION) --generate-notes --title "$(VERSION)" || true
 
 ## -----------------------------------
-## 🗑️ Clean up hassfest-core manually (if needed)
+## 🗑️ Clean hassfest-core manually
 clean:
 	@echo "🧹 Cleaning hassfest-core folder (if exists)..."
 	rm -rf hassfest-core
+
+## -----------------------------------
+## 🧪 CI pipeline: lint + typecheck + hassfest
+ci: lint typecheck hassfest
+	@echo "✅ CI pipeline completed successfully."
