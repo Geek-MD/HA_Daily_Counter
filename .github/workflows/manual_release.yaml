@@ -54,6 +54,7 @@ jobs:
             atomicwrites \
             aiohttp \
             packaging \
+            tqdm \
             types-setuptools \
             types-pyyaml \
             types-requests \
