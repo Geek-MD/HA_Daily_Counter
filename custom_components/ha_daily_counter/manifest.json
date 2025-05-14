@@ -7,6 +7,5 @@
   "dependencies": [],
   "codeowners": ["@Geek-MD"],
   "config_flow": true,
-  "iot_class": "local_push",
-  "domains": ["sensor"]
+  "iot_class": "local_push"
 }
