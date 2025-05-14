@@ -43,9 +43,9 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Mypy and Types
+      - name: Install Mypy and Type Definitions
         run: |
           pip install mypy types-setuptools types-pyyaml types-requests
 
-      - name: Run Mypy Type Checker
-        run: mypy --namespace-packages --install-types --non-interactive custom_components/ha_daily_counter/
+      - name: Run Mypy Type Checker with config file
+        run: mypy --config-file mypy.ini custom_components/ha_daily_counter/
