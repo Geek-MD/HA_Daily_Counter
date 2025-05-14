@@ -47,6 +47,7 @@ jobs:
             propcache \
             slugify \
             awesomeversion \
+            aiozoneinfo \
             types-setuptools \
             types-pyyaml \
             types-requests
