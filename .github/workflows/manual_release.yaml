@@ -50,6 +50,7 @@ jobs:
             aiozoneinfo \
             ciso8601 \
             yarl \
+            orjson \
             types-setuptools \
             types-pyyaml \
             types-requests
