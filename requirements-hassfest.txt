@@ -1,23 +1,23 @@
 ruff
 # mypy
-# voluptuous
-# voluptuous-serialize
-# pyyaml
+voluptuous
+voluptuous-serialize
+pyyaml
 # requests
-# propcache
-# slugify
-# awesomeversion
-# aiozoneinfo
-# ciso8601
-# yarl
-# orjson
-# atomicwrites
-# aiohttp
-# packaging
+propcache
+slugify
+awesomeversion
+aiozoneinfo
+ciso8601
+yarl
+orjson
+atomicwrites
+aiohttp
+packaging
 # tqdm
 # ulid-transform
-# jinja2
-# types-setuptools
+jinja2
+types-setuptools
 astroid==3.3.10
 coverage==7.6.12
 freezegun==1.5.1
