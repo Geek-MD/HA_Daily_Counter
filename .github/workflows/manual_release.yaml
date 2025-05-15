@@ -39,6 +39,6 @@ jobs:
 
       - name: Create GitHub Release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create ${{ github.event.inputs.version }} --generate-notes --title "${{ github.event.inputs.version }}"
