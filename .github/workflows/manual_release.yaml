@@ -8,7 +8,7 @@ on:
         required: true
 
 permissions:
-  contents: write  # Necesario para gh release
+  contents: write  # Necesario para release
 
 jobs:
   release:
@@ -38,7 +38,8 @@ jobs:
           git push || echo "Nothing to push"
 
       - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create ${{ github.event.inputs.version }} --generate-notes --title "${{ github.event.inputs.version }}"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: ${{ github.event.inputs.version }}
+          generate_release_notes: true
