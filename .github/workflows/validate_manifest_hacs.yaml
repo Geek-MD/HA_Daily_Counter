@@ -1,0 +1,51 @@
+name: Validate manifest.json & hacs.json
+
+on:
+  push:
+    paths:
+      - 'custom_components/ha_daily_counter/manifest.json'
+      - 'hacs.json'
+  pull_request:
+    paths:
+      - 'custom_components/ha_daily_counter/manifest.json'
+      - 'hacs.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate manifest.json schema
+        run: |
+          echo "🔍 Validating manifest.json..."
+          python3 -c "
+import json, sys
+with open('custom_components/ha_daily_counter/manifest.json') as f:
+    data = json.load(f)
+required_keys = ['domain', 'name', 'codeowners', 'version']
+for key in required_keys:
+    if key not in data:
+        print(f'❌ manifest.json is missing required key: {key}')
+        sys.exit(1)
+print('✅ manifest.json passed validation.')
+"
+
+      - name: Validate hacs.json schema
+        run: |
+          echo "🔍 Validating hacs.json..."
+          python3 -c "
+import json, sys
+with open('hacs.json') as f:
+    data = json.load(f)
+required_keys = ['name', 'content_in_root', 'domains', 'category']
+if data.get('content_in_root') != False:
+    print('❌ hacs.json content_in_root must be false.')
+    sys.exit(1)
+if 'ha_daily_counter' not in data.get('domains', []):
+    print('❌ hacs.json domains must include ha_daily_counter.')
+    sys.exit(1)
+print('✅ hacs.json passed validation.')
+"
