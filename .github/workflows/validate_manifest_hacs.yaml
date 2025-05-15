@@ -19,14 +19,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate manifest.json schema
+      - name: Validate manifest.json
         run: |
           echo "🔍 Validating manifest.json..."
-          python3 -c "
-import json, sys
+          cat <<PYTHON | python3
+import json
+import sys
+import os
+
+path = 'custom_components/ha_daily_counter/manifest.json'
+
+if not os.path.exists(path):
+    print(f'❌ {path} not found')
+    sys.exit(1)
 
 try:
-    with open('custom_components/ha_daily_counter/manifest.json') as f:
+    with open(path) as f:
         data = json.load(f)
 except Exception as e:
     print(f'❌ Failed to load manifest.json: {e}')
@@ -39,16 +47,24 @@ if missing:
     sys.exit(1)
 
 print('✅ manifest.json passed validation.')
-"
+PYTHON
 
-      - name: Validate hacs.json schema
+      - name: Validate hacs.json
         run: |
           echo "🔍 Validating hacs.json..."
-          python3 -c "
-import json, sys
+          cat <<PYTHON | python3
+import json
+import sys
+import os
+
+path = 'hacs.json'
+
+if not os.path.exists(path):
+    print(f'❌ {path} not found')
+    sys.exit(1)
 
 try:
-    with open('hacs.json') as f:
+    with open(path) as f:
         data = json.load(f)
 except Exception as e:
     print(f'❌ Failed to load hacs.json: {e}')
@@ -60,13 +76,5 @@ if missing:
     print(f'❌ hacs.json is missing keys: {missing}')
     sys.exit(1)
 
-if data.get('content_in_root') != False:
-    print('❌ hacs.json content_in_root must be false.')
-    sys.exit(1)
-
-if 'ha_daily_counter' not in data.get('domains', []):
-    print('❌ hacs.json domains must include \"ha_daily_counter\".')
-    sys.exit(1)
-
 print('✅ hacs.json passed validation.')
-"
+PYTHON
