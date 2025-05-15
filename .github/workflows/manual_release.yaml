@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install hassfest dependencies
+      - name: Install hassfest dependencies (minimal)
         run: |
           pip install -r requirements-hassfest.txt
 
