@@ -1,6 +1,7 @@
 name: Validate manifest.json & hacs.json
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'custom_components/ha_daily_counter/manifest.json'
