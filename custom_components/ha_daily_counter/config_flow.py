@@ -2,14 +2,15 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
 import voluptuous as vol
 from homeassistant.helpers.selector import selector
+from homeassistant.core import callback
 
 from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DEFAULT_NAME
 from .options_flow import HADailyCounterOptionsFlowHandler
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow):
+
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for HA Daily Counter."""
 
-    DOMAIN = DOMAIN
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
@@ -28,5 +29,8 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow):
             })
         )
 
-def async_get_options_flow(config_entry):
-    return HADailyCounterOptionsFlowHandler(config_entry)
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Return the options flow handler."""
+        return HADailyCounterOptionsFlowHandler(config_entry)
