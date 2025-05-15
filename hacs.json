@@ -1,7 +1,7 @@
 {
   "name": "HA Daily Counter",
-  "content_in_root": true,
-  "domains": ["sensor"],
+  "content_in_root": false,
+  "domains": ["ha_daily_counter"],
   "country": "global",
   "render_readme": true,
   "documentation": "https://github.com/Geek-MD/HA_Daily_Counter",
