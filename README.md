@@ -6,6 +6,10 @@
 [![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
+[![Hassfest Validation](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/hassfest.yaml/badge.svg?branch=main)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/hassfest.yaml)
+[![Brands Icons Check](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/check_brands_icons.yaml/badge.svg?branch=main)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/check_brands_icons.yaml)
+[![Python Lint & Type Check](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/python_lint.yaml/badge.svg?branch=main)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/python_lint.yaml)
+
 ![HA Daily Counter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/icon.png?raw=true)
 
 # HA Daily Counter
