@@ -1,4 +1,4 @@
-name: Manual Release Process & Hassfest Validation
+name: Manual Release with Hassfest Validation
 
 on:
   workflow_dispatch:
@@ -16,6 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Validate with Hassfest
+        uses: home-assistant/actions/hassfest@master
+
       - name: Update version in manifest.json
         run: |
           sed -i 's/"version": *".*"/"version": "${{ github.event.inputs.version }}"/' custom_components/ha_daily_counter/manifest.json
@@ -30,42 +33,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -am "Update version references to ${{ github.event.inputs.version }}" || echo "No changes to commit"
           git push || echo "Nothing to push"
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install hassfest dependencies (minimal)
-        run: |
-          pip install -r requirements-hassfest.txt
-
-      - name: Cache hassfest-core (v2024.5.3)
-        uses: actions/cache@v4
-        with:
-          path: hassfest-core
-          key: hassfest-core-${{ runner.os }}-v2024.5.3
-          restore-keys: |
-            hassfest-core-${{ runner.os }}-
-
-      - name: Clone Home Assistant core (v2024.5.3)
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: git clone --depth 1 --branch 2024.5.3 https://github.com/home-assistant/core hassfest-core
-
-      - name: Ruff - Lint code
-        run: ruff check custom_components/ha_daily_counter
-
-      - name: Mypy - Type check code
-        run: mypy --config-file mypy.ini custom_components/ha_daily_counter
-
-      - name: Patch lru.py for hassfest
-        run: |
-          cp lru.py hassfest-core/homeassistant/lru.py
-
-      - name: Run Hassfest validation
-        run: |
-          cd hassfest-core
-          python3 -m script.hassfest --integration ../custom_components/ha_daily_counter
 
       - name: Create GitHub Release
         env:
