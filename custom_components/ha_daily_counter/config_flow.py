@@ -8,7 +8,7 @@ from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DEFAULT_NAME
 from .options_flow import HADailyCounterOptionsFlowHandler
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Handle a config flow for HA Daily Counter."""
 
     VERSION = 1
