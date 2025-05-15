@@ -22,31 +22,51 @@ jobs:
       - name: Validate manifest.json schema
         run: |
           echo "🔍 Validating manifest.json..."
-          python3 -c "import json, sys; \
-try: \
-    with open('custom_components/ha_daily_counter/manifest.json') as f: data = json.load(f) \
-except Exception as e: \
-    print(f'❌ Failed to load manifest.json: {e}'); sys.exit(1); \
-required_keys = ['domain', 'name', 'codeowners', 'version']; \
-missing = [k for k in required_keys if k not in data]; \
-if missing: \
-    print(f'❌ manifest.json is missing keys: {missing}'); sys.exit(1); \
-print('✅ manifest.json passed validation.')"
+          python3 -c "
+import json, sys
+
+try:
+    with open('custom_components/ha_daily_counter/manifest.json') as f:
+        data = json.load(f)
+except Exception as e:
+    print(f'❌ Failed to load manifest.json: {e}')
+    sys.exit(1)
+
+required_keys = ['domain', 'name', 'codeowners', 'version']
+missing = [k for k in required_keys if k not in data]
+if missing:
+    print(f'❌ manifest.json is missing keys: {missing}')
+    sys.exit(1)
+
+print('✅ manifest.json passed validation.')
+"
 
       - name: Validate hacs.json schema
         run: |
           echo "🔍 Validating hacs.json..."
-          python3 -c "import json, sys; \
-try: \
-    with open('hacs.json') as f: data = json.load(f) \
-except Exception as e: \
-    print(f'❌ Failed to load hacs.json: {e}'); sys.exit(1); \
-required_keys = ['name', 'content_in_root', 'domains', 'category']; \
-missing = [k for k in required_keys if k not in data]; \
-if missing: \
-    print(f'❌ hacs.json is missing keys: {missing}'); sys.exit(1); \
-if data.get('content_in_root') != False: \
-    print('❌ hacs.json content_in_root must be false.'); sys.exit(1); \
-if 'ha_daily_counter' not in data.get('domains', []): \
-    print('❌ hacs.json domains must include \"ha_daily_counter\".'); sys.exit(1); \
-print('✅ hacs.json passed validation.')"
+          python3 -c "
+import json, sys
+
+try:
+    with open('hacs.json') as f:
+        data = json.load(f)
+except Exception as e:
+    print(f'❌ Failed to load hacs.json: {e}')
+    sys.exit(1)
+
+required_keys = ['name', 'content_in_root', 'domains', 'category']
+missing = [k for k in required_keys if k not in data]
+if missing:
+    print(f'❌ hacs.json is missing keys: {missing}')
+    sys.exit(1)
+
+if data.get('content_in_root') != False:
+    print('❌ hacs.json content_in_root must be false.')
+    sys.exit(1)
+
+if 'ha_daily_counter' not in data.get('domains', []):
+    print('❌ hacs.json domains must include \"ha_daily_counter\".')
+    sys.exit(1)
+
+print('✅ hacs.json passed validation.')
+"
