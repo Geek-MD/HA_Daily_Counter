@@ -19,62 +19,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate manifest.json
-        run: |
-          echo "🔍 Validating manifest.json..."
-          cat <<PYTHON | python3
-import json
-import sys
-import os
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-path = 'custom_components/ha_daily_counter/manifest.json'
-
-if not os.path.exists(path):
-    print(f'❌ {path} not found')
-    sys.exit(1)
-
-try:
-    with open(path) as f:
-        data = json.load(f)
-except Exception as e:
-    print(f'❌ Failed to load manifest.json: {e}')
-    sys.exit(1)
-
-required_keys = ['domain', 'name', 'codeowners', 'version']
-missing = [k for k in required_keys if k not in data]
-if missing:
-    print(f'❌ manifest.json is missing keys: {missing}')
-    sys.exit(1)
-
-print('✅ manifest.json passed validation.')
-PYTHON
-
-      - name: Validate hacs.json
-        run: |
-          echo "🔍 Validating hacs.json..."
-          cat <<PYTHON | python3
-import json
-import sys
-import os
-
-path = 'hacs.json'
-
-if not os.path.exists(path):
-    print(f'❌ {path} not found')
-    sys.exit(1)
-
-try:
-    with open(path) as f:
-        data = json.load(f)
-except Exception as e:
-    print(f'❌ Failed to load hacs.json: {e}')
-    sys.exit(1)
-
-required_keys = ['name', 'content_in_root', 'domains', 'category']
-missing = [k for k in required_keys if k not in data]
-if missing:
-    print(f'❌ hacs.json is missing keys: {missing}')
-    sys.exit(1)
-
-print('✅ hacs.json passed validation.')
-PYTHON
+      - name: Validate manifest.json & hacs.json
+        run: python3 .github/scripts/validate_manifest.py
