@@ -8,8 +8,11 @@ from .counter import HADailyCounter
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
-    """Set up HA Daily Counter sensor from a config entry."""
-    _LOGGER.debug("Setting up sensor for entry: %s", entry.entry_id)
+    """Set up counters from config entry."""
+    counters = entry.options.get("counters", [])
 
-    entity = HADailyCounter(hass, entry)
-    async_add_entities([entity], update_before_add=True)
+    entities = []
+    for idx, cfg in enumerate(counters):
+        entities.append(HADailyCounter(hass, entry, idx, cfg))
+
+    async_add_entities(entities, update_before_add=True)
