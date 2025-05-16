@@ -1,52 +1,41 @@
 import logging
-
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
-from homeassistant.helpers.event import async_track_state_change, async_track_time_change
-from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.core import callback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-
 class HADailyCounterEntity(SensorEntity, RestoreEntity):
-    def __init__(self, name, trigger_entity, trigger_state, entry_id):
-        self._attr_name = name
-        self._attr_icon = "mdi:counter"
-        self._attr_should_poll = False
-        self._attr_unique_id = f"{entry_id}_{trigger_entity.replace('.', '_')}"
+    """Representation of a daily counter sensor."""
+
+    def __init__(self, entry_id, counter_data):
+        self._entry_id = entry_id
+        self._counter_data = counter_data
+        self._attr_name = counter_data.get("name", "Daily Counter")
         self._state = 0
-        self._trigger_entity = trigger_entity
-        self._trigger_state = trigger_state
 
-    async def async_added_to_hass(self):
-        last_state = await self.async_get_last_state()
-        if last_state and last_state.state != STATE_UNKNOWN:
-            try:
-                self._state = int(last_state.state)
-            except ValueError:
-                self._state = 0
-            self.async_write_ha_state()
-
-        async_track_state_change(
-            self.hass, self._trigger_entity, self._handle_trigger_change
-        )
-
-        async_track_time_change(
-            self.hass, self._reset_counter, hour=0, minute=0, second=0
-        )
-
-    @callback
-    def _handle_trigger_change(self, entity_id, old_state, new_state):
-        if new_state and new_state.state == self._trigger_state:
-            self._state += 1
-            self.async_write_ha_state()
-
-    @callback
-    def _reset_counter(self, now=None):
-        self._state = 0
-        self.async_write_ha_state()
+    @property
+    def unique_id(self):
+        return f"{self._entry_id}_{self._attr_name.lower().replace(' ', '_')}"
 
     @property
     def native_value(self):
         return self._state
+
+    async def async_added_to_hass(self):
+        """Restore state when entity is added to hass."""
+        await super().async_added_to_hass()
+        if (state := await self.async_get_last_state()) is not None:
+            if state.state != STATE_UNKNOWN:
+                self._state = int(state.state)
+
+    @callback
+    def increment(self):
+        """Increment the counter."""
+        self._state += 1
+        self.async_write_ha_state()
+
+    async def async_update(self):
+        """Update the sensor state."""
+        _LOGGER.debug("Updating state for %s: %d", self._attr_name, self._state)
