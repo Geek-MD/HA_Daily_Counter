@@ -1,27 +1,29 @@
 from homeassistant import config_entries
-from homeassistant.const import CONF_NAME
 import voluptuous as vol
 from homeassistant.helpers.selector import selector
 
-from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DEFAULT_NAME
+from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 
-class HADailyCounterOptionsFlowHandler(config_entries.OptionsFlow):
+class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
+    """Options flow for managing counters."""
+
     def __init__(self, config_entry):
         self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
+        return await self.async_step_manage()
+
+    async def async_step_manage(self, user_input=None):
+        counters = self.config_entry.options.get("counters", [])
+
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            counters.append(user_input)
+            return self.async_create_entry(title="", data={"counters": counters})
 
-        current = self.config_entry.options or self.config_entry.data
+        schema = vol.Schema({
+            vol.Required("name"): str,
+            vol.Required(ATTR_TRIGGER_ENTITY): selector({"entity": {"multiple": False}}),
+            vol.Required(ATTR_TRIGGER_STATE): str,
+        })
 
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema({
-                vol.Required(CONF_NAME, default=current.get(CONF_NAME, DEFAULT_NAME)): str,
-                vol.Required(ATTR_TRIGGER_ENTITY, default=current.get(ATTR_TRIGGER_ENTITY)): selector({
-                    "entity": {"multiple": False}
-                }),
-                vol.Required(ATTR_TRIGGER_STATE, default=current.get(ATTR_TRIGGER_STATE)): str,
-            })
-        )
+        return self.async_show_form(step_id="manage", data_schema=schema)
