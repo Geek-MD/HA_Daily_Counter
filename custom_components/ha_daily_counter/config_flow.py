@@ -1,7 +1,6 @@
 from homeassistant import config_entries
 
 from .options_flow import HADailyCounterOptionsFlow
-from .const import DOMAIN
 
 class HADailyCounterConfigFlow(config_entries.ConfigFlow):
     """Config flow for HA Daily Counter."""
