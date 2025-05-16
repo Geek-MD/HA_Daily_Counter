@@ -1,14 +1,12 @@
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
 from homeassistant.helpers.selector import selector
-import voluptuous as vol
 
 from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DEFAULT_NAME
-from .options_flow import HADailyCounterOptionsFlow
-
+from .options_flow import HADailyCounterOptionsFlowHandler
 
 class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for HA Daily Counter."""
+    """Handle config flow for HA Daily Counter."""
 
     VERSION = 1
 
@@ -19,13 +17,12 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({
-                vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
-                vol.Required(ATTR_TRIGGER_ENTITY): selector({"entity": {"multiple": False}}),
-                vol.Required(ATTR_TRIGGER_STATE): str,
+            data_schema=config_entries.ConfigFlow.schema({
+                CONF_NAME: DEFAULT_NAME,
+                ATTR_TRIGGER_ENTITY: selector({"entity": {"multiple": False}}),
+                ATTR_TRIGGER_STATE: str,
             }),
         )
 
-
 async def async_get_options_flow(config_entry):
-    return HADailyCounterOptionsFlow(config_entry)
+    return HADailyCounterOptionsFlowHandler(config_entry)
