@@ -3,7 +3,7 @@ from homeassistant.const import CONF_NAME
 import voluptuous as vol
 from homeassistant.helpers.selector import selector
 
-from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
+from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 
 class HADailyCounterConfigFlow(config_entries.ConfigFlow):
     """Handle a config flow for HA Daily Counter."""
