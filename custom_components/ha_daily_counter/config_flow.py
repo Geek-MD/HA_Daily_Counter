@@ -1,8 +1,9 @@
 from homeassistant import config_entries
+
 from .options_flow import HADailyCounterOptionsFlow
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow):
-    """Handle a config flow for HA Daily Counter."""
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain="ha_daily_counter"):
+    """Config flow for HA Daily Counter."""
 
     VERSION = 1
 
@@ -12,4 +13,5 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow):
 
     @staticmethod
     def async_get_options_flow(config_entry):
+        """Get the options flow handler."""
         return HADailyCounterOptionsFlow(config_entry)
