@@ -1,30 +1,28 @@
 from __future__ import annotations
 
-import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.const import CONF_NAME
 from homeassistant.helpers.selector import selector
 
-from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DEFAULT_NAME
-from .options_flow import HADailyCounterOptionsFlow
+from .const import DOMAIN
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for HA Daily Counter."""
+class HADailyCounterConfigFlow(config_entries.ConfigFlow):
+    """Handle a config flow for HA Daily Counter."""
 
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
         if user_input is not None:
-            return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
+            return self.async_create_entry(title=user_input["name"], data=user_input)
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({
-                vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
-                vol.Required(ATTR_TRIGGER_ENTITY): selector({"entity": {}}),
-                vol.Required(ATTR_TRIGGER_STATE): str,
-            }),
+            data_schema={
+                "name": selector({"text": {}}),
+                "trigger_entity": selector({"entity": {"domain": "binary_sensor"}}),
+                "trigger_state": selector({"text": {}}),
+            },
         )
 
     async def async_get_options_flow(self, config_entry):
+        from .options_flow import HADailyCounterOptionsFlow
         return HADailyCounterOptionsFlow(config_entry)
