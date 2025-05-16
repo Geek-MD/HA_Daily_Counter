@@ -1,9 +1,8 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import UnitOfNone
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 
