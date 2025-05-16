@@ -2,9 +2,10 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.const import CONF_NAME
 
 from .counter import HADailyCounterEntity
-from .const import CONF_NAME, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
+from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 
 _LOGGER = logging.getLogger(__name__)
 
