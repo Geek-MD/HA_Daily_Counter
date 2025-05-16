@@ -2,10 +2,11 @@ from homeassistant import config_entries
 
 from .options_flow import HADailyCounterOptionsFlow
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain="ha_daily_counter"):
+class HADailyCounterConfigFlow(config_entries.ConfigFlow):
     """Config flow for HA Daily Counter."""
 
     VERSION = 1
+    DOMAIN = "ha_daily_counter"
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
