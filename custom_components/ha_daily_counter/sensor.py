@@ -1,25 +1,16 @@
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .counter import HADailyCounterEntity
 
-
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
-    """Set up HA Daily Counter entities from config entry."""
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+    """Set up HA Daily Counter sensors from config entry."""
     entities = []
-
     counters = entry.options.get("counters", [])
-    if not counters:
-        counters = [entry.data]  # Fallback for legacy configs
 
-    for counter_data in counters:
-        entity = HADailyCounterEntity(
-            name=counter_data["name"],
-            trigger_entity=counter_data["trigger_entity"],
-            trigger_state=counter_data["trigger_state"],
-            entry_id=entry.entry_id,
-        )
-        entities.append(entity)
+    for counter in counters:
+        entities.append(HADailyCounterEntity(entry.entry_id, counter))
 
-    async_add_entities(entities)
+    if entities:
+        async_add_entities(entities)
