@@ -1,18 +1,25 @@
-import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .counter import HADailyCounter
+from .counter import HADailyCounterEntity
+from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 
-_LOGGER = logging.getLogger(__name__)
-
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
-    """Set up counters from config entry."""
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback
+):
     counters = entry.options.get("counters", [])
-
     entities = []
-    for idx, cfg in enumerate(counters):
-        entities.append(HADailyCounter(hass, entry, idx, cfg))
 
-    async_add_entities(entities, update_before_add=True)
+    for counter_cfg in counters:
+        entity = HADailyCounterEntity(
+            name=counter_cfg["name"],
+            trigger_entity=counter_cfg[ATTR_TRIGGER_ENTITY],
+            trigger_state=counter_cfg[ATTR_TRIGGER_STATE]
+        )
+        entities.append(entity)
+
+    if entities:
+        async_add_entities(entities, True)
