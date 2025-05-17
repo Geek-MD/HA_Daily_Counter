@@ -2,13 +2,9 @@ name: Python Lint & Type Check
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
 
 jobs:
   lint:
@@ -16,11 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -33,19 +27,19 @@ jobs:
   typing:
     name: Mypy Type Check
     runs-on: ubuntu-latest
+    env:
+      MYPYPATH: .  # 🔥 FIX for import error you've been getting
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Mypy and Type Definitions
+      - name: Install Mypy + type hints
         run: |
           pip install mypy types-setuptools types-pyyaml types-requests
 
-      - name: Run Mypy Type Checker with config file
-        run: mypy --config-file mypy.ini custom_components/ha_daily_counter/
+      - name: Run Mypy with config
+        run: mypy --config-file mypy.ini custom_components.ha_daily_counter  # 🔥 SWITCH to module path
