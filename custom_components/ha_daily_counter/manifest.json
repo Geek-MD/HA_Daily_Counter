@@ -1,11 +1,13 @@
 {
   "domain": "ha_daily_counter",
   "name": "HA Daily Counter",
-  "codeowners": ["@Geek-MD"],
+  "version": "1.1.3",
   "config_flow": true,
-  "dependencies": [],
   "documentation": "https://github.com/Geek-MD/HA_Daily_Counter",
-  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/Geek-MD/HA_Daily_Counter/issues",
+  "codeowners": ["@Geek-MD"],
   "requirements": [],
-  "version": "v1.1.2"
+  "dependencies": [],
+  "iot_class": "local_push",
+  "loggers": ["custom_components.ha_daily_counter"]
 }
