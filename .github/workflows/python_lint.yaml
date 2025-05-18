@@ -42,4 +42,4 @@ jobs:
           pip install mypy types-setuptools types-pyyaml types-requests
 
       - name: Run Mypy with config
-        run: mypy --config-file mypy.ini custom_components.ha_daily_counter  # 🔥 SWITCH to module path
+        run: mypy --config-file mypy.ini  # 🔥 SWITCH to module path
