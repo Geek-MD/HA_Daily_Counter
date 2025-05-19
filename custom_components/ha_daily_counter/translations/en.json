@@ -10,17 +10,6 @@
           "trigger_state": "Trigger State"
         }
       },
-      "trigger_entity": {
-        "title": "Trigger Entity",
-        "description": "Select the entity that will trigger the counter."
-      },
-      "trigger_state": {
-        "title": "Trigger State",
-        "description": "Select the state that will increment the counter.",
-        "data": {
-          "trigger_state": "Trigger State"
-        }
-      },
       "done": {
         "title": "Counter Created",
         "description": "The counter {name} has been added successfully."
