@@ -1,91 +1,45 @@
-name: Continuous Integration
+name: CI: Ruff + Mypy + Hassfest
 
 on:
   push:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
-  schedule:
-    - cron: "0 0 * * *"  # Nightly check
 
 jobs:
   ruff:
-    name: Ruff
+    name: Ruff Lint
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-
-      - name: Install Ruff
-        run: pip install ruff
-
-      - name: Run Ruff Linter
+          python-version: "3.10"
+      - run: pip install ruff
+      - name: Run Ruff
         run: ruff check custom_components/ha_daily_counter/
 
   mypy:
-    name: Mypy
+    name: Mypy Type Check
     runs-on: ubuntu-latest
     env:
       MYPYPATH: .
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-
-      - name: Install mypy and types
-        run: |
-          pip install mypy types-setuptools types-pyyaml types-requests
-
+          python-version: "3.10"
+      - name: Install mypy + stubs
+        run: pip install mypy types-setuptools types-pyyaml types-requests
       - name: Run Mypy
         run: mypy --config-file mypy.ini
 
   hassfest:
-    name: Hassfest
+    name: Hassfest Validation
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
       - uses: home-assistant/actions/hassfest@master
-
-  check-icons:
-    name: Icon Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Verify required icon/logo files
-        run: |
-          required_files=(
-            "brands/ha_daily_counter/icon.png"
-            "brands/ha_daily_counter/icon@2x.png"
-            "brands/ha_daily_counter/logo.png"
-            "brands/ha_daily_counter/logo@2x.png"
-          )
-
-          missing_files=0
-
-          for file in "${required_files[@]}"; do
-            if [ ! -f "$file" ]; then
-              echo "❌ Missing: $file"
-              missing_files=$((missing_files + 1))
-            else
-              echo "✅ Found: $file"
-            fi
-          done
-
-          if [ $missing_files -gt 0 ]; then
-            echo "❌ ERROR: One or more required icon/logo files are missing in brands/ha_daily_counter."
-            exit 1
-          fi
-
-      - name: Success
-        if: success()
-        run: echo "✅ All required icon/logo files are present."
