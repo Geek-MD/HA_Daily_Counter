@@ -29,10 +29,24 @@
     "option": {
       "step": {
         "init": {
-          "title": "Configurar contadores",
-          "description": "Agrega nuevos contadores a esta integración.",
+          "title": "Gestionar contadores",
+          "description": "Agrega o elimina contadores usados por esta integración.",
           "data": {
-            "add_counter": "¿Agregar nuevo contador?"
+            "action": "Selecciona una acción"
+          }
+        },
+        "select_delete": {
+          "title": "Eliminar contador",
+          "description": "Selecciona el contador que deseas eliminar.",
+          "data": {
+            "delete_target": "Contador"
+          }
+        },
+        "confirm_delete": {
+          "title": "Confirmar eliminación",
+          "description": "¿Estás seguro de que deseas eliminar este contador?",
+          "data": {
+            "confirm_delete": "Confirmar eliminación"
           }
         }
       }
