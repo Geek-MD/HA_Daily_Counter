@@ -1,15 +1,16 @@
 [![Geek-MD - HA Daily Counter](https://img.shields.io/static/v1?label=Geek-MD&message=HA%20Daily%20Counter&color=blue&logo=github)](https://github.com/Geek-MD/HA_Daily_Counter)
-[![stars](https://img.shields.io/github/stars/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
-[![forks](https://img.shields.io/github/forks/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
+[![Stars](https://img.shields.io/github/stars/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
+[![Forks](https://img.shields.io/github/forks/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
 
 [![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 ![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)
 
-[![CI Status](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
+[![Ruff](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Ruff)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
+[![Mypy](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Mypy)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
+[![Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Hassfest)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
 
 ![HA Daily Counter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/icon.png?raw=true)
-
 # HA Daily Counter
 
 **HA Daily Counter** is a custom integration for Home Assistant that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, or sensor triggers.
