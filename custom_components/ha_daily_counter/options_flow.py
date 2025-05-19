@@ -24,29 +24,33 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
         """Initial step: prompt to add a new counter or finish."""
+        if user_input is not None:
+            if user_input["add_counter"]:
+                return await self.async_step_user()
+            return self.async_create_entry(title="", data={"counters": self._counters})
+
         return self.async_show_form(
             step_id="init",
             data_schema={
                 "add_counter": bool
             },
-            description_placeholders={
-                "current_count": str(len(self._counters))
-            }
+            translation_key="init"
         )
 
     async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
-        """Collect name for the new counter."""
+        """Step to collect the name of the new counter."""
         if user_input is not None:
             self._new_counter["name"] = user_input["name"]
             return await self.async_step_trigger_entity()
 
         return self.async_show_form(
             step_id="user",
-            data_schema={"name": str}
+            data_schema={"name": str},
+            translation_key="user"
         )
 
     async def async_step_trigger_entity(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
-        """Collect trigger entity."""
+        """Step to collect the entity that triggers the counter."""
         if user_input is not None:
             self._new_counter["trigger_entity"] = user_input["trigger_entity"]
             return await self.async_step_trigger_state()
@@ -54,25 +58,19 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="trigger_entity",
             data_schema={
-                "trigger_entity": EntitySelector(
-                    EntitySelectorConfig(domain=None)
-                )
-            }
+                "trigger_entity": EntitySelector(EntitySelectorConfig())
+            },
+            translation_key="trigger_entity"
         )
 
     async def async_step_trigger_state(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
-        """Collect trigger state and finish."""
+        """Step to collect the trigger state."""
         if user_input is not None:
             self._new_counter["trigger_state"] = user_input["trigger_state"]
             self._new_counter["id"] = str(uuid.uuid4())
             self._counters.append(self._new_counter)
 
-            return self.async_show_form(
-                step_id="done",
-                description_placeholders={"name": self._new_counter["name"]},
-                data_schema={},
-                last_step=True
-            )
+            return await self.async_step_init()
 
         return self.async_show_form(
             step_id="trigger_state",
@@ -93,13 +91,11 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
                         mode="dropdown"
                     )
                 )
-            }
+            },
+            translation_key="trigger_state"
         )
 
     @callback
     def async_get_options(self) -> Dict[str, Any]:
+        """Return current options."""
         return {"counters": self._counters}
-
-    async def async_step_done(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
-        """Save and finish options flow."""
-        return self.async_create_entry(title="", data=self.async_get_options())
