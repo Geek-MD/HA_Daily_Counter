@@ -23,31 +23,31 @@
       },
       "done": {
         "title": "Contador creado",
-        "description": "El contador '{name}' ha sido añadido correctamente."
+        "description": "El contador {name} ha sido añadido correctamente."
       }
-    },
-    "option": {
-      "step": {
-        "init": {
-          "title": "Gestionar contadores",
-          "description": "Agrega o elimina contadores usados por esta integración.",
-          "data": {
-            "action": "Selecciona una acción"
-          }
-        },
-        "select_delete": {
-          "title": "Eliminar contador",
-          "description": "Selecciona el contador que deseas eliminar.",
-          "data": {
-            "delete_target": "Contador"
-          }
-        },
-        "confirm_delete": {
-          "title": "Confirmar eliminación",
-          "description": "¿Estás seguro de que deseas eliminar este contador?",
-          "data": {
-            "confirm_delete": "Confirmar eliminación"
-          }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Gestionar contadores",
+        "description": "Agrega o elimina contadores usados por esta integración.",
+        "data": {
+          "action": "Selecciona una acción"
+        }
+      },
+      "select_delete": {
+        "title": "Eliminar contador",
+        "description": "Selecciona el contador que deseas eliminar.",
+        "data": {
+          "delete_target": "Contador"
+        }
+      },
+      "confirm_delete": {
+        "title": "Confirmar eliminación",
+        "description": "¿Estás seguro de que deseas eliminar este contador?",
+        "data": {
+          "confirm_delete": "Confirmar eliminación"
         }
       }
     }
