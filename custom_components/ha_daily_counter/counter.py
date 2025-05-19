@@ -3,7 +3,10 @@ from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import callback, HomeAssistant, State
-from homeassistant.helpers.event import async_track_state_change, async_track_point_in_utc_time
+from homeassistant.helpers.event import (
+    async_track_state_change,
+    async_track_point_in_utc_time,
+)
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
@@ -92,9 +95,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         async_track_point_in_utc_time(self.hass, self._reset_counter, next_reset)
 
     def _get_next_reset_time(self) -> datetime:
-    """Calculate the next reset time at 00:00 UTC."""
-    now = dt_util.utcnow()
-    next_reset: datetime = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    if next_reset <= now:
-        next_reset += timedelta(days=1)
-    return next_reset
+        """Calculate the next reset time at 00:00 UTC."""
+        now = dt_util.utcnow()
+        next_reset: datetime = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        if next_reset <= now:
+            next_reset += timedelta(days=1)
+        return next_reset
