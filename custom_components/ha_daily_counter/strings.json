@@ -29,10 +29,24 @@
     "option": {
       "step": {
         "init": {
-          "title": "Configure Counters",
-          "description": "Add new counters to this integration.",
+          "title": "Manage Counters",
+          "description": "Add or remove counters used by this integration.",
           "data": {
-            "add_counter": "Add new counter?"
+            "action": "Choose an action"
+          }
+        },
+        "select_delete": {
+          "title": "Delete Counter",
+          "description": "Select the counter you want to delete.",
+          "data": {
+            "delete_target": "Counter"
+          }
+        },
+        "confirm_delete": {
+          "title": "Confirm Deletion",
+          "description": "Are you sure you want to delete this counter?",
+          "data": {
+            "confirm_delete": "Confirm deletion"
           }
         }
       }
