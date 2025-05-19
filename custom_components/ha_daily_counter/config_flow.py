@@ -6,7 +6,7 @@ from .options_flow import HADailyCounterOptionsFlow
 from .const import DOMAIN
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Config flow for HA Daily Counter."""
 
     VERSION = 1
