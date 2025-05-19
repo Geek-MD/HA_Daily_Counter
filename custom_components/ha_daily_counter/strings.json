@@ -10,6 +10,13 @@
           "trigger_state": "Trigger State"
         }
       },
+      "trigger_state": {
+        "title": "Trigger State",
+        "description": "Enter the state that will increment the counter (e.g., 'on', 'open', 'home').",
+        "data": {
+          "trigger_state": "State to monitor"
+        }
+      },
       "done": {
         "title": "Counter Created",
         "description": "The counter {name} has been added successfully."
