@@ -21,18 +21,31 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
         self.config_entry = config_entry
         self._counters = list(config_entry.options.get("counters", []))
         self._new_counter: Dict[str, Any] = {}
+        self._selected_delete_name: Optional[str] = None
 
     async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
-        """Initial step: prompt to add a new counter or finish."""
+        """Initial step: add or delete a counter."""
         if user_input is not None:
-            if user_input["add_counter"]:
+            if user_input["action"] == "add":
                 return await self.async_step_user()
+            elif user_input["action"] == "delete":
+                return await self.async_step_select_delete()
+
             return self.async_create_entry(title="", data={"counters": self._counters})
 
         return self.async_show_form(
             step_id="init",
             data_schema={
-                "add_counter": bool
+                "action": SelectSelector(
+                    SelectSelectorConfig(
+                        options=[
+                            SelectOptionDict(value="add", label="Add counter"),
+                            SelectOptionDict(value="delete", label="Delete counter"),
+                            SelectOptionDict(value="finish", label="Finish setup")
+                        ],
+                        mode="dropdown"
+                    )
+                )
             },
             translation_key="init"
         )
@@ -95,7 +108,43 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
             translation_key="trigger_state"
         )
 
+    async def async_step_select_delete(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
+        """Step to select a counter to delete."""
+        if not self._counters:
+            return await self.async_step_init()
+
+        if user_input is not None:
+            self._selected_delete_name = user_input["delete_target"]
+            return await self.async_step_confirm_delete()
+
+        return self.async_show_form(
+            step_id="select_delete",
+            data_schema={
+                "delete_target": SelectSelector(
+                    SelectSelectorConfig(
+                        options=[
+                            SelectOptionDict(value=c["name"], label=c["name"])
+                            for c in self._counters
+                        ],
+                        mode="dropdown"
+                    )
+                )
+            },
+            translation_key="select_delete"
+        )
+
+    async def async_step_confirm_delete(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
+        """Confirm and delete the selected counter."""
+        if user_input is not None and user_input.get("confirm_delete"):
+            self._counters = [c for c in self._counters if c["name"] != self._selected_delete_name]
+
+        return await self.async_step_init()
+
+    def _confirm_delete_schema(self) -> dict:
+        return {
+            "confirm_delete": bool
+        }
+
     @callback
     def async_get_options(self) -> Dict[str, Any]:
-        """Return current options."""
         return {"counters": self._counters}
