@@ -71,6 +71,20 @@ Pull requests and feature suggestions are welcome!
 
 ---
 
+## ⚠️ Upgrading to v1.1.8+
+
+If you're upgrading from a previous version, existing counters **will not inherit** the new statistical capabilities automatically.
+
+To benefit from improved dashboards and long-term statistics:
+
+1. Go to **Settings → Devices & Services → HA Daily Counter → Options**.
+2. Remove each existing counter.
+3. Recreate them using the updated interface.
+
+Counters created after `v1.1.8` will automatically support **history graphs**, **statistics**, and **better data visualizations**.
+
+---
+
 ## 📄 License
 
 MIT License
