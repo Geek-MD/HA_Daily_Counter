@@ -23,31 +23,31 @@
       },
       "done": {
         "title": "Counter Created",
-        "description": "The counter '{name}' has been added successfully."
+        "description": "The counter {name} has been added successfully."
       }
-    },
-    "option": {
-      "step": {
-        "init": {
-          "title": "Manage Counters",
-          "description": "Add or remove counters used by this integration.",
-          "data": {
-            "action": "Choose an action"
-          }
-        },
-        "select_delete": {
-          "title": "Delete Counter",
-          "description": "Select the counter you want to delete.",
-          "data": {
-            "delete_target": "Counter"
-          }
-        },
-        "confirm_delete": {
-          "title": "Confirm Deletion",
-          "description": "Are you sure you want to delete this counter?",
-          "data": {
-            "confirm_delete": "Confirm deletion"
-          }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Manage Counters",
+        "description": "Add or remove counters used by this integration.",
+        "data": {
+          "action": "Choose an action"
+        }
+      },
+      "select_delete": {
+        "title": "Delete Counter",
+        "description": "Select the counter you want to delete.",
+        "data": {
+          "delete_target": "Counter"
+        }
+      },
+      "confirm_delete": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this counter?",
+        "data": {
+          "confirm_delete": "Confirm deletion"
         }
       }
     }
