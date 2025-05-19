@@ -2,12 +2,10 @@ import logging
 from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.core import callback, HomeAssistant
+from homeassistant.core import callback, HomeAssistant, State
 from homeassistant.helpers.event import async_track_state_change, async_track_point_in_utc_time
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
-
-from .const import CONF_RESET_HOUR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,12 +17,11 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         self.hass = hass
         self._entry_id = entry_id
         self._unique_id = f"{entry_id}_{counter_config['id']}"
-        self._name = counter_config["name"]
+        self._name: str = counter_config["name"]
         self._trigger_entity = counter_config["trigger_entity"]
         self._trigger_state = counter_config["trigger_state"]
         self._device_id = counter_config["id"]
-        self._device_name = counter_config["name"]
-        self._reset_hour = counter_config.get(CONF_RESET_HOUR, 0)
+        self._device_name: str = counter_config["name"]
         self._attr_native_value = 0
 
     @property
@@ -67,14 +64,16 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             )
         )
 
-        # Schedule daily reset at the configured hour
+        # Schedule daily reset at midnight UTC
         next_reset = self._get_next_reset_time()
         self.async_on_remove(
             async_track_point_in_utc_time(self.hass, self._reset_counter, next_reset)
         )
 
     @callback
-    def _handle_trigger_state_change(self, entity_id, old_state, new_state) -> None:
+    def _handle_trigger_state_change(
+        self, entity_id: str, old_state: State | None, new_state: State | None
+    ) -> None:
         """Handle a trigger state change."""
         if new_state and new_state.state == self._trigger_state:
             self._attr_native_value += 1
@@ -86,16 +85,16 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         """Reset the counter to 0 and reschedule the next reset."""
         self._attr_native_value = 0
         self.async_write_ha_state()
-        _LOGGER.debug("Counter '%s' reset to 0 at scheduled hour", self._name)
+        _LOGGER.debug("Counter '%s' reset to 0 at midnight", self._name)
 
         # Reschedule next reset
         next_reset = self._get_next_reset_time()
         async_track_point_in_utc_time(self.hass, self._reset_counter, next_reset)
 
     def _get_next_reset_time(self) -> datetime:
-        """Calculate the next reset time based on reset_hour."""
+        """Calculate the next reset time at 00:00 UTC."""
         now = dt_util.utcnow()
-        next_reset = now.replace(hour=self._reset_hour, minute=0, second=0, microsecond=0)
+        next_reset = now.replace(hour=0, minute=0, second=0, microsecond=0)
         if next_reset <= now:
             next_reset += timedelta(days=1)
         return next_reset
