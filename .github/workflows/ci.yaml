@@ -1,4 +1,4 @@
-name: CI: Ruff + Mypy + Hassfest
+name: Ruff + Mypy + Hassfest
 
 on:
   push:
