@@ -6,22 +6,58 @@ on:
   pull_request:
     branches: [main, develop]
   schedule:
-    - cron: "0 0 * * *"  # Optional: nightly validation
+    - cron: "0 0 * * *"  # Nightly check
 
 jobs:
-  setup:
-    name: Common Setup
+  ruff:
+    name: Ruff
     runs-on: ubuntu-latest
-    outputs:
-      python-version: ${{ steps.set-vars.outputs.python-version }}
+
     steps:
-      - name: Set Python version
-        id: set-vars
-        run: echo "python-version=3.10" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff Linter
+        run: ruff check custom_components/ha_daily_counter/
+
+  mypy:
+    name: Mypy
+    runs-on: ubuntu-latest
+    env:
+      MYPYPATH: .
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install mypy and types
+        run: |
+          pip install mypy types-setuptools types-pyyaml types-requests
+
+      - name: Run Mypy
+        run: mypy --config-file mypy.ini
+
+  hassfest:
+    name: Hassfest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
 
   check-icons:
-    name: Check Brands Icons
+    name: Icon Check
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -50,32 +86,6 @@ jobs:
             exit 1
           fi
 
-  hassfest:
-    name: Validate with Hassfest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: home-assistant/actions/hassfest@master
-
-  lint:
-    name: Python Lint & Type Check
-    runs-on: ubuntu-latest
-    env:
-      MYPYPATH: .
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install tools
-        run: |
-          pip install ruff mypy types-setuptools types-pyyaml types-requests
-
-      - name: Run Ruff Linter
-        run: ruff check custom_components/ha_daily_counter/
-
-      - name: Run Mypy Type Checker
-        run: mypy --config-file mypy.ini
+      - name: Success
+        if: success()
+        run: echo "✅ All required icon/logo files are present."
