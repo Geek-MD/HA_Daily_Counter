@@ -1,5 +1,4 @@
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_NAME
 from homeassistant.helpers.selector import (
     EntitySelector,
@@ -7,17 +6,19 @@ from homeassistant.helpers.selector import (
     TextSelector,
     TextSelectorConfig
 )
+from homeassistant.data_entry_flow import FlowResult
 from typing import Any
+
 from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 from .options_flow import HADailyCounterOptionsFlow
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class HADailyCounterConfigFlow(config_entries.ConfigFlow):
     """Config flow for HA Daily Counter."""
 
     VERSION = 1
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None):
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the initial step."""
         if user_input is not None:
             name = user_input[CONF_NAME]
@@ -26,7 +27,6 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             counter_id = trigger_entity.replace(".", "_")
 
-            # Build the first counter config
             counter = {
                 "id": counter_id,
                 "name": name,
@@ -54,6 +54,6 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    def async_get_options_flow(entry: config_entries.ConfigEntry):
+    def async_get_options_flow(entry: config_entries.ConfigEntry) -> config_entries.OptionsFlow:
         """Return the options flow."""
         return HADailyCounterOptionsFlow(entry)
