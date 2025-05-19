@@ -9,7 +9,7 @@ from homeassistant.helpers.selector import (
 from homeassistant.data_entry_flow import FlowResult
 from typing import Any
 
-from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
+from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 from .options_flow import HADailyCounterOptionsFlow
 
 
