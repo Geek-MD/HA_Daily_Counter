@@ -13,7 +13,7 @@ from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 from .options_flow import HADailyCounterOptionsFlow
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow):
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain="ha_daily_counter"):
     """Config flow for HA Daily Counter."""
 
     VERSION = 1
