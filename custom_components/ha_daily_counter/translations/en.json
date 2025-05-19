@@ -2,12 +2,38 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configure Daily Counter",
-        "description": "Create a daily counter that increments when a trigger reaches a specific state.",
+        "title": "Add Counter",
+        "description": "Create a new counter to monitor entity states.",
         "data": {
           "name": "Name",
           "trigger_entity": "Trigger Entity",
           "trigger_state": "Trigger State"
+        }
+      },
+      "trigger_entity": {
+        "title": "Trigger Entity",
+        "description": "Select the entity that will trigger the counter."
+      },
+      "trigger_state": {
+        "title": "Trigger State",
+        "description": "Select the state that will increment the counter.",
+        "data": {
+          "trigger_state": "Trigger State"
+        }
+      },
+      "done": {
+        "title": "Counter Created",
+        "description": "The counter '{name}' has been added successfully."
+      }
+    },
+    "option": {
+      "step": {
+        "init": {
+          "title": "Configure Counters",
+          "description": "Add new counters to this integration.",
+          "data": {
+            "add_counter": "Add new counter?"
+          }
         }
       }
     }
