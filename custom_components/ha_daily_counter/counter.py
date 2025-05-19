@@ -2,10 +2,12 @@ import logging
 from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.core import callback, HomeAssistant, State
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.event import async_track_state_change, async_track_point_in_utc_time
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
+
+from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,15 +16,21 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     """Sensor that increments when another entity hits a specific state."""
 
     def __init__(self, hass: HomeAssistant, entry_id: str, counter_config: dict) -> None:
-        self.hass: HomeAssistant = hass
-        self._entry_id: str = entry_id
-        self._unique_id: str = f"{entry_id}_{counter_config['id']}"
-        self._name: str = counter_config["name"]
-        self._trigger_entity: str = counter_config["trigger_entity"]
-        self._trigger_state: str = counter_config["trigger_state"]
-        self._device_id: str = counter_config["id"]
-        self._device_name: str = counter_config["name"]
-        self._attr_native_value: int = 0
+        self.hass = hass
+        self._entry_id = entry_id
+        self._unique_id = f"{entry_id}_{counter_config['id']}"
+        self._name = counter_config["name"]
+        self._trigger_entity = counter_config["trigger_entity"]
+        self._trigger_state = counter_config["trigger_state"]
+        self._device_id = counter_config["id"]
+        self._device_name = counter_config["name"]
+        self._attr_native_value = 0
+
+        # 📈 Stats support + clean appearance
+        self._attr_state_class = "total"
+        self._attr_device_class = None
+        self._attr_native_unit_of_measurement = None
+        self._attr_icon = "mdi:counter"
 
     @property
     def unique_id(self) -> str:
@@ -45,17 +53,13 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     def native_value(self) -> int:
         return self._attr_native_value
 
-    @property
-    def native_unit_of_measurement(self) -> str | None:
-        return None
-
     async def async_added_to_hass(self) -> None:
         """Restore state, set up trigger listener and reset timer."""
-        last_state = await self.async_get_last_state()
-        if last_state and last_state.state.isdigit():
+        if (last_state := await self.async_get_last_state()) and last_state.state.isdigit():
             self._attr_native_value = int(last_state.state)
             _LOGGER.debug("Restored state for %s: %s", self._name, self._attr_native_value)
 
+        # Listen for state change
         self.async_on_remove(
             async_track_state_change(
                 self.hass,
@@ -64,18 +68,14 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             )
         )
 
-        next_reset: datetime = self._get_next_reset_time()
+        # Schedule daily reset at midnight
+        next_reset = self._get_next_reset_time()
         self.async_on_remove(
             async_track_point_in_utc_time(self.hass, self._reset_counter, next_reset)
         )
 
     @callback
-    def _handle_trigger_state_change(
-        self,
-        entity_id: str,
-        old_state: State | None,
-        new_state: State | None,
-    ) -> None:
+    def _handle_trigger_state_change(self, entity_id, old_state, new_state) -> None:
         """Handle a trigger state change."""
         if new_state and new_state.state == self._trigger_state:
             self._attr_native_value += 1
@@ -89,13 +89,14 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         self.async_write_ha_state()
         _LOGGER.debug("Counter '%s' reset to 0 at scheduled hour", self._name)
 
-        next_reset: datetime = self._get_next_reset_time()
+        # Reschedule next reset
+        next_reset = self._get_next_reset_time()
         async_track_point_in_utc_time(self.hass, self._reset_counter, next_reset)
 
     def _get_next_reset_time(self) -> datetime:
         """Calculate the next reset time at 00:00 UTC."""
-        now: datetime = dt_util.utcnow()
-        next_reset: datetime = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        now = dt_util.utcnow()
+        next_reset = now.replace(hour=0, minute=0, second=0, microsecond=0)
         if next_reset <= now:
             next_reset += timedelta(days=1)
         return next_reset
