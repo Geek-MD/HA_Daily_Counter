@@ -2,12 +2,38 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configurar Contador Diario",
-        "description": "Crea un contador diario que se incrementa cuando un disparador alcanza un estado específico.",
+        "title": "Agregar contador",
+        "description": "Crea un nuevo contador para monitorizar estados de entidades.",
         "data": {
           "name": "Nombre",
-          "trigger_entity": "Entidad Disparadora",
-          "trigger_state": "Estado del Disparador"
+          "trigger_entity": "Entidad disparadora",
+          "trigger_state": "Estado a monitorizar"
+        }
+      },
+      "trigger_entity": {
+        "title": "Entidad disparadora",
+        "description": "Selecciona la entidad que disparará el contador."
+      },
+      "trigger_state": {
+        "title": "Estado objetivo",
+        "description": "Selecciona el estado que incrementará el contador.",
+        "data": {
+          "trigger_state": "Estado a monitorizar"
+        }
+      },
+      "done": {
+        "title": "Contador creado",
+        "description": "El contador '{name}' ha sido añadido correctamente."
+      }
+    },
+    "option": {
+      "step": {
+        "init": {
+          "title": "Configurar contadores",
+          "description": "Agrega nuevos contadores a esta integración.",
+          "data": {
+            "add_counter": "¿Agregar nuevo contador?"
+          }
         }
       }
     }
