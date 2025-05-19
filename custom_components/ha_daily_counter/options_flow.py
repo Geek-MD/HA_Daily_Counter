@@ -11,9 +11,6 @@ from homeassistant.helpers.selector import (
 from typing import Any, Dict, Optional
 import uuid
 
-from .const import DOMAIN
-
-
 class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
     """Handle the options flow for HA Daily Counter."""
 
