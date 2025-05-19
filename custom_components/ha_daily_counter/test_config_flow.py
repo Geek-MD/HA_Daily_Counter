@@ -5,7 +5,7 @@ from custom_components.ha_daily_counter.const import DOMAIN, CONF_RESET_HOUR
 
 
 @pytest.mark.asyncio
-async def test_options_flow(hass: HomeAssistant):
+async def test_options_flow(hass: HomeAssistant) -> None:
     """Test the options flow."""
     entry = config_entries.ConfigEntry(
         version=1,
