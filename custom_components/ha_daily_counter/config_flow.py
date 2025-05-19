@@ -1,25 +1,59 @@
 from homeassistant import config_entries
-from homeassistant.config_entries import ConfigEntry
-from typing import Any, Dict, Optional
-
+from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_NAME
+from homeassistant.helpers.selector import (
+    EntitySelector,
+    EntitySelectorConfig,
+    TextSelector,
+    TextSelectorConfig
+)
+from typing import Any
+from .const import DOMAIN, ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
 from .options_flow import HADailyCounterOptionsFlow
-from .const import DOMAIN
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for HA Daily Counter."""
 
     VERSION = 1
 
-    async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
-        """Initial step: just create an empty entry, all configuration goes to options."""
-        return self.async_create_entry(
-            title="HA Daily Counter",
-            data={},
-            options={"counters": []},
+    async def async_step_user(self, user_input: dict[str, Any] | None = None):
+        """Handle the initial step."""
+        if user_input is not None:
+            name = user_input[CONF_NAME]
+            trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+            trigger_state = user_input[ATTR_TRIGGER_STATE]
+
+            counter_id = trigger_entity.replace(".", "_")
+
+            # Build the first counter config
+            counter = {
+                "id": counter_id,
+                "name": name,
+                "trigger_entity": trigger_entity,
+                "trigger_state": trigger_state,
+            }
+
+            return self.async_create_entry(
+                title="HA Daily Counter",
+                data={},
+                options={"counters": [counter]},
+            )
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=config_entries.vol.Schema({
+                config_entries.vol.Required(CONF_NAME): str,
+                config_entries.vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+                    EntitySelectorConfig()
+                ),
+                config_entries.vol.Required(ATTR_TRIGGER_STATE): TextSelector(
+                    TextSelectorConfig(type="text")
+                ),
+            }),
         )
 
     @staticmethod
-    def async_get_options_flow(config_entry: ConfigEntry) -> HADailyCounterOptionsFlow:
-        """Return the custom options flow handler."""
-        return HADailyCounterOptionsFlow(config_entry)
+    def async_get_options_flow(entry: config_entries.ConfigEntry):
+        """Return the options flow."""
+        return HADailyCounterOptionsFlow(entry)
