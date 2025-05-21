@@ -92,8 +92,12 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         self.async_write_ha_state()
         _LOGGER.debug("Counter '%s' reset to 0 at scheduled hour", self._name)
 
+        # 🛠️ FIX: Re-schedule the reset properly using `async_on_remove`
         next_reset = self._get_next_reset_time()
-        async_track_point_in_utc_time(self.hass, self._reset_counter, next_reset)
+        self.async_on_remove(
+            async_track_point_in_utc_time(self.hass, self._reset_counter, next_reset)
+        )
+        _LOGGER.debug("Next reset for '%s' scheduled at %s", self._name, next_reset)
 
     def _get_next_reset_time(self) -> datetime:
         """Calculate the next reset time at 00:00 UTC."""
