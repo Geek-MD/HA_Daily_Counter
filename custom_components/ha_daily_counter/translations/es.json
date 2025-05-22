@@ -3,11 +3,22 @@
     "step": {
       "user": {
         "title": "Agregar contador",
-        "description": "Crea un nuevo contador para monitorear estados de entidades.",
+        "description": "Crea un nuevo contador para monitorizar estados de entidades.",
         "data": {
           "name": "Nombre",
           "trigger_entity": "Entidad disparadora",
-          "trigger_state": "Estado a monitorear"
+          "trigger_state": "Estado a monitorizar"
+        }
+      },
+      "trigger_entity": {
+        "title": "Entidad disparadora",
+        "description": "Selecciona la entidad que disparará el contador."
+      },
+      "trigger_state": {
+        "title": "Estado objetivo",
+        "description": "Selecciona el estado que incrementará el contador.",
+        "data": {
+          "trigger_state": "Estado a monitorizar"
         }
       },
       "done": {
