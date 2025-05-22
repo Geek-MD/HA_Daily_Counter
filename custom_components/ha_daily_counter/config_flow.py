@@ -4,7 +4,7 @@ from homeassistant.helpers.selector import (
     EntitySelector,
     EntitySelectorConfig,
     TextSelector,
-    TextSelectorConfig
+    TextSelectorConfig,
 )
 from homeassistant.data_entry_flow import FlowResult
 from typing import Any
@@ -45,7 +45,9 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain="ha_daily_count
             data_schema=config_entries.vol.Schema({
                 config_entries.vol.Required(CONF_NAME): str,
                 config_entries.vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
-                    EntitySelectorConfig()
+                    EntitySelectorConfig(
+                        domain=["sensor", "binary_sensor", "input_boolean", "input_number", "input_text"]
+                    )
                 ),
                 config_entries.vol.Required(ATTR_TRIGGER_STATE): TextSelector(
                     TextSelectorConfig(type="text")
