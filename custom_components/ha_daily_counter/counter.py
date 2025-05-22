@@ -100,8 +100,8 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         _LOGGER.debug("Next reset for '%s' scheduled at %s", self._name, next_reset)
 
     def _get_next_reset_time(self) -> datetime:
-        """Calculate the next reset time at 00:00 UTC."""
-        now = dt_util.utcnow()
+        """Calculate the next reset time at 00:00 local time."""
+        now = dt_util.now()  # ← Local time
         next_reset: datetime = now.replace(hour=0, minute=0, second=0, microsecond=0)
         if next_reset <= now:
             next_reset += timedelta(days=1)
