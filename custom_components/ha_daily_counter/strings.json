@@ -10,11 +10,15 @@
           "trigger_state": "Trigger State"
         }
       },
+      "trigger_entity": {
+        "title": "Trigger Entity",
+        "description": "Select the entity that will trigger the counter."
+      },
       "trigger_state": {
         "title": "Trigger State",
-        "description": "Enter the state that will increment the counter (e.g., 'on', 'open', 'home').",
+        "description": "Select the state that will increment the counter.",
         "data": {
-          "trigger_state": "State to monitor"
+          "trigger_state": "Trigger State"
         }
       },
       "done": {
