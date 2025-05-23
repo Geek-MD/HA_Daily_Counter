@@ -5,21 +5,27 @@
         "title": "Add Counter",
         "description": "Create a new counter to monitor entity states.",
         "data": {
-          "name": "Name",
+          "name": "Name"
+        }
+      },
+      "trigger": {
+        "title": "Add Trigger {count}",
+        "description": "Define the settings for trigger #{count}.",
+        "data": {
           "trigger_entity": "Trigger Entity",
           "trigger_state": "Trigger State"
         }
       },
-      "trigger_state": {
-        "title": "Trigger State",
-        "description": "Enter the state that will increment the counter (e.g., 'on', 'open', 'home').",
+      "another": {
+        "title": "Add Another Trigger?",
+        "description": "You have added {count} trigger(s). Would you like to add another?",
         "data": {
-          "trigger_state": "State to monitor"
+          "add_another": "Add another trigger?"
         }
       },
       "done": {
         "title": "Counter Created",
-        "description": "The counter {name} has been added successfully."
+        "description": "The counter {name} with {count} trigger(s) has been added successfully."
       }
     }
   },
