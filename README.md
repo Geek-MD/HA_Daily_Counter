@@ -6,85 +6,107 @@
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 ![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)
 
-[![CI: Ruff + Mypy + Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
+[![Ruff](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Ruff)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
+[![Mypy](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Mypy)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
+[![Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Hassfest)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
 
 ![HA Daily Counter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/icon.png?raw=true)
 
 # HA Daily Counter
 
-**HA Daily Counter** is a custom integration for Home Assistant that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, or sensor triggers.
+**HA Daily Counter** is a custom integration for Home Assistant that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more.
 
 ---
 
 ## 🛠️ Features
 
-- Create one or more counters with custom names.
-- Increment counters when a trigger entity reaches a specific state.
-- Auto-reset counters daily at midnight (00:00).
-- Persistent values across Home Assistant restarts.
-- Manage everything via the UI — no YAML required.
-- Exposed as devices and entities for dashboards, automations, and statistics.
+- Create one or more counters with custom names.  
+- Increment counters when one or more trigger entities reach specified states (OR logic).  
+- Auto-reset counters daily at midnight (00:00 local time).  
+- Persistent counter values across Home Assistant restarts.  
+- Fully manageable via the UI (no YAML required).  
+- Exposed as devices and `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon for proper history graphs.  
+- Two custom services to reset or set counter values manually.  
 
 ---
 
 ## 📦 Installation
 
-1. Add this repository as a **custom repository in HACS**.
-2. Install **HA Daily Counter** from HACS.
-3. Restart Home Assistant.
+1. Add this repository as a **custom repository in HACS**.  
+2. Install **HA Daily Counter** from HACS.  
+3. Restart Home Assistant.  
 
 ---
 
 ## ⚙️ Configuration
 
-1. Go to **Settings → Devices & Services**.
-2. Click **Add Integration** and search for **HA Daily Counter**.
-3. Create counters with:
-   - **Name**: Friendly label (e.g. "Door Open Counter")
-   - **Trigger Entity**: Entity to monitor (e.g. `binary_sensor.door`)
-   - **Trigger State**: Value to match (e.g. `on`, `open`, `pressed`)
+1. Go to **Settings → Devices & Services**.  
+2. Click **Add Integration** and search for **HA Daily Counter**.  
+3. Follow the multi-step form to:  
+   - **Name**: Friendly label for your counter.  
+   - **Trigger Entity**: Pick an entity that will increment the counter.  
+   - **Trigger State**: Specify the state value that will trigger an increment.  
+   - **Add another trigger?**: Repeat as needed for multiple triggers.  
+4. Finish to create the counter.  
 
 ---
 
 ### 📝 Example Use Cases
 
-- Count how many times the front door opened today.
-- Track light switches or button presses.
-- Monitor motion detector activations.
-- Trigger automations when counters reach thresholds.
+- Count how many times a front door opened today.  
+- Track how often a light was switched on or off.  
+- Monitor motion detector activations or button presses.  
+- Combine with automations to notify when thresholds are reached.  
 
 ---
 
 ## 🔎 How It Works
 
-- The counter increases when the trigger entity enters the specified state.
-- Resets automatically to 0 at 00:00 daily.
-- State is restored after Home Assistant restarts.
-- Each counter is exposed as a **sensor entity** attached to a device.
+- The counter increases by 1 whenever **any** of the configured trigger entities enters its matching state.  
+- Automatically resets to 0 every day at **00:00 local time**.  
+- Remembers its value after Home Assistant restarts.  
+- Visible as a **sensor entity** linked to a device for easy management.  
+
+---
+
+## 🛎️ Services
+
+After setup, the following services are available under the `ha_daily_counter` domain:
+
+### ha_daily_counter.reset_counter
+
+Reset a counter back to zero.
+
+**Fields:**
+- `entity_id` _(required)_: The `entity_id` of the counter to reset.
+
+**Example:**
+    service: ha_daily_counter.reset_counter
+    target:
+      entity_id: sensor.my_counter
+
+### ha_daily_counter.set_counter
+
+Set a counter to a specific integer value.
+
+**Fields:**
+- `entity_id` _(required)_: The `entity_id` of the counter to adjust.  
+- `value` _(required)_: Integer to assign to the counter.
+
+**Example:**
+    service: ha_daily_counter.set_counter
+    data:
+      entity_id: sensor.my_counter
+      value: 42
 
 ---
 
 ## 🧑‍💻 Development & Support
 
-Maintained by [Geek-MD](https://github.com/Geek-MD).  
-Pull requests and feature suggestions are welcome!
-
----
-
-## ⚠️ Upgrading to v1.1.8+
-
-If you're upgrading from a previous version, existing counters **will not inherit** the new statistical capabilities automatically.
-
-To benefit from improved dashboards and long-term statistics:
-
-1. Go to **Settings → Devices & Services → HA Daily Counter → Options**.
-2. Remove each existing counter.
-3. Recreate them using the updated interface.
-
-Counters created after `v1.1.8` will automatically support **history graphs**, **statistics**, and **better data visualizations**.
+Maintained by [Geek-MD](https://github.com/Geek-MD). Pull requests and feature suggestions are welcome!
 
 ---
 
 ## 📄 License
 
-MIT License
+MIT License 
