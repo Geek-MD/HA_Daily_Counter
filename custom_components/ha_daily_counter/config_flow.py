@@ -4,22 +4,21 @@ from homeassistant.helpers.selector import (
     EntitySelector,
     EntitySelectorConfig,
     TextSelector,
-    TextSelectorConfig
+    TextSelectorConfig,
 )
 from homeassistant.data_entry_flow import FlowResult
 from typing import Any
 
-from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE
+from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
 from .options_flow import HADailyCounterOptionsFlow
 
-class ConfigFlow(config_entries.ConfigFlow):
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Config flow for HA Daily Counter with multiple triggers."""
 
     VERSION = 1
 
     async def async_step_user(
-        self,
-        user_input: dict[str, Any] | None = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         if user_input is not None:
             name = user_input[CONF_NAME]
