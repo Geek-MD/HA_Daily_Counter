@@ -1,11 +1,32 @@
 reset_counter:
   name: Reset counter
-  description: Reset the specified counter entity to 0 manually.
+  description: Reset the specified counter entity to 0.
   fields:
     entity_id:
-      name: Entity
+      name: Entity ID
       description: The entity_id of the counter to reset.
       required: true
       selector:
         entity:
           domain: sensor
+
+set_counter:
+  name: Set counter value
+  description: Set a specific value for the given counter entity.
+  fields:
+    entity_id:
+      name: Entity ID
+      description: The entity_id of the counter to set.
+      required: true
+      selector:
+        entity:
+          domain: sensor
+    value:
+      name: Counter value
+      description: The integer value to assign to the counter.
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 999999
+          mode: box
