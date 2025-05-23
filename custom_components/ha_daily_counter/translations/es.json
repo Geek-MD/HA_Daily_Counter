@@ -5,25 +5,27 @@
         "title": "Agregar contador",
         "description": "Crea un nuevo contador para monitorizar estados de entidades.",
         "data": {
-          "name": "Nombre",
+          "name": "Nombre"
+        }
+      },
+      "trigger": {
+        "title": "Agregar disparador {count}",
+        "description": "Define la configuración para el disparador #{count}.",
+        "data": {
           "trigger_entity": "Entidad disparadora",
           "trigger_state": "Estado a monitorizar"
         }
       },
-      "trigger_entity": {
-        "title": "Entidad disparadora",
-        "description": "Selecciona la entidad que disparará el contador."
-      },
-      "trigger_state": {
-        "title": "Estado objetivo",
-        "description": "Selecciona el estado que incrementará el contador.",
+      "another": {
+        "title": "¿Agregar otro disparador?",
+        "description": "Has agregado {count} disparador(es). ¿Quieres agregar otro?",
         "data": {
-          "trigger_state": "Estado a monitorizar"
+          "add_another": "Agregar otro disparador?"
         }
       },
       "done": {
         "title": "Contador creado",
-        "description": "El contador {name} ha sido añadido correctamente."
+        "description": "El contador {name} con {count} disparador(es) ha sido añadido correctamente."
       }
     }
   },
