@@ -1,85 +1,103 @@
 import logging
-import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
+
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the integration from configuration.yaml (not used)."""
+    """Set up the integration (no YAML)."""
     return True
 
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up HA Daily Counter from a config entry."""
+    """Set up HA Daily Counter and register services."""
+    # Creamos el caché (sensor.py lo irá llenando)
     hass.data.setdefault(DOMAIN, {})
 
-    # Forward sensor setup
+    # Montamos la plataforma sensor
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(entry, "sensor")
     )
 
-    # Service: reset counter
     async def handle_reset_counter(call: ServiceCall) -> None:
+        """Reset a counter to 0."""
+        _LOGGER.debug("reset_counter called with %s", call.data)
         entity_id = call.data.get("entity_id")
         if not entity_id:
-            _LOGGER.warning("No entity_id provided for reset_counter service.")
+            _LOGGER.warning("reset_counter: missing entity_id")
             return
-        entity = hass.data[DOMAIN].get(entity_id)
-        if entity:
-            entity._attr_native_value = 0
-            entity.async_write_ha_state()
-            _LOGGER.info("Counter '%s' manually reset to 0", entity_id)
-        else:
-            _LOGGER.warning("Entity '%s' not found for reset.", entity_id)
 
-    # Service: set counter value
+        entity = hass.data[DOMAIN].get(entity_id)
+        if not entity:
+            _LOGGER.warning("reset_counter: Entity '%s' not in cache", entity_id)
+            return
+
+        # 1) Actualizamos el atributo
+        entity._attr_native_value = 0
+        # 2) Forzamos la escritura en el State Machine
+        hass.states.async_set(entity_id, 0)
+        # 3) Avisamos al entity
+        entity.async_write_ha_state()
+        _LOGGER.info("reset_counter: '%s' reset to 0", entity_id)
+
     async def handle_set_counter(call: ServiceCall) -> None:
+        """Set a counter to a specific value."""
+        _LOGGER.debug("set_counter called with %s", call.data)
         entity_id = call.data.get("entity_id")
         value = call.data.get("value")
-        if entity_id is None or value is None:
-            _LOGGER.warning("entity_id and value are required for set_counter service.")
+        if not entity_id or value is None:
+            _LOGGER.warning("set_counter: missing entity_id or value")
             return
+
         entity = hass.data[DOMAIN].get(entity_id)
-        if entity:
-            try:
-                val = int(value)
-            except (ValueError, TypeError):
-                _LOGGER.error("Invalid value '%s' for set_counter; must be integer.", value)
-                return
-            entity._attr_native_value = val
-            entity.async_write_ha_state()
-            _LOGGER.info("Counter '%s' manually set to %s", entity_id, val)
-        else:
-            _LOGGER.warning("Entity '%s' not found for set_counter.", entity_id)
+        if not entity:
+            _LOGGER.warning("set_counter: Entity '%s' not in cache", entity_id)
+            return
 
-    # Register both services
+        try:
+            val = int(value)
+        except (ValueError, TypeError):
+            _LOGGER.error("set_counter: invalid value %r", value)
+            return
+
+        entity._attr_native_value = val
+        hass.states.async_set(entity_id, val)
+        entity.async_write_ha_state()
+        _LOGGER.info("set_counter: '%s' set to %d", entity_id, val)
+
+    # Registramos servicios
     hass.services.async_register(
         DOMAIN,
-        'reset_counter',
+        "reset_counter",
         handle_reset_counter,
-        schema=vol.Schema({
-            vol.Required('entity_id'): cv.entity_id
-        })
+        schema=vol.Schema({vol.Required("entity_id"): cv.entity_id}),
     )
-
     hass.services.async_register(
         DOMAIN,
-        'set_counter',
+        "set_counter",
         handle_set_counter,
-        schema=vol.Schema({
-            vol.Required('entity_id'): cv.entity_id,
-            vol.Required('value'): cv.positive_int
-        })
+        schema=vol.Schema(
+            {
+                vol.Required("entity_id"): cv.entity_id,
+                vol.Required("value"): cv.positive_int,
+            }
+        ),
     )
 
     return True
 
+
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    result: bool = await hass.config_entries.async_forward_entry_unload(entry, "sensor")
-    return result
+    return bool(
+        await hass.config_entries.async_forward_entry_unload(entry, "sensor")
+    )
