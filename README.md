@@ -21,7 +21,7 @@
 ## 🛠️ Features
 
 - Create one or more counters with custom names.  
-- Increment counters when one or more trigger entities reach specified states (OR logic).  
+- Increment counters when a trigger entity reach a specified state.  
 - Auto-reset counters daily at midnight (00:00 local time).  
 - Persistent counter values across Home Assistant restarts.  
 - Fully manageable via the UI (no YAML required).  
@@ -38,16 +38,21 @@
 
 ---
 
+## 👣 Previous Steps
+
+- If you need to configure multiple triggers, you must first create a “group” type helper and then use that helper as the trigger when setting up the sensor.
+
+---
+
 ## ⚙️ Configuration
 
-1. Go to **Settings → Devices & Services**.  
-2. Click **Add Integration** and search for **HA Daily Counter**.  
-3. Follow the multi-step form to:  
-   - **Name**: Friendly label for your counter.  
-   - **Trigger Entity**: Pick an entity that will increment the counter.  
-   - **Trigger State**: Specify the state value that will trigger an increment.  
-   - **Add another trigger?**: Repeat as needed for multiple triggers.  
-4. Finish to create the counter.  
+1. Go to **Settings → Devices & Services**.
+2. Click **Add Integration** and search for **HA Daily Counter**.
+3. Follow the multi-step form to:
+   - **Name**: Friendly label for your counter.
+   - **Trigger Entity**: Pick an entity that will increment the counter.
+   - **Trigger State**: Specify the state value that will trigger an increment.
+4. Finish to create the counter.
 
 ---
 
@@ -62,7 +67,7 @@
 
 ## 🔎 How It Works
 
-- The counter increases by 1 whenever **any** of the configured trigger entities enters its matching state.  
+- The counter increases by 1 whenever the configured trigger entity enters its matching state.  
 - Automatically resets to 0 every day at **00:00 local time**.  
 - Remembers its value after Home Assistant restarts.  
 - Visible as a **sensor entity** linked to a device for easy management.  
