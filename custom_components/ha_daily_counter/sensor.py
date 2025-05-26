@@ -18,6 +18,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -29,7 +30,6 @@ async def async_setup_entry(
 
     for cfg in counters:
         entity = HADailyCounterEntity(hass, entry.entry_id, cfg)
-        hass.data.setdefault(DOMAIN, {})[entity.entity_id] = entity
         entities.append(entity)
 
     if entities:
@@ -81,12 +81,12 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         }
 
     async def async_added_to_hass(self) -> None:
-        """Restore state, subscribe to triggers, and schedule daily reset."""
+        """Restore state, subscribe to triggers, schedule reset, and cache entity."""
         await super().async_added_to_hass()
 
-        # Restore last value
-        if (last_state := await self.async_get_last_state()) and last_state.state.isdigit():
-            self._attr_native_value = int(last_state.state)
+        # Restore last state
+        if (last := await self.async_get_last_state()) and last.state.isdigit():
+            self._attr_native_value = int(last.state)
             _LOGGER.debug("Restored state for '%s': %d", self._name, self._attr_native_value)
 
         # Subscribe to state change events
@@ -98,7 +98,7 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             )
         )
 
-        # Schedule first reset
+        # Schedule daily reset
         next_reset = self._get_next_reset_time()
         self._cancel_reset = async_track_point_in_utc_time(
             self.hass,
@@ -107,17 +107,22 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         )
         _LOGGER.debug("Scheduled reset for '%s' at %s", self._name, next_reset)
 
+        # **Cache this entity by its actual entity_id**
+        self.hass.data.setdefault(DOMAIN, {})[self.entity_id] = self
+        _LOGGER.debug("Cached entity '%s' for services", self.entity_id)
+
     @callback
     def _handle_trigger_state_change(self, event: Any) -> None:
         """Increment counter when trigger entity reaches specified state."""
         new_state = event.data.get("new_state")
         if not new_state or new_state.state in (STATE_UNKNOWN, None):
             return
-
         if new_state.state == self._trigger_state:
             self._attr_native_value += 1
             self.async_write_ha_state()
-            _LOGGER.debug("Counter '%s' incremented to %d", self._name, self._attr_native_value)
+            _LOGGER.debug(
+                "Counter '%s' incremented to %d", self._name, self._attr_native_value
+            )
 
     @callback
     def _reset_counter(self, now: datetime) -> None:
