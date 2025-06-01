@@ -112,6 +112,12 @@ Maintained by [Geek-MD](https://github.com/Geek-MD). Pull requests and feature s
 
 ---
 
+## 🆒 Icon Curiosity
+
+Why does the icon shows the number 28? Simply because it's a very interesting number, it's a perfect number. What is a perfect number? A perfect number is a positive integer that equals the sum of its positive proper divisors. In the case of number 28, its divisors are 1, 2, 4, 7 and 14. Mathematics, beauty, and poetry.
+
+---
+
 ## 📄 License
 
 MIT License 
