@@ -115,6 +115,6 @@ Why does the icon shows the number 28? Simply because it's a very interesting nu
 
 ---
 
-## 📄 License
+## License
 
 MIT License 
