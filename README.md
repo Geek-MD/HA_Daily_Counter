@@ -9,7 +9,6 @@
 [![Ruff](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Ruff)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
 [![Mypy](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Mypy)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
 [![Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Hassfest)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
-
 ![HA Daily Counter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/icon.png?raw=true)
 
 # HA Daily Counter
