@@ -5,12 +5,9 @@
 [![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 ![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)
-
 [![Ruff](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Ruff)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
-[![Mypy](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Mypy)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
-[![Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Hassfest)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
 
-<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/9feab86a-1242-4e17-a438-97c3ff0b9d89" />
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/028786f5-7c8e-4a18-9baa-23002cd368c0" />
 
 # HA Daily Counter
 
@@ -18,7 +15,7 @@
 
 ---
 
-## 🛠️ Features
+## Features
 
 - Create one or more counters with custom names.  
 - Increment counters when a trigger entity reach a specified state.  
@@ -30,7 +27,7 @@
 
 ---
 
-## 📦 Installation
+## Installation
 
 1. Add this repository as a **custom repository in HACS**.  
 2. Install **HA Daily Counter** from HACS.  
@@ -38,13 +35,13 @@
 
 ---
 
-## 👣 Previous Steps
+## Previous Steps
 
 - If you need to configure multiple triggers, you must first create a “group” type helper and then use that helper as the trigger when setting up the sensor.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 1. Go to **Settings → Devices & Services**.
 2. Click **Add Integration** and search for **HA Daily Counter**.
@@ -56,7 +53,7 @@
 
 ---
 
-### 📝 Example Use Cases
+### Example Use Cases
 
 - Count how many times a front door opened today.  
 - Track how often a light was switched on or off.  
@@ -65,7 +62,7 @@
 
 ---
 
-## 🔎 How It Works
+## How It Works
 
 - The counter increases by 1 whenever the configured trigger entity enters its matching state.  
 - Automatically resets to 0 every day at **00:00 local time**.  
@@ -74,7 +71,7 @@
 
 ---
 
-## 🛎️ Services
+## Services
 
 After setup, the following services are available under the `ha_daily_counter` domain:
 
@@ -106,12 +103,18 @@ Set a counter to a specific integer value.
 
 ---
 
-## 🧑‍💻 Development & Support
+## Development & Support
 
 Maintained by [Geek-MD](https://github.com/Geek-MD). Pull requests and feature suggestions are welcome!
 
 ---
 
-## 📄 License
+## Icon Curiosity
+
+Why does the icon shows the number 28? Simply because it's a very interesting number, it's a perfect number. What is a perfect number? A perfect number is a positive integer that equals the sum of its positive proper divisors. In the case of number 28, its divisors are 1, 2, 4, 7 and 14. Mathematics, beauty, and poetry.
+
+---
+
+## License
 
 MIT License 
