@@ -7,8 +7,6 @@
 ![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)
 [![Ruff](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Ruff)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
 
-![HA Daily Counter Icon](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/logo.png?raw=true)
-
 # HA Daily Counter
 
 **HA Daily Counter** is a custom integration for Home Assistant that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more.
