@@ -1,0 +1,57 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Counter",
+        "description": "Create a new counter to monitor entity states.",
+        "data": {
+          "name": "Name"
+        }
+      },
+      "trigger": {
+        "title": "Add Trigger {count}",
+        "description": "Define the settings for trigger #{count}.",
+        "data": {
+          "trigger_entity": "Trigger Entity",
+          "trigger_state": "Trigger State"
+        }
+      },
+      "another": {
+        "title": "Add Another Trigger?",
+        "description": "You have added {count} trigger(s). Would you like to add another?",
+        "data": {
+          "add_another": "Add another trigger?"
+        }
+      },
+      "done": {
+        "title": "Counter Created",
+        "description": "The counter {name} with {count} trigger(s) has been added successfully."
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Manage Counters",
+        "description": "Add or remove counters used by this integration.",
+        "data": {
+          "action": "Choose an action"
+        }
+      },
+      "select_delete": {
+        "title": "Delete Counter",
+        "description": "Select the counter you want to delete.",
+        "data": {
+          "delete_target": "Counter"
+        }
+      },
+      "confirm_delete": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this counter?",
+        "data": {
+          "confirm_delete": "Confirm deletion"
+        }
+      }
+    }
+  }
+}
