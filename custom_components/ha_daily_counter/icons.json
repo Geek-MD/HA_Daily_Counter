@@ -1,0 +1,8 @@
+{
+  "reset_counter": {
+    "icon": "mdi:restart"
+  },
+  "set_counter": {
+    "icon": "mdi:numeric"
+  }
+}
