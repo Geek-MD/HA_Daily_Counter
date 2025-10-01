@@ -6,26 +6,33 @@
         "description": "Crea un nuevo contador para monitorizar estados de entidades.",
         "data": {
           "name": "Nombre",
-          "trigger_entity": "Entidad a Monitorizar"
+          "trigger_entity": "Entidad a Monitorizar",
+          "trigger_state": "Estado a Monitorizar",
+          "add_another": "¿Agregar otro disparador?"
         }
       },
-      "trigger_state": {
-        "title": "Seleccionar Estado",
-        "description": "Elige el estado que incrementará el contador.",
+      "additional_trigger": {
+        "title": "Agregar Otro Disparador",
+        "description": "Define un disparador adicional para el contador.",
         "data": {
-          "trigger_state": "Estado a Monitorizar"
+          "next_trigger_entity": "Entidad Adicional a Monitorizar",
+          "logic_operator": "Lógica de Disparadores"
         }
+      },
+      "logic_help": {
+        "title": "Operadores Lógicos",
+        "description": "Elige cómo deben combinarse múltiples disparadores:\n- **AND**: El contador incrementa solo cuando todos los disparadores están activos al mismo tiempo.\n- **OR**: El contador incrementa cuando cualquiera de los disparadores está activo.\n- **NAND**: El contador incrementa cuando NO todos los disparadores están activos.\n- **NOR**: El contador incrementa solo cuando ninguno de los disparadores está activo."
       },
       "done": {
         "title": "Contador Creado",
-        "description": "El contador {name} ha sido agregado exitosamente."
+        "description": "El contador {name} ha sido creado exitosamente con {count} disparador(es)."
       }
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Gestionar Contadores",
+        "title": "Administrar Contadores",
         "description": "Agrega o elimina contadores usados por esta integración.",
         "data": {
           "action": "Elige una acción"
@@ -33,14 +40,14 @@
       },
       "select_delete": {
         "title": "Eliminar Contador",
-        "description": "Selecciona el contador que deseas eliminar.",
+        "description": "Selecciona el contador que quieres eliminar.",
         "data": {
           "delete_target": "Contador"
         }
       },
       "confirm_delete": {
         "title": "Confirmar Eliminación",
-        "description": "¿Seguro que deseas eliminar este contador?",
+        "description": "¿Estás seguro de que deseas eliminar este contador?",
         "data": {
           "confirm_delete": "Confirmar eliminación"
         }
