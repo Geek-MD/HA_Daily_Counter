@@ -13,21 +13,19 @@
       },
       "another_trigger": {
         "title": "Add Another Trigger",
-        "description": "Select an additional trigger for the counter. Already used entities are excluded automatically.",
+        "description": "Define an additional trigger for the counter.",
         "data": {
           "trigger_entity": "Additional Entity to Monitor",
-          "logic_operator": "Trigger Logic",
           "add_another": "Add another trigger?"
         }
-      },
-      "logic_help": {
-        "title": "Logic Operators",
-        "description": "Choose how multiple triggers should be combined:\n- **AND**: Counter increments only when all triggers are active at the same time.\n- **OR**: Counter increments when any trigger is active.\n- **NAND**: Counter increments when NOT all triggers are active.\n- **NOR**: Counter increments only when none of the triggers are active."
       },
       "done": {
         "title": "Counter Created",
         "description": "The counter {name} has been added successfully with {count} trigger(s)."
       }
+    },
+    "abort": {
+      "reconfigured": "The counter has been successfully reconfigured."
     }
   },
   "options": {
