@@ -5,24 +5,27 @@
         "title": "Add Counter",
         "description": "Create a new counter to monitor entity states.",
         "data": {
-          "name": "Counter Name",
+          "name": "Name",
           "trigger_entity": "Entity to Monitor",
           "trigger_state": "State to Monitor",
           "add_another": "Add another trigger?"
         }
       },
-      "add_trigger": {
-        "title": "Add Additional Trigger",
-        "description": "Define more triggers and choose the logic for combining them.",
+      "additional_trigger": {
+        "title": "Add Another Trigger",
+        "description": "Define an additional trigger for the counter.",
         "data": {
-          "trigger_entity": "Additional Trigger Entity",
-          "logic_operator": "Trigger Logic",
-          "add_another": "Add another trigger?"
+          "next_trigger_entity": "Additional Entity to Monitor",
+          "logic_operator": "Trigger Logic"
         }
+      },
+      "logic_help": {
+        "title": "Logic Operators",
+        "description": "Choose how multiple triggers should be combined:\n- **AND**: Counter increments only when all triggers are active at the same time.\n- **OR**: Counter increments when any trigger is active.\n- **NAND**: Counter increments when NOT all triggers are active.\n- **NOR**: Counter increments only when none of the triggers are active."
       },
       "done": {
         "title": "Counter Created",
-        "description": "The counter {name} with {count} trigger(s) has been added successfully."
+        "description": "The counter {name} has been added successfully with {count} trigger(s)."
       }
     }
   },
