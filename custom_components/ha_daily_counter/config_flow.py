@@ -11,10 +11,10 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectOptionDict,
-    BooleanSelector,
 )
 
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.core import HomeAssistant
 
 from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
 from .options_flow import HADailyCounterOptionsFlow
@@ -27,27 +27,35 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
 
     def __init__(self) -> None:
         self._name: str | None = None
-        self._trigger_state: str | None = None
-        self._trigger_entities: list[str] = []
-        self._logic_operator: str | None = None
-        self._domain: str | None = None
+        self._triggers: list[dict[str, str]] = []
+        self._available_domain: str | None = None
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """First step: basic info, first trigger, and state."""
+        """First step: name, first trigger entity, and its state."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
             self._name = user_input[CONF_NAME]
-            first_entity = user_input[ATTR_TRIGGER_ENTITY]
-            self._trigger_state = user_input[ATTR_TRIGGER_STATE]
-            self._trigger_entities.append(first_entity)
-            self._domain = first_entity.split(".")[0]
+            trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+            trigger_state = user_input[ATTR_TRIGGER_STATE]
 
+            # Save domain to enforce consistency across triggers
+            if self._available_domain is None:
+                self._available_domain = trigger_entity.split(".")[0]
+
+            trigger = {
+                "entity": trigger_entity,
+                "state": trigger_state,
+            }
+            self._triggers.append(trigger)
+
+            # Ask if user wants another trigger
             if user_input.get("add_another"):
-                return await self.async_step_add_trigger()
+                return await self.async_step_another_trigger()
 
+            # Finish configuration
             return self._create_entry()
 
         return self.async_show_form(
@@ -67,65 +75,87 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
                         )
                     ),
                     vol.Required(ATTR_TRIGGER_STATE): str,
-                    vol.Optional("add_another", default=False): BooleanSelector(),
+                    vol.Optional("add_another", default=False): bool,
                 }
             ),
+            description_placeholders={"name": "Counter Name"},
             errors=errors,
         )
 
-    async def async_step_add_trigger(
+    async def async_step_another_trigger(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Second step: add more triggers and define logic."""
-        if user_input is not None:
-            next_entity = user_input[ATTR_TRIGGER_ENTITY]
-            self._trigger_entities.append(next_entity)
+        """Step to add additional triggers with same state logic."""
+        errors: dict[str, str] = {}
 
-            if self._logic_operator is None:
-                self._logic_operator = user_input["logic_operator"]
+        hass: HomeAssistant = self.hass
+
+        if user_input is not None:
+            trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+
+            # State should be the same as first trigger
+            trigger_state = self._triggers[0]["state"]
+
+            trigger = {
+                "entity": trigger_entity,
+                "state": trigger_state,
+            }
+            self._triggers.append(trigger)
 
             if user_input.get("add_another"):
-                return await self.async_step_add_trigger()
+                return await self.async_step_another_trigger()
 
+            # Finish configuration
             return self._create_entry()
 
+        # Filter out already selected triggers
+        excluded_entities = [t["entity"] for t in self._triggers]
+
+        all_entities = [
+            e.entity_id
+            for e in hass.states.async_all()
+            if self._available_domain and e.entity_id.startswith(self._available_domain)
+        ]
+        available_entities = [
+            e for e in all_entities if e not in excluded_entities
+        ]
+
         return self.async_show_form(
-            step_id="add_trigger",
+            step_id="another_trigger",
             data_schema=vol.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
-                        EntitySelectorConfig(domain=[self._domain])
-                    ),
-                    vol.Required("logic_operator", default="or"): SelectSelector(
+                    vol.Required(ATTR_TRIGGER_ENTITY): SelectSelector(
                         SelectSelectorConfig(
                             options=[
-                                SelectOptionDict(value="or", label="OR (any trigger matches)"),
-                                SelectOptionDict(value="and", label="AND (all triggers match)"),
-                                SelectOptionDict(value="nor", label="NOR (none match)"),
-                                SelectOptionDict(value="nand", label="NAND (not all match)"),
-                                SelectOptionDict(value="xor", label="XOR (exactly one matches)"),
+                                SelectOptionDict(value=e, label=e)
+                                for e in available_entities
                             ],
                             mode="dropdown",
                         )
                     ),
-                    vol.Optional("add_another", default=False): BooleanSelector(),
+                    vol.Optional("add_another", default=False): bool,
                 }
             ),
+            description_placeholders={
+                "count": str(len(self._triggers) + 1),
+            },
+            errors=errors,
         )
 
     def _create_entry(self) -> FlowResult:
-        """Create the final config entry."""
-        counter_id = self._trigger_entities[0].replace(".", "_")
+        """Finalize and create the config entry."""
+        counter_id = "_".join(
+            [t["entity"].replace(".", "_") for t in self._triggers]
+        )
+
         counter = {
             "id": counter_id,
             "name": self._name,
-            "trigger_entities": self._trigger_entities,
-            "trigger_state": self._trigger_state,
-            "logic_operator": self._logic_operator or "or",
+            "triggers": self._triggers,
         }
 
         return self.async_create_entry(
-            title=self._name or "HA Daily Counter",
+            title=self._name or "Daily Counter",
             data={},
             options={"counters": [counter]},
         )
