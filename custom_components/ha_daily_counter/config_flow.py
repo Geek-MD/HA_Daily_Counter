@@ -26,45 +26,17 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
 
     def __init__(self) -> None:
         self._trigger_entity: str | None = None
+        self._name: str | None = None
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Handle the initial step."""
-        errors: dict[str, str] = {}
-
+        """Step 1: Ask for counter name and entity to monitor."""
         if user_input is not None:
-            # If entity already selected but state not yet chosen, go to next step
-            if ATTR_TRIGGER_ENTITY in user_input and ATTR_TRIGGER_STATE not in user_input:
-                self._trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
-                return await self.async_step_trigger_state(user_input)
+            self._name = user_input[CONF_NAME]
+            self._trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+            return await self.async_step_trigger_state()
 
-            # Final step: both entity and state selected
-            if (
-                CONF_NAME in user_input
-                and ATTR_TRIGGER_ENTITY in user_input
-                and ATTR_TRIGGER_STATE in user_input
-            ):
-                name = user_input[CONF_NAME]
-                trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
-                trigger_state = user_input[ATTR_TRIGGER_STATE]
-
-                counter_id = trigger_entity.replace(".", "_")
-
-                counter = {
-                    "id": counter_id,
-                    "name": name,
-                    "trigger_entity": trigger_entity,
-                    "trigger_state": trigger_state,
-                }
-
-                return self.async_create_entry(
-                    title=name,
-                    data={},
-                    options={"counters": [counter]},
-                )
-
-        # First step: ask for name + entity
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
@@ -83,13 +55,16 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
                     ),
                 }
             ),
-            errors=errors,
+            description_placeholders={
+                "name": "Name",
+                "trigger_entity": "Entity to monitor",
+            },
         )
 
     async def async_step_trigger_state(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Second step: show available states dynamically based on the selected entity."""
+        """Step 2: Select which state of the entity will increment the counter."""
         if self._trigger_entity is None:
             return await self.async_step_user(user_input)
 
@@ -98,20 +73,44 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
 
         options: list[SelectOptionDict] = []
         if entity_state is not None:
+            possible_states = set()
+
+            # Estado actual
+            if entity_state.state not in ("unknown", "unavailable"):
+                possible_states.add(entity_state.state)
+
+            # Opciones de input_select
+            if "options" in entity_state.attributes:
+                possible_states.update(entity_state.attributes["options"])
+
+            # Estados típicos de binary_sensor
+            if self._trigger_entity.startswith("binary_sensor."):
+                possible_states.update(["on", "off"])
+
+            # Estados comunes de puertas y ventanas
+            if entity_state.attributes.get("device_class") in ["door", "window"]:
+                possible_states.update(["open", "closed"])
+
             options = [
                 SelectOptionDict(value=state, label=state)
-                for state in {entity_state.state, *entity_state.attributes.get("options", [])}
-                if state not in ("unknown", "unavailable")
+                for state in sorted(possible_states)
             ]
 
         if user_input is not None and ATTR_TRIGGER_STATE in user_input:
-            # Completed selection: return to async_step_user with full data
-            return await self.async_step_user(
-                {
-                    CONF_NAME: user_input.get(CONF_NAME, "Daily Counter"),
-                    ATTR_TRIGGER_ENTITY: self._trigger_entity,
-                    ATTR_TRIGGER_STATE: user_input[ATTR_TRIGGER_STATE],
-                }
+            trigger_state = user_input[ATTR_TRIGGER_STATE]
+
+            counter_id = self._trigger_entity.replace(".", "_")
+            counter = {
+                "id": counter_id,
+                "name": self._name or "Daily Counter",
+                "trigger_entity": self._trigger_entity,
+                "trigger_state": trigger_state,
+            }
+
+            return self.async_create_entry(
+                title=self._name or "Daily Counter",
+                data={},
+                options={"counters": [counter]},
             )
 
         return self.async_show_form(
@@ -123,6 +122,9 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
                     )
                 }
             ),
+            description_placeholders={
+                "trigger_state": "State to monitor",
+            },
         )
 
     @staticmethod
