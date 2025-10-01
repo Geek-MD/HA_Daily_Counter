@@ -11,32 +11,29 @@
 
 # HA Daily Counter
 
-**HA Daily Counter** is a custom Home Assistant integration that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more.
+**HA Daily Counter** is a custom integration for Home Assistant that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more.
 
 ---
 
 ## ✨ Features
+
 - Create one or more counters with custom names.  
-- Increment counters when a trigger entity reaches a specified state.  
-- Auto-reset counters daily at midnight (**00:00 local time**).  
-- Persistent counter values across Home Assistant restarts.  
-- Fully manageable via the UI (no YAML required).  
-- Exposed as devices and `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon for proper history graphs.  
-- Two custom services to reset or set counter values manually.  
-- **UI improvements in v1.2.5**:  
-  - Trigger entities filtered to only show valid sensors/helpers.  
-  - Trigger state options dynamically populated based on the selected entity.  
-  - Proper usage of friendly strings in the setup dialog.
+- Configure **one or multiple trigger entities**, all within the same counter.  
+- Support for logical operators:  
+  - **AND** → All triggers must be active to increment.  
+  - **OR** → Any trigger increments the counter.  
+  - **NAND** → Increments only if *not all* triggers are active.  
+  - **NOR** → Increments only if *none* of the triggers are active.  
+- Increment counters when trigger entities reach a specific state.  
+- Auto-reset counters daily at midnight (**local time**).  
+- Persistent values across Home Assistant restarts.  
+- Manage everything via the **UI — no YAML required**.  
+- Exposed as devices and `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon for proper line graph history.  
+- Includes **two services** to reset or set counter values manually.  
 
 ---
 
-## ⚙️ Requirements
-- Home Assistant **2024.6.0** or newer.  
-- No additional dependencies required.  
-
----
-
-## 📥 Installation
+## 📦 Installation
 
 ### Option 1: Manual installation
 1. Download the latest release from [GitHub](https://github.com/Geek-MD/HA_Daily_Counter/releases).  
@@ -46,8 +43,6 @@
    ```
 3. Restart Home Assistant.  
 4. Add the integration from **Settings → Devices & Services → Add Integration → HA Daily Counter**.  
-
----
 
 ### Option 2: Installation via HACS
 1. Go to **HACS → Integrations → Custom Repositories**.  
@@ -62,17 +57,42 @@
 
 ---
 
-## 🔧 Configuration
-When adding the integration:  
-- **Name**: Friendly label for your counter.  
-- **Trigger Entity**: Pick a valid sensor or helper that will increment the counter.  
-- **Trigger State**: Select dynamically from the available states of the chosen entity.  
+## ⚙️ Configuration
 
-📌 If you need multiple triggers, first create a **Group Helper** in Home Assistant, and then use that group as the trigger.
+When adding the integration you’ll be guided through a multi-step form:
+
+1. **Name** → Friendly label for your counter.  
+2. **Trigger Entity** → Pick an entity to monitor (e.g. `binary_sensor.door`).  
+3. **Trigger State** → Select the state that should increment the counter.  
+4. **Add Another Trigger?** → Choose whether to add more entities.  
+5. **Trigger Logic** → Define how multiple triggers interact (`AND`, `OR`, `NAND`, `NOR`).  
+
+The counter will be created once configuration is complete.
+
+---
+
+## 📝 Example Use Cases
+
+- Count how many times the **front door** opened today.  
+- Track how often a **light** was switched on or off.  
+- Monitor **motion detector activations** or button presses.  
+- Combine with automations to notify when counters reach thresholds.  
+- Create **compound counters** (e.g., count when two windows are open at the same time with `AND`).  
+
+---
+
+## 🔎 How It Works
+
+- The counter increases by 1 whenever the configured trigger(s) match the logic and state.  
+- Automatically resets to 0 every day at **00:00 local time**.  
+- State is restored after Home Assistant restarts.  
+- Each counter is exposed as a **sensor entity** attached to a device.  
 
 ---
 
 ## 🛠️ Services
+
+After setup, the following services are available under the `ha_daily_counter` domain:
 
 ### 1. `ha_daily_counter.reset_counter`
 Reset a counter back to zero.
@@ -93,7 +113,7 @@ target:
 Set a counter to a specific integer value.
 
 **Fields:**
-- `entity_id` _(required)_: The `entity_id` of the counter.  
+- `entity_id` _(required)_: The `entity_id` of the counter to adjust.  
 - `value` _(required)_: Integer to assign to the counter.  
 
 **Example:**
@@ -106,27 +126,22 @@ data:
 
 ---
 
-## 💡 Example Use Cases
-- Count how many times the front door opened today.  
-- Track how often a light was switched on or off.  
-- Monitor motion detector activations or button presses.  
-- Combine with automations to notify when thresholds are reached.  
+## 👨‍💻 Development & Support
 
----
-
-## ⚙️ How It Works
-- The counter increases by 1 whenever the configured trigger entity enters its matching state.  
-- Automatically resets to 0 every day at **00:00 local time**.  
-- Restores its value after Home Assistant restarts.  
-- Exposed as a **sensor entity** linked to a device for easy dashboards and automations.  
+Maintained by [Geek-MD](https://github.com/Geek-MD).  
+Pull requests and feature suggestions are welcome!
 
 ---
 
 ## 🎨 Icon Curiosity
+
 Why does the icon show the number **28**?  
-Because 28 is a **perfect number**. A perfect number is a positive integer equal to the sum of its proper divisors. For 28, its divisors are **1 + 2 + 4 + 7 + 14**. Mathematics, beauty, and poetry.  
+Because 28 is a **perfect number**: a positive integer equal to the sum of its proper divisors.  
+For 28: `1 + 2 + 4 + 7 + 14 = 28`.  
+Mathematics, beauty, and poetry.
 
 ---
 
 ## 📄 License
-MIT License. See [LICENSE](LICENSE) for details.  
+
+MIT License. See [LICENSE](LICENSE) for details.
