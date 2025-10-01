@@ -1,6 +1,6 @@
 {
   "services": {
-    "reset_counter": "mdi:restart",
-    "set_counter": "mdi:numeric"
+    "reset_counter": {"service": "mdi:restart"},
+    "set_counter": {"service": "mdi:numeric"}
   }
 }
