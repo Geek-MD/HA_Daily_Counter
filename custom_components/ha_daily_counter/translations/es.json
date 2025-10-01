@@ -11,21 +11,22 @@
           "add_another": "¿Agregar otro disparador?"
         }
       },
-      "additional_trigger": {
+      "another_trigger": {
         "title": "Agregar Otro Disparador",
-        "description": "Define un disparador adicional para el contador.",
+        "description": "Selecciona un disparador adicional para el contador. Las entidades ya utilizadas se excluyen automáticamente.",
         "data": {
-          "next_trigger_entity": "Entidad Adicional a Monitorizar",
-          "logic_operator": "Lógica de Disparadores"
+          "trigger_entity": "Entidad Adicional a Monitorizar",
+          "logic_operator": "Lógica de Disparadores",
+          "add_another": "¿Agregar otro disparador?"
         }
       },
       "logic_help": {
         "title": "Operadores Lógicos",
-        "description": "Elige cómo deben combinarse múltiples disparadores:\n- **AND**: El contador incrementa solo cuando todos los disparadores están activos al mismo tiempo.\n- **OR**: El contador incrementa cuando cualquiera de los disparadores está activo.\n- **NAND**: El contador incrementa cuando NO todos los disparadores están activos.\n- **NOR**: El contador incrementa solo cuando ninguno de los disparadores está activo."
+        "description": "Elige cómo se deben combinar múltiples disparadores:\n- **AND**: El contador incrementa solo cuando todos los disparadores están activos al mismo tiempo.\n- **OR**: El contador incrementa cuando cualquier disparador está activo.\n- **NAND**: El contador incrementa cuando NO todos los disparadores están activos.\n- **NOR**: El contador incrementa solo cuando ninguno de los disparadores está activo."
       },
       "done": {
         "title": "Contador Creado",
-        "description": "El contador {name} ha sido creado exitosamente con {count} disparador(es)."
+        "description": "El contador {name} se ha creado exitosamente con {count} disparador(es)."
       }
     }
   },
