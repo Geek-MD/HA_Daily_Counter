@@ -12,7 +12,9 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectOptionDict,
+    BooleanSelector,
 )
+
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
@@ -20,22 +22,34 @@ from .options_flow import HADailyCounterOptionsFlow
 
 
 class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
-    """Config flow for HA Daily Counter."""
+    """Config flow for HA Daily Counter with multiple triggers."""
 
     VERSION = 1
 
     def __init__(self) -> None:
-        self._trigger_entity: str | None = None
         self._name: str | None = None
+        self._trigger_state: str | None = None
+        self._trigger_entities: list[str] = []
+        self._logic_operator: str | None = None
+        self._domain: str | None = None
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 1: Ask for counter name and entity to monitor."""
+        """First step: basic info, first trigger, and state."""
+        errors: dict[str, str] = {}
+
         if user_input is not None:
             self._name = user_input[CONF_NAME]
-            self._trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
-            return await self.async_step_trigger_state()
+            first_entity = user_input[ATTR_TRIGGER_ENTITY]
+            self._trigger_state = user_input[ATTR_TRIGGER_STATE]
+            self._trigger_entities.append(first_entity)
+            self._domain = first_entity.split(".")[0]
+
+            if user_input.get("add_another"):
+                return await self.async_step_add_trigger()
+
+            return self._create_entry()
 
         return self.async_show_form(
             step_id="user",
@@ -53,78 +67,68 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
                             ]
                         )
                     ),
+                    vol.Required(ATTR_TRIGGER_STATE): str,
+                    vol.Optional("add_another", default=False): BooleanSelector(),
                 }
             ),
-            description_placeholders={
-                "name": "Name",
-                "trigger_entity": "Entity to monitor",
-            },
+            errors=errors,
         )
 
-    async def async_step_trigger_state(
+    async def async_step_add_trigger(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 2: Select which state of the entity will increment the counter."""
-        if self._trigger_entity is None:
-            return await self.async_step_user(user_input)
+        """Second step: add more triggers and define logic."""
+        if user_input is not None:
+            next_entity = user_input[ATTR_TRIGGER_ENTITY]
+            self._trigger_entities.append(next_entity)
 
-        hass: HomeAssistant = self.hass
-        entity_state = hass.states.get(self._trigger_entity)
+            if self._logic_operator is None:
+                self._logic_operator = user_input["logic_operator"]
 
-        options: list[SelectOptionDict] = []
-        if entity_state is not None:
-            possible_states = set()
+            if user_input.get("add_another"):
+                return await self.async_step_add_trigger()
 
-            # Estado actual
-            if entity_state.state not in ("unknown", "unavailable"):
-                possible_states.add(entity_state.state)
-
-            # Opciones de input_select
-            if "options" in entity_state.attributes:
-                possible_states.update(entity_state.attributes["options"])
-
-            # Estados típicos de binary_sensor
-            if self._trigger_entity.startswith("binary_sensor."):
-                possible_states.update(["on", "off"])
-
-            # Estados comunes de puertas y ventanas
-            if entity_state.attributes.get("device_class") in ["door", "window"]:
-                possible_states.update(["open", "closed"])
-
-            options = [
-                SelectOptionDict(value=state, label=state)
-                for state in sorted(possible_states)
-            ]
-
-        if user_input is not None and ATTR_TRIGGER_STATE in user_input:
-            trigger_state = user_input[ATTR_TRIGGER_STATE]
-
-            counter_id = self._trigger_entity.replace(".", "_")
-            counter = {
-                "id": counter_id,
-                "name": self._name or "Daily Counter",
-                "trigger_entity": self._trigger_entity,
-                "trigger_state": trigger_state,
-            }
-
-            return self.async_create_entry(
-                title=self._name or "Daily Counter",
-                data={},
-                options={"counters": [counter]},
-            )
+            return self._create_entry()
 
         return self.async_show_form(
-            step_id="trigger_state",
+            step_id="add_trigger",
             data_schema=vol.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_STATE): SelectSelector(
-                        SelectSelectorConfig(options=options, mode="dropdown")
-                    )
+                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+                        EntitySelectorConfig(domain=[self._domain])
+                    ),
+                    vol.Required("logic_operator", default="or"): SelectSelector(
+                        SelectSelectorConfig(
+                            options=[
+                                SelectOptionDict(value="or", label="OR (any trigger matches)"),
+                                SelectOptionDict(value="and", label="AND (all triggers match)"),
+                                SelectOptionDict(value="nor", label="NOR (none match)"),
+                                SelectOptionDict(value="nand", label="NAND (not all match)"),
+                                SelectOptionDict(value="xor", label="XOR (exactly one matches)"),
+                            ],
+                            mode="dropdown",
+                        )
+                    ),
+                    vol.Optional("add_another", default=False): BooleanSelector(),
                 }
             ),
-            description_placeholders={
-                "trigger_state": "State to monitor",
-            },
+        )
+
+    def _create_entry(self) -> FlowResult:
+        """Create the final config entry."""
+        counter_id = self._trigger_entities[0].replace(".", "_")
+        counter = {
+            "id": counter_id,
+            "name": self._name,
+            "trigger_entities": self._trigger_entities,
+            "trigger_state": self._trigger_state,
+            "logic_operator": self._logic_operator or "or",
+        }
+
+        return self.async_create_entry(
+            title=self._name or "HA Daily Counter",
+            data={},
+            options={"counters": [counter]},
         )
 
     @staticmethod
