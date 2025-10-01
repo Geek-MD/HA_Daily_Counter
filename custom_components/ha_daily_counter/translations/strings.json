@@ -11,12 +11,13 @@
           "add_another": "Add another trigger?"
         }
       },
-      "additional_trigger": {
+      "another_trigger": {
         "title": "Add Another Trigger",
-        "description": "Define an additional trigger for the counter.",
+        "description": "Select an additional trigger for the counter. Already used entities are excluded automatically.",
         "data": {
-          "next_trigger_entity": "Additional Entity to Monitor",
-          "logic_operator": "Trigger Logic"
+          "trigger_entity": "Additional Entity to Monitor",
+          "logic_operator": "Trigger Logic",
+          "add_another": "Add another trigger?"
         }
       },
       "logic_help": {
