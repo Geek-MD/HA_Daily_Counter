@@ -11,45 +11,32 @@
 
 # HA Daily Counter
 
-**HA Daily Counter** is a custom Home Assistant integration that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more.
+**HA Daily Counter** is a custom integration for Home Assistant that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more. Now with **multiple trigger support** and **custom logic operators**.
 
 ---
 
 ## ✨ Features
+
 - Create one or more counters with custom names.  
-- Increment counters when a trigger entity reaches a specified state.  
-- Auto-reset counters daily at midnight (**00:00 local time**).  
-- Persistent counter values across Home Assistant restarts.  
+- Configure **one or more trigger entities**.  
+- Choose the **state** (`on`, `off`, or custom states) that increments the counter.  
+- Define how multiple triggers are combined with **logic operators**:  
+  - **AND** → All triggers must be active.  
+  - **OR** → Any trigger increments the counter.  
+  - **NAND** → Counter increments when *not all* triggers are active.  
+  - **NOR** → Counter increments only if none of the triggers are active.  
+- Assign an **area** to the counter for better organization in Home Assistant.  
+- Auto-reset counters daily at midnight (00:00 local time).  
+- Persistent values across Home Assistant restarts.  
 - Fully manageable via the UI (no YAML required).  
-- Exposed as devices and `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon for proper history graphs.  
-- Two custom services to reset or set counter values manually.  
-- **UI improvements in v1.2.5**:  
-  - Trigger entities filtered to only show valid sensors/helpers.  
-  - Trigger state options dynamically populated based on the selected entity.  
-  - Proper usage of friendly strings in the setup dialog.
+- Exposed as `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon.  
+- Includes **reset** and **set** services for manual control.  
 
 ---
 
-## ⚙️ Requirements
-- Home Assistant **2024.6.0** or newer.  
-- No additional dependencies required.  
+## 🛠 Installation
 
----
-
-## 📥 Installation
-
-### Option 1: Manual installation
-1. Download the latest release from [GitHub](https://github.com/Geek-MD/HA_Daily_Counter/releases).  
-2. Copy the `ha_daily_counter` folder into:  
-   ```
-   /config/custom_components/ha_daily_counter/
-   ```
-3. Restart Home Assistant.  
-4. Add the integration from **Settings → Devices & Services → Add Integration → HA Daily Counter**.  
-
----
-
-### Option 2: Installation via HACS
+### Option 1: Installation via HACS
 1. Go to **HACS → Integrations → Custom Repositories**.  
 2. Add the repository URL:  
    ```
@@ -58,29 +45,49 @@
 3. Select category **Integration**.  
 4. Search for **HA Daily Counter** in HACS and install it.  
 5. Restart Home Assistant.  
-6. Add the integration from **Settings → Devices & Services → Add Integration → HA Daily Counter**.  
+
+### Option 2: Manual installation
+1. Download the latest release from [GitHub](https://github.com/Geek-MD/HA_Daily_Counter/releases).  
+2. Copy the `ha_daily_counter` folder into:  
+   ```
+   /config/custom_components/ha_daily_counter/
+   ```
+3. Restart Home Assistant.  
 
 ---
 
-## 🔧 Configuration
-When adding the integration:  
-- **Name**: Friendly label for your counter.  
-- **Trigger Entity**: Pick a valid sensor or helper that will increment the counter.  
-- **Trigger State**: Select dynamically from the available states of the chosen entity.  
+## ⚙️ Configuration
 
-📌 If you need multiple triggers, first create a **Group Helper** in Home Assistant, and then use that group as the trigger.
+1. Go to **Settings → Devices & Services → Add Integration → HA Daily Counter**.  
+2. Fill in the multi-step form:  
+   - **Name**: Friendly name of the counter.  
+   - **Trigger Entity**: Entity that will increment the counter.  
+   - **Trigger State**: State value to monitor (e.g., `on`, `off`).  
+   - **Add Another Trigger?**: Toggle to add additional triggers.  
+
+3. If multiple triggers are added:  
+   - Select additional entities and states.  
+   - At the end, configure the **logic operator** and optionally assign an **area**.  
 
 ---
 
-## 🛠️ Services
+## 💡 Example Use Cases
+
+- Count how many times the front door opened today.  
+- Track how often lights were turned **on**.  
+- Monitor motion detectors across multiple rooms, combined with **OR** logic.  
+- Require two conditions (e.g., window open **AND** heater on) to increment.  
+- Use **NOR** to count when no devices are active.  
+
+---
+
+## 🖥 Services
+
+Available services under the `ha_daily_counter` domain:
 
 ### 1. `ha_daily_counter.reset_counter`
-Reset a counter back to zero.
+Reset a counter to zero.
 
-**Fields:**
-- `entity_id` _(required)_: The `entity_id` of the counter to reset.
-
-**Example:**
 ```yaml
 service: ha_daily_counter.reset_counter
 target:
@@ -92,11 +99,6 @@ target:
 ### 2. `ha_daily_counter.set_counter`
 Set a counter to a specific integer value.
 
-**Fields:**
-- `entity_id` _(required)_: The `entity_id` of the counter.  
-- `value` _(required)_: Integer to assign to the counter.  
-
-**Example:**
 ```yaml
 service: ha_daily_counter.set_counter
 data:
@@ -106,27 +108,22 @@ data:
 
 ---
 
-## 💡 Example Use Cases
-- Count how many times the front door opened today.  
-- Track how often a light was switched on or off.  
-- Monitor motion detector activations or button presses.  
-- Combine with automations to notify when thresholds are reached.  
+## 📊 How It Works
+
+- The counter increases by `+1` when its triggers match the configured states.  
+- If multiple triggers are configured, the logic operator defines how they combine.  
+- Counters reset to **0 every midnight** (local time).  
+- Values persist across Home Assistant restarts.  
 
 ---
 
-## ⚙️ How It Works
-- The counter increases by 1 whenever the configured trigger entity enters its matching state.  
-- Automatically resets to 0 every day at **00:00 local time**.  
-- Restores its value after Home Assistant restarts.  
-- Exposed as a **sensor entity** linked to a device for easy dashboards and automations.  
+## 🧮 Icon Curiosity
 
----
-
-## 🎨 Icon Curiosity
 Why does the icon show the number **28**?  
-Because 28 is a **perfect number**. A perfect number is a positive integer equal to the sum of its proper divisors. For 28, its divisors are **1 + 2 + 4 + 7 + 14**. Mathematics, beauty, and poetry.  
+Because 28 is a **perfect number** — equal to the sum of its divisors (1 + 2 + 4 + 7 + 14).  
+Math, beauty, and poetry in one number.  
 
 ---
 
-## 📄 License
+## 📜 License
 MIT License. See [LICENSE](LICENSE) for details.  
