@@ -52,10 +52,24 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     ) -> None:
         self.hass = hass
         self._entry_id = entry_id
-        self._unique_id = f"{entry_id}_{counter_config['id']}"
-        self._name: str = counter_config["name"]
-        self._trigger_entity: str = counter_config["trigger_entity"]
-        self._trigger_state: str = counter_config["trigger_state"]
+
+        # === Retrocompatibilidad ===
+        # v1.3.0 → usa trigger_entity / trigger_state
+        # v1.3.1+ → usa triggers (lista)
+        if "trigger_entity" in counter_config:
+            self._trigger_entity: str = counter_config["trigger_entity"]
+            self._trigger_state: str = counter_config["trigger_state"]
+        elif "triggers" in counter_config and isinstance(counter_config["triggers"], list):
+            first = counter_config["triggers"][0] if counter_config["triggers"] else {}
+            self._trigger_entity = first.get("entity", "")
+            self._trigger_state = first.get("state", "")
+        else:
+            _LOGGER.warning("Invalid counter config: %s", counter_config)
+            self._trigger_entity = ""
+            self._trigger_state = ""
+
+        self._unique_id = f"{entry_id}_{counter_config.get('id', 'unknown')}"
+        self._name: str = counter_config.get("name", "Unnamed Counter")
         self._attr_native_value: int = 0
         self._cancel_reset: Any = None
 
@@ -90,13 +104,17 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             _LOGGER.debug("Restored state for '%s': %d", self._name, self._attr_native_value)
 
         # Subscribe to state change events
-        self.async_on_remove(
-            async_track_state_change_event(
-                self.hass,
-                [self._trigger_entity],
-                self._handle_trigger_state_change,
+        if self._trigger_entity:
+            self.async_on_remove(
+                async_track_state_change_event(
+                    self.hass,
+                    [self._trigger_entity],
+                    self._handle_trigger_state_change,
+                )
             )
-        )
+            _LOGGER.debug("Subscribed to trigger '%s' for '%s'", self._trigger_entity, self._name)
+        else:
+            _LOGGER.warning("Counter '%s' has no valid trigger entity", self._name)
 
         # Schedule daily reset
         next_reset = self._get_next_reset_time()
@@ -107,7 +125,7 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         )
         _LOGGER.debug("Scheduled reset for '%s' at %s", self._name, next_reset)
 
-        # **Cache this entity by its actual entity_id**
+        # Cache this entity for service access
         self.hass.data.setdefault(DOMAIN, {})[self.entity_id] = self
         _LOGGER.debug("Cached entity '%s' for services", self.entity_id)
 
@@ -131,7 +149,6 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         self.async_write_ha_state()
         _LOGGER.info("Counter '%s' reset to 0", self._name)
 
-        # Schedule next reset
         next_reset = self._get_next_reset_time()
         self._cancel_reset = async_track_point_in_utc_time(
             self.hass,
