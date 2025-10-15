@@ -117,13 +117,5 @@ data:
 
 ---
 
-## 🧮 Icon Curiosity
-
-Why does the icon show the number **28**?  
-Because 28 is a **perfect number** — equal to the sum of its divisors (1 + 2 + 4 + 7 + 14).  
-Math, beauty, and poetry in one number.  
-
----
-
 ## 📜 License
 MIT License. See [LICENSE](LICENSE) for details.  
