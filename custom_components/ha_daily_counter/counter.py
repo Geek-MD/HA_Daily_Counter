@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import HomeAssistant, callback, State
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import (
     async_track_state_change,
     async_track_point_in_utc_time,
@@ -41,13 +42,14 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         return self._name
 
     @property
-    def device_info(self) -> dict:
-        return {
-            "identifiers": {(self._entry_id, self._device_id)},
-            "name": self._device_name,
-            "manufacturer": "Geek-MD",
-            "model": "HA Daily Counter",
-        }
+    def device_info(self) -> DeviceInfo | None:
+        """Return device information for Home Assistant UI."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._unique_id)},
+            name=self._name,
+            manufacturer="Geek-MD",
+            model="HA Daily Counter",
+        )
 
     @property
     def native_value(self) -> int:
