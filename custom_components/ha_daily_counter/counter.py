@@ -11,6 +11,8 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
+from .const import DOMAIN
+
 _LOGGER = logging.getLogger(__name__)
 
 
