@@ -1,6 +1,5 @@
-# --- Core type stubs for Home Assistant development ---
-# Home Assistant typings (standalone)
-git+https://github.com/home-assistant/core@2024.3.3#subdirectory=homeassistant
+# --- Type stubs and minimal deps for Home Assistant development ---
+homeassistant-stubs==2024.2.0
 
 # --- Dev tools ---
 mypy==1.10.0
