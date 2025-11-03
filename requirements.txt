@@ -1,14 +1,11 @@
-# Core Home Assistant framework
-homeassistant==2024.9.3
+# --- Core type stubs for Home Assistant development ---
+# Home Assistant typings (standalone)
+git+https://github.com/home-assistant/core@2024.3.3#subdirectory=homeassistant
 
-# Type checking
+# --- Dev tools ---
 mypy==1.10.0
-types-setuptools==68.2.0.0
-
-# Linting & formatting
 ruff==0.6.4
-
-# Static analysis helpers
 voluptuous==0.13.1
 pytest==8.3.2
 aiohttp==3.9.5
+types-setuptools==68.2.0.0
