@@ -18,8 +18,7 @@ per-file-ignores = { "custom_components/*/__init__.py" = ["F401"] }
 
 [tool.isort]
 profile = "black"
-# Asegura orden reproducible: ajusta "homebridge_monitor" si usas otro nombre de paquete
-known_first_party = ["homebridge_monitor", "custom_components"]
+known_first_party = ["ha_daily_counter", "custom_components"]
 known_third_party = ["aiohttp", "voluptuous", "homeassistant"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 default_section = "THIRDPARTY"
