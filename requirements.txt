@@ -3,7 +3,7 @@ homeassistant-stubs==2024.2.0
 
 # --- Dev tools ---
 mypy==1.10.0
-ruff==0.6.4
+ruff==0.14.3
 voluptuous==0.13.1
 pytest==8.3.2
 aiohttp==3.9.3
