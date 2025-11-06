@@ -5,6 +5,7 @@ from typing import Any, Dict
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_point_in_utc_time,
@@ -86,13 +87,14 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         return self._attr_native_value
 
     @property
-    def device_info(self) -> Dict[str, Any]:
-        return {
-            "identifiers": {(DOMAIN, self._unique_id)},
-            "name": self._name,
-            "manufacturer": "Geek-MD",
-            "model": "HA Daily Counter",
-        }
+    def device_info(self) -> DeviceInfo | None:
+        """Return device information for Home Assistant UI."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._unique_id)},
+            name=self._name,
+            manufacturer="Geek-MD",
+            model="HA Daily Counter",
+        )
 
     async def async_added_to_hass(self) -> None:
         """Restore state, subscribe to triggers, schedule reset, and cache entity."""
