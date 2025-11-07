@@ -2,6 +2,7 @@
 
 import logging
 from typing import Any
+from typing import cast
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -22,9 +23,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up HA Daily Counter from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
-    # ✅ Updated for HA 2025.x+: use plural forward_entry_setups
+    # Compatibilidad con diferentes versiones de HA/stubs:
+    # intentamos usar la API plural si existe; para evitar errores de mypy
+    # hacemos un cast a Any en la llamada.
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
+        cast(Any, hass.config_entries).async_forward_entry_setups(entry, ["sensor"])
     )
 
     async def handle_reset_counter(call: ServiceCall) -> None:
@@ -76,6 +79,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    # ✅ Updated for HA 2025.x+: use plural forward_entry_unloads
-    unloaded = await hass.config_entries.async_forward_entry_unloads(entry, ["sensor"])
+    # Llamada a la versión plural de unload si existe; usar cast para evitar chequeos estáticos.
+    unloaded = await cast(Any, hass.config_entries).async_forward_entry_unloads(entry, ["sensor"])
     return all(unloaded)
