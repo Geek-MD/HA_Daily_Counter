@@ -1,27 +1,21 @@
 from __future__ import annotations
 
-import voluptuous as vol
 from typing import Any
+import uuid
+import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
-from homeassistant.helpers.selector import (
-    EntitySelector,
-    EntitySelectorConfig,
-    SelectSelector,
-    SelectSelectorConfig,
-    SelectOptionDict,
-    AreaSelector,
-    AreaSelectorConfig,
-)
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.selector import EntitySelector, EntitySelectorConfig, SelectSelectorMode
 
 from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
-from .options_flow import HADailyCounterOptionsFlow
+
+LOGIC_OPTIONS = ["AND", "OR"]  # Solo AND y OR, OR por defecto
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
-    """Config flow for HA Daily Counter with multiple triggers."""
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Config flow for HA Daily Counter with multiple triggers and an overall logic operator."""
 
     VERSION = 1
 
@@ -30,11 +24,15 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
         self._triggers: list[dict[str, str]] = []
         self._available_domain: str | None = None
         self._add_more: bool = False
+        self._logic: str = "OR"  # lógica elegida SOLO en el primer paso
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """First step: name, first trigger entity, its state, and add more toggle."""
+        """
+        Primer paso: nombre, entidad disparadora inicial, estado, checkbox add_another,
+        y selector de lógica (AND/OR). La lógica se guarda y se usa para todos los triggers.
+        """
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -48,17 +46,24 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
 
             self._triggers.append(
                 {
+                    "id": str(uuid.uuid4()),
                     "entity": trigger_entity,
                     "state": trigger_state,
                 }
             )
 
+            # Guardamos la lógica seleccionada (OR por defecto)
+            self._logic = user_input.get("logic", "OR")
+
             self._add_more = user_input.get("add_another", False)
-            if self._add_more:
-                return await self.async_step_another_trigger()
+            # Si no se pide agregar otro sensor, terminamos y creamos la entrada
+            if not self._add_more:
+                return await self.async_step_finish()
 
-            return await self.async_step_finish()
+            # Si se pidió agregar otro, vamos al paso de añadir más triggers
+            return await self.async_step_another_trigger()
 
+        # Formulario inicial: checkbox antes del selector de lógica, según requeriste.
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
@@ -77,6 +82,7 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
                     ),
                     vol.Required(ATTR_TRIGGER_STATE): str,
                     vol.Optional("add_another", default=False): bool,
+                    vol.Optional("logic", default="OR"): vol.In(LOGIC_OPTIONS),
                 }
             ),
             errors=errors,
@@ -85,7 +91,12 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
     async def async_step_another_trigger(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step to add additional triggers with their states."""
+        """
+        Paso repetible para añadir triggers adicionales.
+        Muestra: selector de entidad filtrado por el mismo dominio que la primera entidad,
+        selector de estado y la casilla add_another para repetir. NO muestra el selector de lógica:
+        la lógica ya fue elegida en el primer paso y se aplica a todos los triggers.
+        """
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -94,18 +105,21 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
 
             self._triggers.append(
                 {
+                    "id": str(uuid.uuid4()),
                     "entity": trigger_entity,
                     "state": trigger_state,
                 }
             )
 
             self._add_more = user_input.get("add_another", False)
-            if self._add_more:
-                return await self.async_step_another_trigger()
+            # Si no se pide agregar otro, terminamos y creamos la entrada
+            if not self._add_more:
+                return await self.async_step_finish()
 
-            return await self.async_step_finish()
+            # Si se pidió agregar otro, repetimos este mismo paso
+            return await self.async_step_another_trigger()
 
-        # Friendly names y filtrado de entidades ya seleccionadas
+        # Excluir entidades ya seleccionadas para no duplicar
         excluded_entities = [t["entity"] for t in self._triggers]
 
         all_entities = [
@@ -115,7 +129,7 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
         ]
         available_entities = [e for e in all_entities if e not in excluded_entities]
 
-        # Friendly names de triggers previos
+        # Friendly names de triggers previos (si existen en hass.states)
         prev_friendly = [
             f"{self.hass.states.get(t['entity']).name} ({t['state']})"
             for t in self._triggers
@@ -126,76 +140,23 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
             step_id="another_trigger",
             data_schema=vol.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_ENTITY): SelectSelector(
-                        SelectSelectorConfig(
-                            options=[
-                                SelectOptionDict(value=e, label=self.hass.states.get(e).name)
-                                for e in available_entities
-                                if self.hass.states.get(e)
-                            ],
-                            mode="dropdown",
-                        )
+                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+                        EntitySelectorConfig(options=available_entities)
                     ),
                     vol.Required(ATTR_TRIGGER_STATE): str,
                     vol.Optional("add_another", default=False): bool,
                 }
             ),
-            description_placeholders={
-                "previous_triggers": ", ".join(prev_friendly) or "None",
-                "count": str(len(self._triggers) + 1),
-            },
+            description_placeholders={"previous": ", ".join(prev_friendly)} if prev_friendly else {},
             errors=errors,
         )
 
-    async def async_step_finish(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Final step: logic operator and area."""
-        if user_input is not None:
-            logic_operator = user_input["logic_operator"]
-            area = user_input.get("area")
+    async def async_step_finish(self) -> FlowResult:
+        """Finaliza el flujo y crea la entry con los triggers y la lógica seleccionada en el primer paso."""
+        title = self._name or "HA Daily Counter"
+        data = {
+            "triggers": self._triggers,
+            "logic": self._logic,  # AND u OR
+        }
 
-            counter_id = "_".join([t["entity"].replace(".", "_") for t in self._triggers])
-
-            counter = {
-                "id": counter_id,
-                "name": self._name,
-                "triggers": self._triggers,
-                "logic": logic_operator,
-                "area": area,
-            }
-
-            return self.async_create_entry(
-                title=self._name or "Daily Counter",
-                data={},
-                options={"counters": [counter]},
-            )
-
-        return self.async_show_form(
-            step_id="finish",
-            data_schema=vol.Schema(
-                {
-                    vol.Required("logic_operator"): SelectSelector(
-                        SelectSelectorConfig(
-                            options=[
-                                SelectOptionDict(value="and", label="AND"),
-                                SelectOptionDict(value="or", label="OR"),
-                                SelectOptionDict(value="nand", label="NAND"),
-                                SelectOptionDict(value="nor", label="NOR"),
-                            ],
-                            mode="dropdown",
-                        )
-                    ),
-                    vol.Optional("area"): AreaSelector(AreaSelectorConfig()),
-                }
-            ),
-            description_placeholders={
-                "count": str(len(self._triggers)),
-            },
-        )
-
-    @staticmethod
-    def async_get_options_flow(
-        entry: config_entries.ConfigEntry,
-    ) -> config_entries.OptionsFlow:
-        return HADailyCounterOptionsFlow(entry)
+        return self.async_create_entry(title=title, data=data)
