@@ -7,7 +7,14 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.selector import EntitySelector, EntitySelectorConfig, SelectSelectorMode
+from homeassistant.helpers.selector import (
+    EntitySelector,
+    EntitySelectorConfig,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectOptionDict,
+    SelectSelectorMode,
+)
 
 from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
 
@@ -136,12 +143,18 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if self.hass.states.get(t["entity"])
         ]
 
+        # Usamos SelectSelector con opciones construidas desde available_entities
+        select_options = [SelectOptionDict(value=e, label=e) for e in available_entities]
+
         return self.async_show_form(
             step_id="another_trigger",
             data_schema=vol.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
-                        EntitySelectorConfig(options=available_entities)
+                    vol.Required(ATTR_TRIGGER_ENTITY): SelectSelector(
+                        SelectSelectorConfig(
+                            options=select_options,
+                            mode=SelectSelectorMode.DROPDOWN,
+                        )
                     ),
                     vol.Required(ATTR_TRIGGER_STATE): str,
                     vol.Optional("add_another", default=False): bool,
