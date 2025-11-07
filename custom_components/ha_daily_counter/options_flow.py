@@ -7,6 +7,7 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectOptionDict,
+    SelectSelectorMode,
 )
 from typing import Any, Dict, Optional
 import uuid
@@ -40,11 +41,10 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
                             SelectOptionDict(value="delete", label="Delete counter"),
                             SelectOptionDict(value="finish", label="Finish setup")
                         ],
-                        mode="dropdown"
+                        mode=SelectSelectorMode.DROPDOWN
                     )
                 )
             },
-            translation_key="init"
         )
 
     async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
@@ -56,7 +56,6 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="user",
             data_schema={"name": str},
-            translation_key="user"
         )
 
     async def async_step_trigger_entity(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
@@ -70,7 +69,6 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
             data_schema={
                 "trigger_entity": EntitySelector(EntitySelectorConfig())
             },
-            translation_key="trigger_entity"
         )
 
     async def async_step_trigger_state(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
@@ -98,11 +96,10 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
                             SelectOptionDict(value="playing", label="playing")
                         ],
                         multiple=False,
-                        mode="dropdown"
+                        mode=SelectSelectorMode.DROPDOWN
                     )
                 )
             },
-            translation_key="trigger_state"
         )
 
     async def async_step_select_delete(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
@@ -123,11 +120,10 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
                             SelectOptionDict(value=c["name"], label=c["name"])
                             for c in self._counters
                         ],
-                        mode="dropdown"
+                        mode=SelectSelectorMode.DROPDOWN
                     )
                 )
             },
-            translation_key="select_delete"
         )
 
     async def async_step_confirm_delete(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
