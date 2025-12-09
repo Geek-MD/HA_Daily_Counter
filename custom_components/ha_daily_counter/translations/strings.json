@@ -6,6 +6,7 @@
         "description": "Create a new counter with a trigger entity and state.",
         "data": {
           "name": "Name",
+          "domain_filter": "Entity Type",
           "trigger_entity": "Entity to Monitor",
           "trigger_state": "State to Monitor",
           "add_another": "Add another trigger?"
@@ -15,8 +16,10 @@
         "title": "Add Another Trigger",
         "description": "Define another trigger for this counter.\nAlready configured: {previous_triggers}",
         "data": {
+          "text_filter": "Filter by Name (optional)",
           "trigger_entity": "Additional Entity to Monitor",
           "trigger_state": "State to Monitor",
+          "logic": "Trigger Logic",
           "add_another": "Add another trigger?"
         }
       },

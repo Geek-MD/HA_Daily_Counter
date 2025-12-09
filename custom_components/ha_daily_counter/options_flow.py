@@ -1,16 +1,18 @@
+import uuid
+from typing import Any, Dict, Optional
+
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
     EntitySelector,
     EntitySelectorConfig,
+    SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
-    SelectOptionDict,
     SelectSelectorMode,
 )
-from typing import Any, Dict, Optional
-import uuid
+
 
 class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
     """Handle the options flow for HA Daily Counter."""

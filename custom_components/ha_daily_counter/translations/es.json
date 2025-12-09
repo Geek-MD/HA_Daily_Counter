@@ -6,6 +6,7 @@
         "description": "Crea un nuevo contador con una entidad disparadora y un estado.",
         "data": {
           "name": "Nombre",
+          "domain_filter": "Tipo de Entidad",
           "trigger_entity": "Entidad a Monitorizar",
           "trigger_state": "Estado a Monitorizar",
           "add_another": "¿Agregar otro disparador?"
@@ -15,8 +16,10 @@
         "title": "Agregar Otro Disparador",
         "description": "Define otro disparador para este contador.\nYa configurados: {previous_triggers}",
         "data": {
+          "text_filter": "Filtrar por Nombre (opcional)",
           "trigger_entity": "Entidad Adicional a Monitorizar",
           "trigger_state": "Estado a Monitorizar",
+          "logic": "Lógica de Disparadores",
           "add_another": "¿Agregar otro disparador?"
         }
       },

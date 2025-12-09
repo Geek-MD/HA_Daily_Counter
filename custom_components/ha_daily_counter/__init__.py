@@ -1,8 +1,7 @@
 """Init file for HA Daily Counter integration."""
 
 import logging
-from typing import Any
-from typing import cast
+from typing import Any, cast
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
