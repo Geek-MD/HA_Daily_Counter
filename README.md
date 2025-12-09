@@ -18,13 +18,18 @@
 ## ✨ Features
 
 - Create one or more counters with custom names.  
-- Configure **one or more trigger entities**.  
+- Configure **one or more trigger entities** from multiple domains:
+  - **Binary Sensors** (doors, windows, motion detectors)
+  - **Sensors** (temperature, humidity, etc.)
+  - **Automations** (track automation executions)
+  - **Scripts** (monitor script runs)
+  - **Input Helpers** (input_boolean, input_number, input_select)
 - Choose the **state** (`on`, `off`, or custom states) that increments the counter.  
 - Define how multiple triggers are combined with **logic operators**:  
   - **AND** → All triggers must be active.  
   - **OR** → Any trigger increments the counter.  
-  - **NAND** → Counter increments when *not all* triggers are active.  
-  - **NOR** → Counter increments only if none of the triggers are active.  
+- Filter entities by domain type for easy selection.
+- Search entities by name when adding additional triggers.
 - Assign an **area** to the counter for better organization in Home Assistant.  
 - Auto-reset counters daily at midnight (00:00 local time).  
 - Persistent values across Home Assistant restarts.  
@@ -60,14 +65,17 @@
 
 1. Go to **Settings → Devices & Services → Add Integration → HA Daily Counter**.  
 2. Fill in the multi-step form:  
-   - **Name**: Friendly name of the counter.  
-   - **Trigger Entity**: Entity that will increment the counter.  
-   - **Trigger State**: State value to monitor (e.g., `on`, `off`).  
+   - **Name**: Friendly name of the counter.
+   - **Entity Type**: Select the domain to filter entities (Binary Sensor, Sensor, Automation, Script, or Input Helpers).
+   - **Trigger Entity**: Entity that will increment the counter (filtered by selected type).  
+   - **Trigger State**: State value to monitor (e.g., `on`, `off`, `home`, `triggered`).  
    - **Add Another Trigger?**: Toggle to add additional triggers.  
 
 3. If multiple triggers are added:  
-   - Select additional entities and states.  
-   - At the end, configure the **logic operator** and optionally assign an **area**.  
+   - **Filter by Name**: Optional text field to search entities by name.
+   - Select additional entities and states from the same domain.  
+   - Configure the **logic operator** (AND/OR) when adding the second trigger.
+   - The same logic applies to all subsequent triggers.  
 
 ---
 
@@ -76,8 +84,10 @@
 - Count how many times the front door opened today.  
 - Track how often lights were turned **on**.  
 - Monitor motion detectors across multiple rooms, combined with **OR** logic.  
+- Track automation executions (e.g., how many times "Turn on lights" automation ran).
+- Monitor script runs (e.g., count "Night mode" script executions).
 - Require two conditions (e.g., window open **AND** heater on) to increment.  
-- Use **NOR** to count when no devices are active.  
+- Use multiple binary sensors to track activity across different zones.  
 
 ---
 
