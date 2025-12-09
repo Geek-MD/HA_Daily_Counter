@@ -16,8 +16,10 @@
         "title": "Add Another Trigger",
         "description": "Define an additional trigger for this counter.\nAlready configured: {previous_triggers}",
         "data": {
+          "text_filter": "Filter by Name (optional)",
           "trigger_entity": "Additional Entity to Monitor",
           "trigger_state": "State to Monitor",
+          "logic": "Trigger Logic",
           "add_another": "Add another trigger?"
         }
       },
