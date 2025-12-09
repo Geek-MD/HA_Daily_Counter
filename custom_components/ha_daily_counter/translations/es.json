@@ -6,6 +6,7 @@
         "description": "Crea un nuevo contador con una entidad disparadora y un estado.",
         "data": {
           "name": "Nombre",
+          "domain_filter": "Tipo de Entidad",
           "trigger_entity": "Entidad a Monitorizar",
           "trigger_state": "Estado a Monitorizar",
           "add_another": "¿Agregar otro disparador?"

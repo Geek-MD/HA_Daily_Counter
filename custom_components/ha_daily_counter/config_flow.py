@@ -1,24 +1,35 @@
 from __future__ import annotations
 
-from typing import Any
 import uuid
-import voluptuous as vol
+from typing import Any
 
+import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.selector import (
     EntitySelector,
     EntitySelectorConfig,
+    SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
-    SelectOptionDict,
     SelectSelectorMode,
 )
 
 from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
 
 LOGIC_OPTIONS = ["AND", "OR"]  # Solo AND y OR, OR por defecto
+
+# Domain options for entity filtering
+DOMAIN_OPTIONS = [
+    SelectOptionDict(value="binary_sensor", label="Binary Sensor"),
+    SelectOptionDict(value="sensor", label="Sensor"),
+    SelectOptionDict(value="automation", label="Automation"),
+    SelectOptionDict(value="script", label="Script"),
+    SelectOptionDict(value="input_boolean", label="Input Boolean"),
+    SelectOptionDict(value="input_number", label="Input Number"),
+    SelectOptionDict(value="input_select", label="Input Select"),
+]
 
 
 class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -32,18 +43,24 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._available_domain: str | None = None
         self._add_more: bool = False
         self._logic: str = "OR"  # lógica elegida SOLO en el primer paso
+        self._domain_filter: str | None = None  # Domain filter selected by user
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """
-        Primer paso: nombre, entidad disparadora inicial, estado, checkbox add_another,
-        y selector de lógica (AND/OR). La lógica se guarda y se usa para todos los triggers.
+        Primer paso: nombre, selección de dominio, entidad disparadora inicial,
+        estado, checkbox add_another, y selector de lógica (AND/OR).
+        La lógica se guarda y se usa para todos los triggers.
         """
         errors: dict[str, str] = {}
 
         if user_input is not None:
             self._name = user_input[CONF_NAME]
+            
+            # Store domain filter for next steps
+            self._domain_filter = user_input.get("domain_filter")
+            
             trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
             trigger_state = user_input[ATTR_TRIGGER_STATE]
 
@@ -70,21 +87,24 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Si se pidió agregar otro, vamos al paso de añadir más triggers
             return await self.async_step_another_trigger()
 
-        # Formulario inicial: checkbox antes del selector de lógica, según requeriste.
+        # Default domain filter
+        domain_filter = self._domain_filter or "binary_sensor"
+
+        # Formulario inicial con dominio y selector de entidad
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_NAME): str,
+                    vol.Required("domain_filter", default=domain_filter): SelectSelector(
+                        SelectSelectorConfig(
+                            options=DOMAIN_OPTIONS,
+                            mode=SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
                     vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
                         EntitySelectorConfig(
-                            domain=[
-                                "sensor",
-                                "binary_sensor",
-                                "input_boolean",
-                                "input_number",
-                                "input_select",
-                            ]
+                            domain=[domain_filter]
                         )
                     ),
                     vol.Required(ATTR_TRIGGER_STATE): str,
