@@ -21,7 +21,7 @@ from homeassistant.helpers.selector import (
 
 from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
 
-LOGIC_OPTIONS = ["AND", "OR"]  # Solo AND y OR, OR por defecto
+LOGIC_OPTIONS = ["AND", "OR"]  # Only AND and OR, OR by default
 
 # Domain options for entity filtering
 DOMAIN_OPTIONS = [
@@ -45,7 +45,7 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._triggers: list[dict[str, str]] = []
         self._available_domain: str | None = None
         self._add_more: bool = False
-        self._logic: str = "OR"  # lógica elegida SOLO en el primer paso
+        self._logic: str = "OR"  # Logic selected only in first step
         self._domain_filter: str | None = None  # Domain filter selected by user
         self._text_filter: str = ""  # Text filter for additional triggers
 
@@ -167,18 +167,22 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Apply text filter if provided
         text_filter = self._text_filter.lower()
         if text_filter:
-            available_entities = [
-                e for e in available_entities
-                if text_filter in e.lower() or 
-                (self.hass.states.get(e) and text_filter in self.hass.states.get(e).name.lower())
-            ]
+            filtered = []
+            for e in available_entities:
+                if text_filter in e.lower():
+                    filtered.append(e)
+                    continue
+                state = self.hass.states.get(e)
+                if state and state.name and text_filter in state.name.lower():
+                    filtered.append(e)
+            available_entities = filtered
 
         # Friendly names de triggers previos (si existen en hass.states)
-        prev_friendly = [
-            f"{self.hass.states.get(t['entity']).name} ({t['state']})"
-            for t in self._triggers
-            if self.hass.states.get(t["entity"])
-        ]
+        prev_friendly = []
+        for t in self._triggers:
+            state = self.hass.states.get(t["entity"])
+            if state and state.name:
+                prev_friendly.append(f"{state.name} ({t['state']})")
 
         # Usamos SelectSelector con opciones construidas desde available_entities
         select_options = [SelectOptionDict(value=e, label=e) for e in available_entities]
