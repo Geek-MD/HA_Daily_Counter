@@ -36,11 +36,10 @@ DOMAIN_OPTIONS = [
 ]
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow):
+class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Config flow for HA Daily Counter with multiple triggers and an overall logic operator."""
 
     VERSION = 1
-    domain = DOMAIN
 
     @staticmethod
     def async_get_options_flow(config_entry: ConfigEntry) -> config_entries.OptionsFlow:
