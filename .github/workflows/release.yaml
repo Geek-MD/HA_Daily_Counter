@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'custom_components/video_normalizer/manifest.json'
+      - 'custom_components/ha_daily_counter/manifest.json'
 
 jobs:
   release:
