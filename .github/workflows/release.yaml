@@ -23,7 +23,7 @@ jobs:
       - name: Get version from manifest
         id: get_version
         run: |
-          VERSION=$(jq -r '.version' custom_components/video_normalizer/manifest.json)
+          VERSION=$(jq -r '.version' custom_components/ha_daily_counter/manifest.json)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
