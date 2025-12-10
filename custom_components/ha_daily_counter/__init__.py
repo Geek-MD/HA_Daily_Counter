@@ -18,6 +18,19 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
     return True
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate old config entries to new format."""
+    _LOGGER.debug("Migrating config entry from version %s", entry.version)
+
+    if entry.version == 1:
+        # Version 1 is the current version, no migration needed
+        return True
+
+    # If we get here, we have an unsupported version
+    _LOGGER.error("Cannot migrate config entry from version %s", entry.version)
+    return False
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up HA Daily Counter from a config entry."""
     hass.data.setdefault(DOMAIN, {})
