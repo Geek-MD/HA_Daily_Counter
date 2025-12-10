@@ -3,9 +3,12 @@
 [![Forks](https://img.shields.io/github/forks/Geek-MD/HA_Daily_Counter?style=social)](https://github.com/Geek-MD/HA_Daily_Counter)
 
 [![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
-[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
-![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)
-[![Ruff](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml/badge.svg?branch=main&label=Ruff)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/ci.yaml)
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/LICENSE)
+[![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)](https://hacs.xyz/)
+
+[![Ruff + Mypy + Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/validate.yaml/badge.svg)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/validate.yaml)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 
 <img width="200" height="200" alt="image" src="https://github.com/Geek-MD/HA_Daily_Counter/blob/main/icon.png?raw=true" />
 
