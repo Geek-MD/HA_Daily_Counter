@@ -5,6 +5,7 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.selector import (
@@ -40,6 +41,12 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow):
 
     VERSION = 1
     domain = DOMAIN
+
+    @staticmethod
+    def async_get_options_flow(config_entry: ConfigEntry) -> config_entries.OptionsFlow:
+        """Get the options flow for this handler."""
+        from .options_flow import HADailyCounterOptionsFlow
+        return HADailyCounterOptionsFlow(config_entry)
 
     def __init__(self) -> None:
         self._name: str | None = None
