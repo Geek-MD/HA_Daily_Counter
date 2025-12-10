@@ -129,3 +129,11 @@ data:
 
 ## 📜 License
 MIT License. See [LICENSE](LICENSE) for details.  
+
+---
+
+<div align="center">
+  
+💻 **Proudly developed with GitHub Copilot** 🚀
+
+</div>
