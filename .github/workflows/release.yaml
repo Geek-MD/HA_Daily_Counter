@@ -29,6 +29,47 @@ jobs:
           echo "Version: $VERSION"
           echo "Tag: v$VERSION"
       
+      - name: Extract changelog for current version
+        id: changelog
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          
+          # Check if CHANGELOG.md exists
+          if [ ! -f "CHANGELOG.md" ]; then
+            echo "No CHANGELOG.md found, using default release notes"
+            echo "release_notes=Release v$VERSION" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Extract the section for the current version
+          # This will extract content between [VERSION] and the next ## heading or end of file
+          CHANGELOG_CONTENT=$(awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (found) exit;
+              if ($0 ~ "\\[" ver "\\]") {
+                found=1;
+                next;
+              }
+            }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md | sed '/^$/d' | head -100)
+          
+          # If we found changelog content, use it; otherwise use default
+          if [ -n "$CHANGELOG_CONTENT" ]; then
+            echo "Found changelog for version $VERSION"
+            # Save to a temporary file to handle multiline content
+            echo "$CHANGELOG_CONTENT" > /tmp/release_notes.txt
+            {
+              echo "release_notes<<EOF"
+              cat /tmp/release_notes.txt
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+          else
+            echo "No changelog found for version $VERSION, using default"
+            echo "release_notes=Release v$VERSION - See CHANGELOG.md for details" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Check if tag exists
         id: check_tag
         run: |
@@ -49,9 +90,6 @@ jobs:
         with:
           tag_name: ${{ steps.get_version.outputs.tag }}
           release_name: ${{ steps.get_version.outputs.tag }}
-          body: |
-            Release ${{ steps.get_version.outputs.tag }}
-            
-            This release corresponds to version ${{ steps.get_version.outputs.version }} from manifest.json
+          body: ${{ steps.changelog.outputs.release_notes }}
           draft: false
           prerelease: false
