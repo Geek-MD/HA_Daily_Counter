@@ -35,10 +35,11 @@ DOMAIN_OPTIONS = [
 ]
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class HADailyCounterConfigFlow(config_entries.ConfigFlow):
     """Config flow for HA Daily Counter with multiple triggers and an overall logic operator."""
 
     VERSION = 1
+    domain = DOMAIN
 
     def __init__(self) -> None:
         self._name: str | None = None
