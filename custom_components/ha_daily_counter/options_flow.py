@@ -90,22 +90,7 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="trigger_state",
             data_schema={
-                "trigger_state": SelectSelector(
-                    SelectSelectorConfig(
-                        options=[
-                            SelectOptionDict(value="on", label="on"),
-                            SelectOptionDict(value="off", label="off"),
-                            SelectOptionDict(value="home", label="home"),
-                            SelectOptionDict(value="not_home", label="not_home"),
-                            SelectOptionDict(value="open", label="open"),
-                            SelectOptionDict(value="closed", label="closed"),
-                            SelectOptionDict(value="idle", label="idle"),
-                            SelectOptionDict(value="playing", label="playing")
-                        ],
-                        multiple=False,
-                        mode=SelectSelectorMode.DROPDOWN
-                    )
-                )
+                "trigger_state": str
             },
         )
 
@@ -167,7 +152,7 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             self._editing_counter["trigger_state"] = user_input["trigger_state"]
             # Update the counter in the list
-            if self._selected_edit_index is not None:
+            if self._selected_edit_index is not None and 0 <= self._selected_edit_index < len(self._counters):
                 self._counters[self._selected_edit_index] = self._editing_counter
             
             # Reset editing state
@@ -182,22 +167,7 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="edit_trigger_state",
             data_schema={
-                "trigger_state": SelectSelector(
-                    SelectSelectorConfig(
-                        options=[
-                            SelectOptionDict(value="on", label="on"),
-                            SelectOptionDict(value="off", label="off"),
-                            SelectOptionDict(value="home", label="home"),
-                            SelectOptionDict(value="not_home", label="not_home"),
-                            SelectOptionDict(value="open", label="open"),
-                            SelectOptionDict(value="closed", label="closed"),
-                            SelectOptionDict(value="idle", label="idle"),
-                            SelectOptionDict(value="playing", label="playing")
-                        ],
-                        multiple=False,
-                        mode=SelectSelectorMode.DROPDOWN
-                    )
-                )
+                "trigger_state": str
             },
             description_placeholders={
                 "current_value": current_state,
