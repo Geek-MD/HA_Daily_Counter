@@ -42,6 +42,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         cast(Any, hass.config_entries).async_forward_entry_setups(entry, ["sensor"])
     )
 
+    # Register update listener to reload when options change
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+
     async def handle_reset_counter(call: ServiceCall) -> None:
         """Handle the reset_counter service call."""
         entity_id = call.data.get("entity_id")
@@ -94,3 +97,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Llamada a la versión plural de unload si existe; usar cast para evitar chequeos estáticos.
     unloaded = await cast(Any, hass.config_entries).async_forward_entry_unloads(entry, ["sensor"])
     return all(unloaded)
+
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload config entry when options are updated."""
+    await hass.config_entries.async_reload(entry.entry_id)

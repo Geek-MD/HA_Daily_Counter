@@ -5,6 +5,40 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.9] - 2025-12-11
+
+### ✨ New Feature: Counter Reconfiguration via Options Flow
+
+This release adds the ability to edit and reconfigure existing counters directly through the Home Assistant UI, without having to delete and recreate them.
+
+### Added
+- ✨ **Edit Counter Option**: New "Edit counter" action in the options flow menu
+- 🔄 **Reconfigure Trigger Entity**: Ability to change the entity that triggers the counter
+- 🔄 **Reconfigure Trigger State**: Ability to change the state that increments the counter
+- 🔄 **Automatic Reload**: Integration automatically reloads when configuration changes are saved
+- 📋 **Current Values Display**: Shows current configuration before making changes in the edit flow
+
+### Changed
+- Updated `__init__.py` to register an update listener that reloads the integration when options are modified
+- Enhanced `options_flow.py` with new edit steps: `async_step_select_edit`, `async_step_edit_trigger_entity`, and `async_step_edit_trigger_state`
+- Updated all translation files (en.json, es.json, strings.json) with new edit-related strings
+- Updated version to 1.3.9 in manifest.json
+
+### Technical Details
+- Added `async_reload_entry` function in `__init__.py` to handle config entry reloads
+- Registered update listener in `async_setup_entry` to detect option changes and trigger reload
+- Modified `HADailyCounterOptionsFlow` class to track editing state with `_selected_edit_index` and `_editing_counter`
+- Edit flow preserves counter ID to maintain entity continuity
+
+### How to Use
+1. Go to Settings → Devices & Services
+2. Find your HA Daily Counter integration
+3. Click "Configure" on any existing counter entry
+4. Select "Edit counter" from the action menu
+5. Choose which counter you want to edit
+6. Update the trigger entity or trigger state
+7. The integration will automatically reload with the new configuration
+
 ## [1.3.8] - 2025-12-10
 
 ### 🔧 Critical Bug Fix Release

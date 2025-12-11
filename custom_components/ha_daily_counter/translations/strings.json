@@ -41,9 +41,30 @@
     "step": {
       "init": {
         "title": "Manage Counters",
-        "description": "Add or remove counters used by this integration.",
+        "description": "Add, edit, or remove counters used by this integration.",
         "data": {
           "action": "Choose an action"
+        }
+      },
+      "select_edit": {
+        "title": "Edit Counter",
+        "description": "Select the counter you want to edit.",
+        "data": {
+          "edit_target": "Counter"
+        }
+      },
+      "edit_trigger_entity": {
+        "title": "Edit Trigger Entity",
+        "description": "Editing counter: {counter_name}\nCurrent entity: {current_value}\n\nSelect the new trigger entity:",
+        "data": {
+          "trigger_entity": "Trigger Entity"
+        }
+      },
+      "edit_trigger_state": {
+        "title": "Edit Trigger State",
+        "description": "Editing counter: {counter_name}\nCurrent state: {current_value}\n\nSelect the new trigger state:",
+        "data": {
+          "trigger_state": "Trigger State"
         }
       },
       "select_delete": {

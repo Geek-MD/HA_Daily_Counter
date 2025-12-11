@@ -41,9 +41,30 @@
     "step": {
       "init": {
         "title": "Gestionar Contadores",
-        "description": "Agrega o elimina contadores usados por esta integración.",
+        "description": "Agrega, edita o elimina contadores usados por esta integración.",
         "data": {
           "action": "Elige una acción"
+        }
+      },
+      "select_edit": {
+        "title": "Editar Contador",
+        "description": "Selecciona el contador que quieres editar.",
+        "data": {
+          "edit_target": "Contador"
+        }
+      },
+      "edit_trigger_entity": {
+        "title": "Editar Entidad Disparadora",
+        "description": "Editando contador: {counter_name}\nEntidad actual: {current_value}\n\nSelecciona la nueva entidad disparadora:",
+        "data": {
+          "trigger_entity": "Entidad Disparadora"
+        }
+      },
+      "edit_trigger_state": {
+        "title": "Editar Estado Disparador",
+        "description": "Editando contador: {counter_name}\nEstado actual: {current_value}\n\nSelecciona el nuevo estado disparador:",
+        "data": {
+          "trigger_state": "Estado Disparador"
         }
       },
       "select_delete": {
