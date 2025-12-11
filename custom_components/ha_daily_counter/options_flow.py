@@ -22,12 +22,16 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
         self._counters = list(config_entry.options.get("counters", []))
         self._new_counter: Dict[str, Any] = {}
         self._selected_delete_name: Optional[str] = None
+        self._selected_edit_index: Optional[int] = None
+        self._editing_counter: Dict[str, Any] = {}
 
     async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
-        """Initial step: add or delete a counter."""
+        """Initial step: add, edit, or delete a counter."""
         if user_input is not None:
             if user_input["action"] == "add":
                 return await self.async_step_user()
+            elif user_input["action"] == "edit":
+                return await self.async_step_select_edit()
             elif user_input["action"] == "delete":
                 return await self.async_step_select_delete()
 
@@ -40,6 +44,7 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
                     SelectSelectorConfig(
                         options=[
                             SelectOptionDict(value="add", label="Add counter"),
+                            SelectOptionDict(value="edit", label="Edit counter"),
                             SelectOptionDict(value="delete", label="Delete counter"),
                             SelectOptionDict(value="finish", label="Finish setup")
                         ],
@@ -102,6 +107,102 @@ class HADailyCounterOptionsFlow(config_entries.OptionsFlow):
                     )
                 )
             },
+        )
+
+    async def async_step_select_edit(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
+        """Step to select a counter to edit."""
+        if not self._counters:
+            return await self.async_step_init()
+
+        if user_input is not None:
+            selected_name = user_input["edit_target"]
+            # Find the counter index by name
+            for idx, counter in enumerate(self._counters):
+                if counter["name"] == selected_name:
+                    self._selected_edit_index = idx
+                    self._editing_counter = dict(counter)
+                    return await self.async_step_edit_trigger_entity()
+            # If not found, go back to init
+            return await self.async_step_init()
+
+        return self.async_show_form(
+            step_id="select_edit",
+            data_schema={
+                "edit_target": SelectSelector(
+                    SelectSelectorConfig(
+                        options=[
+                            SelectOptionDict(value=c["name"], label=c["name"])
+                            for c in self._counters
+                        ],
+                        mode=SelectSelectorMode.DROPDOWN
+                    )
+                )
+            },
+        )
+
+    async def async_step_edit_trigger_entity(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
+        """Step to edit the trigger entity."""
+        if user_input is not None:
+            self._editing_counter["trigger_entity"] = user_input["trigger_entity"]
+            return await self.async_step_edit_trigger_state()
+
+        # Get current trigger entity value
+        current_entity = self._editing_counter.get("trigger_entity", "")
+
+        return self.async_show_form(
+            step_id="edit_trigger_entity",
+            data_schema={
+                "trigger_entity": EntitySelector(
+                    EntitySelectorConfig()
+                )
+            },
+            description_placeholders={
+                "current_value": current_entity,
+                "counter_name": self._editing_counter.get("name", "")
+            }
+        )
+
+    async def async_step_edit_trigger_state(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
+        """Step to edit the trigger state."""
+        if user_input is not None:
+            self._editing_counter["trigger_state"] = user_input["trigger_state"]
+            # Update the counter in the list
+            if self._selected_edit_index is not None:
+                self._counters[self._selected_edit_index] = self._editing_counter
+            
+            # Reset editing state
+            self._selected_edit_index = None
+            self._editing_counter = {}
+            
+            return await self.async_step_init()
+
+        # Get current trigger state value
+        current_state = self._editing_counter.get("trigger_state", "")
+
+        return self.async_show_form(
+            step_id="edit_trigger_state",
+            data_schema={
+                "trigger_state": SelectSelector(
+                    SelectSelectorConfig(
+                        options=[
+                            SelectOptionDict(value="on", label="on"),
+                            SelectOptionDict(value="off", label="off"),
+                            SelectOptionDict(value="home", label="home"),
+                            SelectOptionDict(value="not_home", label="not_home"),
+                            SelectOptionDict(value="open", label="open"),
+                            SelectOptionDict(value="closed", label="closed"),
+                            SelectOptionDict(value="idle", label="idle"),
+                            SelectOptionDict(value="playing", label="playing")
+                        ],
+                        multiple=False,
+                        mode=SelectSelectorMode.DROPDOWN
+                    )
+                )
+            },
+            description_placeholders={
+                "current_value": current_state,
+                "counter_name": self._editing_counter.get("name", "")
+            }
         )
 
     async def async_step_select_delete(self, user_input: Optional[Dict[str, Any]] = None) -> config_entries.FlowResult:
