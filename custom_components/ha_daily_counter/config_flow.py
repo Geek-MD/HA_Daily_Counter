@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import uuid
 from typing import Any
 
@@ -21,6 +22,8 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 LOGIC_OPTIONS = ["AND", "OR"]  # Only AND and OR, OR by default
 
@@ -63,44 +66,53 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
         Primer paso: nombre, selección de dominio, entidad disparadora inicial,
         estado y checkbox add_another. NO incluye selector de lógica.
         """
+        _LOGGER.debug("Config flow step 'user' started")
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            self._name = user_input[CONF_NAME]
-            
-            # Store domain filter for next steps
-            self._domain_filter = user_input.get("domain_filter")
-            
-            trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
-            trigger_state = user_input[ATTR_TRIGGER_STATE]
+            try:
+                self._name = user_input[CONF_NAME]
+                
+                # Store domain filter for next steps
+                self._domain_filter = user_input.get("domain_filter")
+                
+                trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+                trigger_state = user_input[ATTR_TRIGGER_STATE]
 
-            # Guardamos el dominio para los siguientes disparadores
-            if self._available_domain is None:
-                self._available_domain = trigger_entity.split(".")[0]
+                # Guardamos el dominio para los siguientes disparadores
+                if self._available_domain is None:
+                    self._available_domain = trigger_entity.split(".")[0]
 
-            self._triggers.append(
-                {
-                    "id": str(uuid.uuid4()),
-                    "entity": trigger_entity,
-                    "state": trigger_state,
-                }
-            )
+                self._triggers.append(
+                    {
+                        "id": str(uuid.uuid4()),
+                        "entity": trigger_entity,
+                        "state": trigger_state,
+                    }
+                )
 
-            self._add_more = user_input.get("add_another", False)
-            # Si no se pide agregar otro sensor, terminamos y creamos la entrada
-            if not self._add_more:
-                return await self.async_step_finish()
+                self._add_more = user_input.get("add_another", False)
+                # Si no se pide agregar otro sensor, terminamos y creamos la entrada
+                if not self._add_more:
+                    return await self.async_step_finish()
 
-            # Si se pidió agregar otro, vamos al paso de añadir más triggers
-            return await self.async_step_another_trigger()
+                # Si se pidió agregar otro, vamos al paso de añadir más triggers
+                return await self.async_step_another_trigger()
+                
+            except Exception as err:
+                _LOGGER.error(
+                    "Error in user step: %s",
+                    err,
+                    exc_info=True,
+                )
+                errors["base"] = "unknown"
 
         # Default domain filter
         domain_filter = self._domain_filter or "binary_sensor"
 
         # Formulario inicial con dominio y selector de entidad (sin lógica)
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(
+        try:
+            data_schema = vol.Schema(
                 {
                     vol.Required(CONF_NAME): str,
                     vol.Required("domain_filter", default=domain_filter): SelectSelector(
@@ -117,7 +129,28 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
                     vol.Required(ATTR_TRIGGER_STATE): str,
                     vol.Optional("add_another", default=False): bool,
                 }
-            ),
+            )
+        except Exception as err:
+            _LOGGER.error(
+                "Error creating user form schema: %s",
+                err,
+                exc_info=True,
+            )
+            errors["base"] = "unknown"
+            # Fallback to minimal schema
+            data_schema = vol.Schema(
+                {
+                    vol.Required(CONF_NAME): str,
+                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+                        EntitySelectorConfig()
+                    ),
+                    vol.Required(ATTR_TRIGGER_STATE): str,
+                }
+            )
+        
+        return self.async_show_form(
+            step_id="user",
+            data_schema=data_schema,
             errors=errors,
         )
 
@@ -130,109 +163,182 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
         selector de estado, selector de lógica (solo en el primer trigger adicional),
         y la casilla add_another para repetir.
         """
+        _LOGGER.debug("Config flow step 'another_trigger' started")
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            # Store text filter if provided
-            self._text_filter = user_input.get("text_filter", "")
-            
-            # Guardamos la lógica seleccionada solo en el primer trigger adicional
-            if len(self._triggers) == 1 and "logic" in user_input:
-                self._logic = user_input.get("logic", "OR")
-            
-            # If entity is selected, add to triggers
-            if ATTR_TRIGGER_ENTITY in user_input:
-                trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
-                trigger_state = user_input[ATTR_TRIGGER_STATE]
+            try:
+                # Store text filter if provided
+                self._text_filter = user_input.get("text_filter", "")
+                
+                # Guardamos la lógica seleccionada solo en el primer trigger adicional
+                if len(self._triggers) == 1 and "logic" in user_input:
+                    self._logic = user_input.get("logic", "OR")
+                
+                # If entity is selected, add to triggers
+                if ATTR_TRIGGER_ENTITY in user_input:
+                    trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+                    trigger_state = user_input[ATTR_TRIGGER_STATE]
 
-                self._triggers.append(
-                    {
-                        "id": str(uuid.uuid4()),
-                        "entity": trigger_entity,
-                        "state": trigger_state,
-                    }
+                    self._triggers.append(
+                        {
+                            "id": str(uuid.uuid4()),
+                            "entity": trigger_entity,
+                            "state": trigger_state,
+                        }
+                    )
+
+                    self._add_more = user_input.get("add_another", False)
+                    # Si no se pide agregar otro, terminamos y creamos la entrada
+                    if not self._add_more:
+                        return await self.async_step_finish()
+
+                    # Si se pidió agregar otro, repetimos este mismo paso
+                    return await self.async_step_another_trigger()
+                    
+            except Exception as err:
+                _LOGGER.error(
+                    "Error processing another_trigger input: %s",
+                    err,
+                    exc_info=True,
                 )
-
-                self._add_more = user_input.get("add_another", False)
-                # Si no se pide agregar otro, terminamos y creamos la entrada
-                if not self._add_more:
-                    return await self.async_step_finish()
-
-                # Si se pidió agregar otro, repetimos este mismo paso
-                return await self.async_step_another_trigger()
+                errors["base"] = "unknown"
 
         # Excluir entidades ya seleccionadas para no duplicar
-        excluded_entities = [t["entity"] for t in self._triggers]
+        try:
+            excluded_entities = [t["entity"] for t in self._triggers]
 
-        all_entities = [
-            e.entity_id
-            for e in self.hass.states.async_all()
-            if self._available_domain and e.entity_id.startswith(self._available_domain)
-        ]
-        available_entities = [e for e in all_entities if e not in excluded_entities]
-        
-        # Apply text filter if provided
-        text_filter = self._text_filter.lower()
-        if text_filter:
-            filtered = []
-            for e in available_entities:
-                if text_filter in e.lower():
-                    filtered.append(e)
-                    continue
-                state = self.hass.states.get(e)
-                if state and state.name and text_filter in state.name.lower():
-                    filtered.append(e)
-            available_entities = filtered
+            all_entities = [
+                e.entity_id
+                for e in self.hass.states.async_all()
+                if self._available_domain and e.entity_id.startswith(self._available_domain)
+            ]
+            available_entities = [e for e in all_entities if e not in excluded_entities]
+            
+            # Apply text filter if provided
+            text_filter = self._text_filter.lower()
+            if text_filter:
+                filtered = []
+                for e in available_entities:
+                    try:
+                        if text_filter in e.lower():
+                            filtered.append(e)
+                            continue
+                        state = self.hass.states.get(e)
+                        if state and state.name and text_filter in state.name.lower():
+                            filtered.append(e)
+                    except Exception as err:
+                        _LOGGER.warning(
+                            "Error filtering entity %s: %s",
+                            e,
+                            err,
+                        )
+                        continue
+                available_entities = filtered
 
-        # Friendly names de triggers previos (si existen en hass.states)
-        prev_friendly = []
-        for t in self._triggers:
-            state = self.hass.states.get(t["entity"])
-            if state and state.name:
-                prev_friendly.append(f"{state.name} ({t['state']})")
+            # Friendly names de triggers previos (si existen en hass.states)
+            prev_friendly = []
+            for t in self._triggers:
+                try:
+                    state = self.hass.states.get(t["entity"])
+                    if state and state.name:
+                        prev_friendly.append(f"{state.name} ({t['state']})")
+                except Exception as err:
+                    _LOGGER.warning(
+                        "Error getting friendly name for %s: %s",
+                        t.get("entity"),
+                        err,
+                    )
 
-        # Usamos SelectSelector con opciones construidas desde available_entities
-        select_options = [SelectOptionDict(value=e, label=e) for e in available_entities]
+            # Handle case when no entities are available
+            if not available_entities:
+                _LOGGER.warning("No available entities found for domain %s", self._available_domain)
+                errors["base"] = "no_entities"
+                # Provide at least one dummy option to prevent 500 error
+                available_entities = ["no.entities_available"]
 
-        # Determinar si mostrar el selector de lógica (solo en el primer trigger adicional)
-        is_first_additional = len(self._triggers) == 1
-        
-        # Construir el esquema del formulario dinámicamente
-        schema_dict = {
-            vol.Optional("text_filter", default=self._text_filter): TextSelector(
-                TextSelectorConfig(
-                    type=TextSelectorType.TEXT,
-                )
-            ),
-            vol.Required(ATTR_TRIGGER_ENTITY): SelectSelector(
-                SelectSelectorConfig(
-                    options=select_options,
-                    mode=SelectSelectorMode.DROPDOWN,
-                )
-            ),
-            vol.Required(ATTR_TRIGGER_STATE): str,
-        }
-        
-        # Agregar selector de lógica solo si es el primer trigger adicional
-        if is_first_additional:
-            schema_dict[vol.Optional("logic", default="OR")] = vol.In(LOGIC_OPTIONS)
-        
-        # Agregar checkbox add_another al final
-        schema_dict[vol.Optional("add_another", default=False)] = bool
+            # Usamos SelectSelector con opciones construidas desde available_entities
+            select_options = [SelectOptionDict(value=e, label=e) for e in available_entities]
+
+            # Determinar si mostrar el selector de lógica (solo en el primer trigger adicional)
+            is_first_additional = len(self._triggers) == 1
+            
+            # Construir el esquema del formulario dinámicamente
+            schema_dict = {
+                vol.Optional("text_filter", default=self._text_filter): TextSelector(
+                    TextSelectorConfig(
+                        type=TextSelectorType.TEXT,
+                    )
+                ),
+                vol.Required(ATTR_TRIGGER_ENTITY): SelectSelector(
+                    SelectSelectorConfig(
+                        options=select_options,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+                vol.Required(ATTR_TRIGGER_STATE): str,
+            }
+            
+            # Agregar selector de lógica solo si es el primer trigger adicional
+            if is_first_additional:
+                schema_dict[vol.Optional("logic", default="OR")] = vol.In(LOGIC_OPTIONS)
+            
+            # Agregar checkbox add_another al final
+            schema_dict[vol.Optional("add_another", default=False)] = bool
+
+            data_schema = vol.Schema(schema_dict)
+            
+        except Exception as err:
+            _LOGGER.error(
+                "Error building another_trigger form schema: %s",
+                err,
+                exc_info=True,
+            )
+            errors["base"] = "unknown"
+            # Fallback to minimal schema
+            data_schema = vol.Schema(
+                {
+                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+                        EntitySelectorConfig(
+                            domain=[self._available_domain] if self._available_domain else None
+                        )
+                    ),
+                    vol.Required(ATTR_TRIGGER_STATE): str,
+                }
+            )
 
         return self.async_show_form(
             step_id="another_trigger",
-            data_schema=vol.Schema(schema_dict),
+            data_schema=data_schema,
             description_placeholders={"previous_triggers": ", ".join(prev_friendly)} if prev_friendly else {},
             errors=errors,
         )
 
     async def async_step_finish(self) -> FlowResult:
         """Finaliza el flujo y crea la entry con los triggers y la lógica seleccionada en el primer paso."""
-        title = self._name or "HA Daily Counter"
-        data = {
-            "triggers": self._triggers,
-            "logic": self._logic,  # AND u OR
-        }
+        _LOGGER.debug("Config flow step 'finish' started")
+        
+        try:
+            title = self._name or "HA Daily Counter"
+            data = {
+                "triggers": self._triggers,
+                "logic": self._logic,  # AND u OR
+            }
 
-        return self.async_create_entry(title=title, data=data)
+            _LOGGER.info(
+                "Creating config entry: title=%s, triggers_count=%d, logic=%s",
+                title,
+                len(self._triggers),
+                self._logic,
+            )
+
+            return self.async_create_entry(title=title, data=data)
+            
+        except Exception as err:
+            _LOGGER.error(
+                "Error creating config entry: %s",
+                err,
+                exc_info=True,
+            )
+            # Return to user step if creation fails
+            return await self.async_step_user()
