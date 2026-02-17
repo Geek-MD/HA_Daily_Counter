@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.0] - 2026-02-17
 
-### 🔧 Critical Bug Fix: Error 500 During Reconfiguration
+### 🔧 Critical Bug Fix: Error 500 During Reconfiguration + Code Structure Improvements
 
-This release fixes HTTP 500 errors that could occur during integration configuration and reconfiguration, applying lessons learned from the Battery Devices Monitor integration.
+This release fixes HTTP 500 errors that could occur during integration configuration and reconfiguration, applying lessons learned from the Battery Devices Monitor integration. Additionally, the code structure has been refactored to follow Home Assistant best practices.
 
 ### Fixed
 - ✅ **Error 500 Prevention**: Added comprehensive error handling throughout the config flow to prevent HTTP 500 errors
@@ -19,14 +19,20 @@ This release fixes HTTP 500 errors that could occur during integration configura
 - ✅ **Better Error Logging**: Added debug and error logging throughout the config flow for easier troubleshooting
 
 ### Changed
+- 🏗️ **Code Structure (Best Practice)**: Renamed classes following professional integration standards:
+  - `HADailyCounterConfigFlow` → `FlowHandler`
+  - `HADailyCounterOptionsFlow` → `OptionsFlowHandler`
+  - Consolidated both classes into single `config_flow.py` file (removed separate `options_flow.py`)
+  - Matches structure used by Battery Devices Monitor and other professional integrations
 - Enhanced `async_step_user()` with comprehensive error handling and fallback schema
 - Enhanced `async_step_another_trigger()` with multiple layers of error protection:
   - Input processing wrapped in try-except
   - Entity filtering with individual error handling
-  - Empty entity list detection with fallback dummy entity
+  - Empty entity list detection with safe fallback
   - Schema creation with comprehensive fallback
 - Enhanced `async_step_finish()` with error handling and informational logging
 - Updated version to 1.4.0 in manifest.json
+- Modernized type hints to use native Python syntax (`dict[str, Any]` instead of `Dict[str, Any]`)
 
 ### Technical Details
 - Applied Battery Devices Monitor pattern: defensive programming with try-except blocks
@@ -34,6 +40,7 @@ This release fixes HTTP 500 errors that could occur during integration configura
 - Empty dropdown prevention: provides safe fallback when no entities available
 - Form schema creation failures now return minimal functional schemas instead of crashing
 - Added `_LOGGER` for consistent debug and error logging throughout config flow
+- File structure now follows Home Assistant integration best practices with both flow handlers in single file
 
 ### Who Should Upgrade?
 **All users should upgrade to v1.4.0** to ensure stable configuration and reconfiguration experience, especially when:
