@@ -5,6 +5,34 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-02-17
+
+### 🔧 Critical Bug Fix: OptionsFlow AttributeError
+
+This release fixes a critical error that prevented users from accessing the options/configuration menu for existing integrations.
+
+### Fixed
+- ✅ **AttributeError Fix**: Fixed "property 'config_entry' of 'OptionsFlowHandler' object has no setter" error
+- ✅ **OptionsFlow Initialization**: Corrected `OptionsFlowHandler.__init__()` to follow Home Assistant's OptionsFlow pattern
+- ✅ **Configuration Access**: Users can now access the options menu without errors
+
+### Technical Details
+- Removed manual `config_entry` parameter from `OptionsFlowHandler.__init__()`
+- The `config_entry` property is automatically provided by Home Assistant's `OptionsFlow` base class
+- Updated `async_step_init()` to initialize counters from `self.config_entry.options` on first call
+- The `config_entry` property is read-only and should not be assigned in `__init__`
+
+### Who Should Upgrade?
+**All users should upgrade to v1.4.1 immediately** if experiencing errors when trying to configure existing integrations, especially:
+- "AttributeError: property 'config_entry' of 'OptionsFlowHandler' object has no setter" errors
+- HTTP 500 errors when clicking "Configure" on an integration
+- Unable to add, edit, or delete counters through the options flow
+
+### Installation
+1. Update via HACS or manually install v1.4.1
+2. Restart Home Assistant
+3. Configuration menu should now work without errors
+
 ## [1.4.0] - 2026-02-17
 
 ### 🔧 Critical Bug Fix: Error 500 During Reconfiguration + Code Structure Improvements
