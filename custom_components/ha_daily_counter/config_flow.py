@@ -253,9 +253,8 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
             # Handle case when no entities are available
             if not available_entities:
                 _LOGGER.warning("No available entities found for domain %s", self._available_domain)
-                errors["base"] = "no_entities"
-                # Provide at least one dummy option to prevent 500 error
-                available_entities = ["no.entities_available"]
+                # Instead of showing an error, go back to user step to start over
+                return await self.async_step_finish()
 
             # Usamos SelectSelector con opciones construidas desde available_entities
             select_options = [SelectOptionDict(value=e, label=e) for e in available_entities]
@@ -295,14 +294,14 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
                 exc_info=True,
             )
             errors["base"] = "unknown"
-            # Fallback to minimal schema
+            # Fallback to minimal schema with conditional domain parameter
+            entity_config = EntitySelectorConfig()
+            if self._available_domain:
+                entity_config = EntitySelectorConfig(domain=[self._available_domain])
+            
             data_schema = vol.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
-                        EntitySelectorConfig(
-                            domain=[self._available_domain] if self._available_domain else None
-                        )
-                    ),
+                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(entity_config),
                     vol.Required(ATTR_TRIGGER_STATE): str,
                 }
             )
