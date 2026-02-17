@@ -39,7 +39,7 @@ DOMAIN_OPTIONS = [
 ]
 
 
-class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
+class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Config flow for HA Daily Counter with multiple triggers and an overall logic operator."""
 
     VERSION = 1
@@ -47,8 +47,8 @@ class HADailyCounterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
     @staticmethod
     def async_get_options_flow(config_entry: ConfigEntry) -> config_entries.OptionsFlow:
         """Get the options flow for this handler."""
-        from .options_flow import HADailyCounterOptionsFlow
-        return HADailyCounterOptionsFlow(config_entry)
+        from .options_flow import OptionsFlowHandler
+        return OptionsFlowHandler(config_entry)
 
     def __init__(self) -> None:
         self._name: str | None = None
