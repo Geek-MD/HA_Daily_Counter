@@ -48,7 +48,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
     @staticmethod
     def async_get_options_flow(config_entry: ConfigEntry) -> config_entries.OptionsFlow:
         """Get the options flow for this handler."""
-        return OptionsFlowHandler(config_entry)
+        return OptionsFlowHandler()
 
     def __init__(self) -> None:
         self._name: str | None = None
@@ -346,9 +346,8 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
 class OptionsFlowHandler(config_entries.OptionsFlow):
     """Handle the options flow for HA Daily Counter."""
 
-    def __init__(self, config_entry: ConfigEntry) -> None:
-        self.config_entry = config_entry
-        self._counters = list(config_entry.options.get("counters", []))
+    def __init__(self) -> None:
+        self._counters: list[dict[str, Any]] = []
         self._new_counter: dict[str, Any] = {}
         self._selected_delete_name: str | None = None
         self._selected_edit_index: int | None = None
@@ -356,6 +355,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Initial step: add, edit, or delete a counter."""
+        # Initialize counters from config_entry on first call
+        if not self._counters:
+            self._counters = list(self.config_entry.options.get("counters", []))
+        
         if user_input is not None:
             if user_input["action"] == "add":
                 return await self.async_step_user()
