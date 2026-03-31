@@ -3,10 +3,16 @@
     "step": {
       "user": {
         "title": "Agregar Contador",
-        "description": "Crea un nuevo contador con una entidad disparadora y un estado.",
+        "description": "Crea un nuevo contador. Elige un nombre y selecciona el dominio de entidad para filtrar la entidad disparadora.",
         "data": {
           "name": "Nombre",
-          "domain_filter": "Tipo de Entidad",
+          "domain_filter": "Tipo de Entidad"
+        }
+      },
+      "first_trigger": {
+        "title": "Seleccionar Entidad Disparadora",
+        "description": "Selecciona la entidad y el estado que incrementarán el contador.",
+        "data": {
           "trigger_entity": "Entidad a Monitorizar",
           "trigger_state": "Estado a Monitorizar",
           "add_another": "¿Agregar otro disparador?"
@@ -16,7 +22,6 @@
         "title": "Agregar Otro Disparador",
         "description": "Define otro disparador para este contador.\nYa configurados: {previous_triggers}",
         "data": {
-          "text_filter": "Filtrar por Nombre (opcional)",
           "trigger_entity": "Entidad Adicional a Monitorizar",
           "trigger_state": "Estado a Monitorizar",
           "logic": "Lógica de Disparadores",
@@ -46,11 +51,46 @@
           "action": "Elige una acción"
         }
       },
+      "user": {
+        "title": "Nombre del Contador",
+        "description": "Introduce un nombre para el nuevo contador.",
+        "data": {
+          "name": "Nombre"
+        }
+      },
+      "trigger_domain": {
+        "title": "Seleccionar Tipo de Entidad",
+        "description": "Elige el dominio de entidad para filtrar la entidad disparadora.",
+        "data": {
+          "domain_filter": "Tipo de Entidad"
+        }
+      },
+      "trigger_entity": {
+        "title": "Seleccionar Entidad Disparadora",
+        "description": "Selecciona la entidad que disparará el contador.",
+        "data": {
+          "trigger_entity": "Entidad Disparadora"
+        }
+      },
+      "trigger_state": {
+        "title": "Seleccionar Estado Disparador",
+        "description": "Introduce el estado que incrementará el contador.",
+        "data": {
+          "trigger_state": "Estado Disparador"
+        }
+      },
       "select_edit": {
         "title": "Editar Contador",
         "description": "Selecciona el contador que quieres editar.",
         "data": {
           "edit_target": "Contador"
+        }
+      },
+      "edit_trigger_domain": {
+        "title": "Seleccionar Tipo de Entidad",
+        "description": "Editando contador: {counter_name}\n\nElige el dominio de entidad para filtrar la entidad disparadora.",
+        "data": {
+          "domain_filter": "Tipo de Entidad"
         }
       },
       "edit_trigger_entity": {

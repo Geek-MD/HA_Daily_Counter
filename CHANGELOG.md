@@ -5,6 +5,47 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2026-03-31
+
+### ✨ New Feature: Monitor Any Entity Type + Fix Domain Filter (closes #31)
+
+This release allows any entity domain to be used as a trigger entity, not just binary sensors, and fixes the bug where the entity selector always showed binary sensor entities regardless of the domain filter selected.
+
+### Fixed
+- ✅ **Domain Filter Bug** (#31): The entity selector was always showing binary sensor entities even when a different entity type was selected. The root cause was that HA config flow forms are static — a domain filter dropdown and an EntitySelector cannot coexist on the same form step and keep in sync. Fixed by splitting the step into two: one for name + domain selection, and a second for entity + state selection.
+
+### Added
+- ✨ **Any Entity Domain as Trigger**: Counters can now monitor entities from any domain:
+  - **Binary Sensors** (doors, windows, motion detectors)
+  - **Sensors** (temperature, humidity, etc.)
+  - **Automations** (track automation executions)
+  - **Scripts** (monitor script runs)
+  - **Input Helpers** (`input_boolean`, `input_number`, `input_select`)
+- ✨ **Domain Filter in Options Flow**: When adding or editing a counter via the options flow, a domain selection step is now shown before the entity selector, ensuring the correct entity type is displayed.
+- ✨ **Cross-Domain Additional Triggers**: The "Add Another Trigger" step now uses a native EntitySelector with no domain restriction, allowing each additional trigger to reference a different entity domain.
+
+### Changed
+- 🏗️ **Config Flow Restructure**: `async_step_user` now only collects the counter name and domain filter. A new `async_step_first_trigger` handles entity and state selection, using an `EntitySelector` filtered to the chosen domain.
+- 🏗️ **Options Flow Restructure**: Added `async_step_trigger_domain` (for adding) and `async_step_edit_trigger_domain` (for editing) steps before entity selection.
+- 🧹 **Simplified `another_trigger` Step**: Replaced the complex server-side entity list builder (custom `SelectSelector`) and text filter with a native `EntitySelector` that supports all entity types and has built-in search.
+- Updated all translation files (en.json, es.json, strings.json) with new step titles and descriptions.
+- Updated version to 1.4.2 in manifest.json.
+
+### Technical Details
+- HA config flow forms are rendered statically: changing a dropdown value does not dynamically update other selectors on the same form. The fix separates domain selection and entity selection into consecutive steps.
+- `EntitySelector` with `domain=[selected_domain]` is now created on a fresh step after the domain is already known, guaranteeing the correct entity list is shown.
+- The `TextSelector` text filter in `another_trigger` has been removed; `EntitySelector` provides built-in search/filter natively in the HA frontend.
+
+### Who Should Upgrade?
+**All users should upgrade to v1.4.2** if experiencing:
+- Entity selector always showing binary sensor entities regardless of domain selection
+- Inability to configure non-binary-sensor entities as triggers
+
+### Installation
+1. Update via HACS or manually install v1.4.2
+2. Restart Home Assistant
+3. New counters can now be configured with any supported entity type
+
 ## [1.4.1] - 2026-02-17
 
 ### 🔧 Critical Bug Fix: OptionsFlow AttributeError

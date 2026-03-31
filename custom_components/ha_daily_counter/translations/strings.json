@@ -3,10 +3,16 @@
     "step": {
       "user": {
         "title": "Add Counter",
-        "description": "Create a new counter with a trigger entity and state.",
+        "description": "Create a new counter. Choose a name and select the entity domain to filter the trigger entity.",
         "data": {
           "name": "Name",
-          "domain_filter": "Entity Type",
+          "domain_filter": "Entity Type"
+        }
+      },
+      "first_trigger": {
+        "title": "Select Trigger Entity",
+        "description": "Select the entity and state that will increment the counter.",
+        "data": {
           "trigger_entity": "Entity to Monitor",
           "trigger_state": "State to Monitor",
           "add_another": "Add another trigger?"
@@ -14,9 +20,8 @@
       },
       "another_trigger": {
         "title": "Add Another Trigger",
-        "description": "Define another trigger for this counter.\nAlready configured: {previous_triggers}",
+        "description": "Define an additional trigger for this counter.\nAlready configured: {previous_triggers}",
         "data": {
-          "text_filter": "Filter by Name (optional)",
           "trigger_entity": "Additional Entity to Monitor",
           "trigger_state": "State to Monitor",
           "logic": "Trigger Logic",
@@ -46,11 +51,46 @@
           "action": "Choose an action"
         }
       },
+      "user": {
+        "title": "Counter Name",
+        "description": "Enter a name for the new counter.",
+        "data": {
+          "name": "Name"
+        }
+      },
+      "trigger_domain": {
+        "title": "Select Entity Type",
+        "description": "Choose the entity domain to filter the trigger entity.",
+        "data": {
+          "domain_filter": "Entity Type"
+        }
+      },
+      "trigger_entity": {
+        "title": "Select Trigger Entity",
+        "description": "Select the entity that will trigger the counter.",
+        "data": {
+          "trigger_entity": "Trigger Entity"
+        }
+      },
+      "trigger_state": {
+        "title": "Select Trigger State",
+        "description": "Enter the state that will increment the counter.",
+        "data": {
+          "trigger_state": "Trigger State"
+        }
+      },
       "select_edit": {
         "title": "Edit Counter",
         "description": "Select the counter you want to edit.",
         "data": {
           "edit_target": "Counter"
+        }
+      },
+      "edit_trigger_domain": {
+        "title": "Select Entity Type",
+        "description": "Editing counter: {counter_name}\n\nChoose the entity domain to filter the trigger entity.",
+        "data": {
+          "domain_filter": "Entity Type"
         }
       },
       "edit_trigger_entity": {
