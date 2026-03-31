@@ -68,15 +68,16 @@
 
 1. Go to **Settings → Devices & Services → Add Integration → HA Daily Counter**.  
 2. Fill in the multi-step form:  
-   - **Name**: Friendly name of the counter.
-   - **Entity Type**: Select the domain to filter entities (Binary Sensor, Sensor, Automation, Script, or Input Helpers).
-   - **Trigger Entity**: Entity that will increment the counter (filtered by selected type).  
-   - **Trigger State**: State value to monitor (e.g., `on`, `off`, `home`, `triggered`).  
-   - **Add Another Trigger?**: Toggle to add additional triggers.  
+   - **Step 1 – Counter Setup**:
+     - **Name**: Friendly name of the counter.
+     - **Entity Type**: Select the domain to filter entities (Binary Sensor, Sensor, Automation, Script, or Input Helpers).
+   - **Step 2 – Trigger Entity**:
+     - **Trigger Entity**: Entity that will increment the counter (filtered to the selected type).
+     - **Trigger State**: State value to monitor (e.g., `on`, `off`, `home`, `triggered`).
+     - **Add Another Trigger?**: Toggle to add additional triggers from any entity domain.
 
 3. If multiple triggers are added:  
-   - **Filter by Name**: Optional text field to search entities by name.
-   - Select additional entities and states from the same domain.  
+   - Select additional entities and states from any supported domain.  
    - Configure the **logic operator** (AND/OR) when adding the second trigger.
    - The same logic applies to all subsequent triggers.  
 
