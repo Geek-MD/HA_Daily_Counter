@@ -24,7 +24,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     _attr_native_unit_of_measurement = None
     _attr_icon = "mdi:counter"
 
-    def __init__(self, hass: HomeAssistant, entry_id: str, counter_config: dict) -> None:
+    def __init__(
+        self, hass: HomeAssistant, entry_id: str, counter_config: dict
+    ) -> None:
         self.hass = hass
         self._entry_id = entry_id
         self._unique_id: str = f"{entry_id}_{counter_config['id']}"
@@ -59,9 +61,13 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
 
     async def async_added_to_hass(self) -> None:
         """Restore state, set up trigger listener and reset timer."""
-        if (last_state := await self.async_get_last_state()) and last_state.state.isdigit():
+        if (
+            last_state := await self.async_get_last_state()
+        ) and last_state.state.isdigit():
             self._attr_native_value = int(last_state.state)
-            _LOGGER.debug("Restored state for %s: %s", self._name, self._attr_native_value)
+            _LOGGER.debug(
+                "Restored state for %s: %s", self._name, self._attr_native_value
+            )
 
         self.async_on_remove(
             async_track_state_change(
@@ -87,7 +93,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         if new_state and new_state.state == self._trigger_state:
             self._attr_native_value += 1
             self.async_write_ha_state()
-            _LOGGER.debug("Counter '%s' incremented to %s", self._name, self._attr_native_value)
+            _LOGGER.debug(
+                "Counter '%s' incremented to %s", self._name, self._attr_native_value
+            )
 
     @callback
     def _reset_counter(self, now: datetime) -> None:

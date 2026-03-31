@@ -13,6 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
+
 async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
     """Set up the integration from configuration.yaml (not used)."""
     return True
@@ -95,7 +96,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     # Llamada a la versión plural de unload si existe; usar cast para evitar chequeos estáticos.
-    unloaded = await cast(Any, hass.config_entries).async_forward_entry_unloads(entry, ["sensor"])
+    unloaded = await cast(Any, hass.config_entries).async_forward_entry_unloads(
+        entry, ["sensor"]
+    )
     return all(unloaded)
 
 

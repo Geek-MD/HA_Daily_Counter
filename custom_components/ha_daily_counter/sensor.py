@@ -60,7 +60,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         if "trigger_entity" in counter_config:
             self._trigger_entity: str = counter_config["trigger_entity"]
             self._trigger_state: str = counter_config["trigger_state"]
-        elif "triggers" in counter_config and isinstance(counter_config["triggers"], list):
+        elif "triggers" in counter_config and isinstance(
+            counter_config["triggers"], list
+        ):
             first = counter_config["triggers"][0] if counter_config["triggers"] else {}
             self._trigger_entity = first.get("entity", "")
             self._trigger_state = first.get("state", "")
@@ -103,7 +105,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         # Restore last state
         if (last := await self.async_get_last_state()) and last.state.isdigit():
             self._attr_native_value = int(last.state)
-            _LOGGER.debug("Restored state for '%s': %d", self._name, self._attr_native_value)
+            _LOGGER.debug(
+                "Restored state for '%s': %d", self._name, self._attr_native_value
+            )
 
         # Subscribe to state change events
         if self._trigger_entity:
@@ -114,7 +118,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
                     self._handle_trigger_state_change,
                 )
             )
-            _LOGGER.debug("Subscribed to trigger '%s' for '%s'", self._trigger_entity, self._name)
+            _LOGGER.debug(
+                "Subscribed to trigger '%s' for '%s'", self._trigger_entity, self._name
+            )
         else:
             _LOGGER.warning("Counter '%s' has no valid trigger entity", self._name)
 
