@@ -142,6 +142,7 @@ MIT License. See [LICENSE](LICENSE) for details.
 | Contribution | Contributor |
 |---|---|
 | Feature request: attach counter to existing device ([#34](https://github.com/Geek-MD/HA_Daily_Counter/issues/34)) | [@alsmaison](https://github.com/alsmaison) |
+| Only binary sensor entities are shown when selecting a different entity type ([#31](https://github.com/Geek-MD/HA_Daily_Counter/issues/31)) | [@ikswokinok](https://github.com/ikswokinok) |
 
 ---
 
