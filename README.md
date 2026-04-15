@@ -10,7 +10,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 
-<img width="200" height="200" alt="https://github.com/Geek-MD/HA_Daily_Counter/blob/main/custom_components/ha_daily_counter/brand/icon.png?raw=true" />
+![](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/custom_components/ha_daily_counter/brand/logo.png)
 
 # HA Daily Counter
 
