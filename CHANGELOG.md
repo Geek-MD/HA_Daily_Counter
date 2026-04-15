@@ -5,6 +5,30 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-04-15
+
+### ✨ New Feature: Attach Counter to an Existing Device (closes #34)
+
+Counter sensors are now automatically associated with the device that owns their trigger entity. When you configure a counter whose trigger entity belongs to a physical or virtual device (e.g. a Tuya light, a Z-Wave switch, etc.), the counter sensor will appear directly on that device's page in Home Assistant instead of creating a separate virtual device entry.
+
+### Added
+- ✨ **Automatic device association**: `device_info` now queries the entity registry and device registry at runtime. If the trigger entity is linked to an existing device, the counter sensor adopts that device's identifiers and appears alongside it in the HA UI.
+- ✅ **Graceful fallback**: If the trigger entity has no associated device (e.g. virtual helpers, template sensors), the counter falls back to the existing behaviour of creating its own virtual device entry.
+
+### Changed
+- Updated version to 1.5.0 in `manifest.json`.
+- Added `device_registry` and `entity_registry` imports to `sensor.py`.
+
+### Technical Details
+- `HADailyCounterEntity.device_info` uses `er.async_get(hass).async_get(entity_id)` to retrieve the trigger entity's `device_id`, then `dr.async_get(hass).async_get(device_id)` to fetch the full `DeviceEntry` and its `identifiers`.
+- Both registry lookups are synchronous in-memory operations (no I/O), so they are safe to perform inside a property.
+- Inspired by the approach used in [ha_real-last-changed](https://github.com/HamletDuFromage/ha_real-last-changed).
+
+### Credits
+- 🙏 Feature requested by [@alsmaison](https://github.com/alsmaison) in [#34](https://github.com/Geek-MD/HA_Daily_Counter/issues/34).
+
+---
+
 ## [1.4.2] - 2026-03-31
 
 ### ✨ New Feature: Monitor Any Entity Type + Fix Domain Filter (closes #31)
