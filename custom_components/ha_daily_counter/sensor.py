@@ -6,6 +6,8 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
@@ -88,7 +90,22 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
 
     @property
     def device_info(self) -> DeviceInfo | None:
-        """Return device information for Home Assistant UI."""
+        """Return device information for Home Assistant UI.
+
+        When the trigger entity belongs to a known device, the counter sensor
+        is attached to that same device so it appears alongside its related
+        hardware in the Home Assistant device page.  If no device is found the
+        counter falls back to creating its own virtual device entry.
+        """
+        if self._trigger_entity:
+            ent_reg = er.async_get(self.hass)
+            ent_entry = ent_reg.async_get(self._trigger_entity)
+            if ent_entry and ent_entry.device_id:
+                dev_reg = dr.async_get(self.hass)
+                device = dev_reg.async_get(ent_entry.device_id)
+                if device and device.identifiers:
+                    return DeviceInfo(identifiers=set(device.identifiers))
+
         return DeviceInfo(
             identifiers={(DOMAIN, self._unique_id)},
             name=self._name,

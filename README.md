@@ -33,6 +33,7 @@
   - **OR** → Any trigger increments the counter.  
 - Filter entities by domain type for easy selection.
 - Search entities by name when adding additional triggers.
+- **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA (falls back to a standalone virtual device when the trigger has no associated device).
 - Assign an **area** to the counter for better organization in Home Assistant.  
 - Auto-reset counters daily at midnight (00:00 local time).  
 - Persistent values across Home Assistant restarts.  
@@ -133,6 +134,14 @@ data:
 
 ## 📜 License
 MIT License. See [LICENSE](LICENSE) for details.  
+
+---
+
+## 🙏 Credits & Community
+
+| Contribution | Contributor |
+|---|---|
+| Feature request: attach counter to existing device ([#34](https://github.com/Geek-MD/HA_Daily_Counter/issues/34)) | [@alsmaison](https://github.com/alsmaison) |
 
 ---
 
