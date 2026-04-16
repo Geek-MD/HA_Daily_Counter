@@ -8,7 +8,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.selector import (
     EntitySelector,
@@ -37,6 +37,54 @@ DOMAIN_OPTIONS = [
 ]
 
 
+def _get_entity_states(hass: HomeAssistant, entity_id: str) -> list[str]:
+    """Return a list of known/possible states for the given entity.
+
+    For domains with well-known finite states the list is hardcoded.
+    For input_select the runtime options attribute is used.
+    For all other domains the entity's current state is returned as the
+    only option so the user always has a sensible starting point.
+    """
+    if not entity_id:
+        return []
+    domain = entity_id.split(".")[0]
+    state_obj = hass.states.get(entity_id)
+
+    if domain in (
+        "binary_sensor",
+        "input_boolean",
+        "switch",
+        "light",
+        "fan",
+        "lock",
+        "automation",
+        "script",
+    ):
+        return ["on", "off"]
+    if domain == "cover":
+        return ["open", "closed", "opening", "closing"]
+    if domain == "alarm_control_panel":
+        return ["disarmed", "armed_home", "armed_away", "armed_night", "pending", "triggered"]
+    if domain == "input_select" and state_obj:
+        return list(state_obj.attributes.get("options", [state_obj.state]))
+    if state_obj:
+        return [state_obj.state]
+    return []
+
+
+def _state_selector(states: list[str]):
+    """Return a SelectSelector for the given states list, or plain str if empty."""
+    if not states:
+        return str
+    return SelectSelector(
+        SelectSelectorConfig(
+            options=[SelectOptionDict(value=s, label=s) for s in states],
+            mode=SelectSelectorMode.DROPDOWN,
+            custom_value=True,
+        )
+    )
+
+
 class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Config flow for HA Daily Counter with multiple triggers and an overall logic operator."""
 
@@ -53,6 +101,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         self._add_more: bool = False
         self._logic: str = "OR"  # Logic selected only when adding the second trigger
         self._domain_filter: str = "binary_sensor"  # Domain filter selected by user
+        self._current_trigger_entity: str = ""  # Entity selected in the current trigger step
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -91,27 +140,14 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
     async def async_step_first_trigger(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 2: Select the first trigger entity (filtered by chosen domain) and state."""
+        """Step 2: Select the first trigger entity (filtered by chosen domain)."""
         _LOGGER.debug("Config flow step 'first_trigger' started")
         errors: dict[str, str] = {}
 
         if user_input is not None:
             try:
-                trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
-                trigger_state = user_input[ATTR_TRIGGER_STATE]
-
-                self._triggers.append(
-                    {
-                        "id": str(uuid.uuid4()),
-                        "entity": trigger_entity,
-                        "state": trigger_state,
-                    }
-                )
-
-                if user_input.get("add_another", False):
-                    return await self.async_step_another_trigger()
-                return await self.async_step_finish()
-
+                self._current_trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+                return await self.async_step_first_trigger_state()
             except Exception as err:
                 _LOGGER.error("Error in first_trigger step: %s", err, exc_info=True)
                 errors["base"] = "unknown"
@@ -122,8 +158,6 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                     vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
                         EntitySelectorConfig(domain=[self._domain_filter])
                     ),
-                    vol.Required(ATTR_TRIGGER_STATE): str,
-                    vol.Optional("add_another", default=False): bool,
                 }
             )
         except Exception as err:
@@ -132,8 +166,6 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
             data_schema = vol.Schema(
                 {
                     vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(EntitySelectorConfig()),
-                    vol.Required(ATTR_TRIGGER_STATE): str,
-                    vol.Optional("add_another", default=False): bool,
                 }
             )
 
@@ -143,12 +175,49 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
             errors=errors,
         )
 
+    async def async_step_first_trigger_state(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Step 3: Select the trigger state from a dropdown populated with the entity's known states."""
+        _LOGGER.debug("Config flow step 'first_trigger_state' started")
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                trigger_state = user_input[ATTR_TRIGGER_STATE]
+                self._triggers.append(
+                    {
+                        "id": str(uuid.uuid4()),
+                        "entity": self._current_trigger_entity,
+                        "state": trigger_state,
+                    }
+                )
+                if user_input.get("add_another", False):
+                    return await self.async_step_another_trigger()
+                return await self.async_step_finish()
+            except Exception as err:
+                _LOGGER.error("Error in first_trigger_state step: %s", err, exc_info=True)
+                errors["base"] = "unknown"
+
+        states = _get_entity_states(self.hass, self._current_trigger_entity)
+        data_schema = vol.Schema(
+            {
+                vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                vol.Optional("add_another", default=False): bool,
+            }
+        )
+
+        return self.async_show_form(
+            step_id="first_trigger_state",
+            data_schema=data_schema,
+            errors=errors,
+        )
+
     async def async_step_another_trigger(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """
-        Repeatable step to add additional triggers.
-        Supports all entity domains via a native EntitySelector.
+        Repeatable step to select an additional trigger entity.
         Shows logic selector (AND/OR) only when adding the second trigger.
         """
         _LOGGER.debug("Config flow step 'another_trigger' started")
@@ -160,20 +229,8 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 if len(self._triggers) == 1 and "logic" in user_input:
                     self._logic = user_input.get("logic", "OR")
 
-                trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
-                trigger_state = user_input[ATTR_TRIGGER_STATE]
-
-                self._triggers.append(
-                    {
-                        "id": str(uuid.uuid4()),
-                        "entity": trigger_entity,
-                        "state": trigger_state,
-                    }
-                )
-
-                if user_input.get("add_another", False):
-                    return await self.async_step_another_trigger()
-                return await self.async_step_finish()
+                self._current_trigger_entity = user_input[ATTR_TRIGGER_ENTITY]
+                return await self.async_step_another_trigger_state()
 
             except Exception as err:
                 _LOGGER.error("Error in another_trigger step: %s", err, exc_info=True)
@@ -196,16 +253,52 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         is_first_additional = len(self._triggers) == 1
         schema_dict: dict[Any, Any] = {
             vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(EntitySelectorConfig()),
-            vol.Required(ATTR_TRIGGER_STATE): str,
         }
         if is_first_additional:
             schema_dict[vol.Optional("logic", default="OR")] = vol.In(LOGIC_OPTIONS)
-        schema_dict[vol.Optional("add_another", default=False)] = bool
 
         return self.async_show_form(
             step_id="another_trigger",
             data_schema=vol.Schema(schema_dict),
             description_placeholders={"previous_triggers": ", ".join(prev_friendly)},
+            errors=errors,
+        )
+
+    async def async_step_another_trigger_state(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """State selection step for an additional trigger, using a dropdown of known states."""
+        _LOGGER.debug("Config flow step 'another_trigger_state' started")
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                trigger_state = user_input[ATTR_TRIGGER_STATE]
+                self._triggers.append(
+                    {
+                        "id": str(uuid.uuid4()),
+                        "entity": self._current_trigger_entity,
+                        "state": trigger_state,
+                    }
+                )
+                if user_input.get("add_another", False):
+                    return await self.async_step_another_trigger()
+                return await self.async_step_finish()
+            except Exception as err:
+                _LOGGER.error("Error in another_trigger_state step: %s", err, exc_info=True)
+                errors["base"] = "unknown"
+
+        states = _get_entity_states(self.hass, self._current_trigger_entity)
+        data_schema = vol.Schema(
+            {
+                vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                vol.Optional("add_another", default=False): bool,
+            }
+        )
+
+        return self.async_show_form(
+            step_id="another_trigger_state",
+            data_schema=data_schema,
             errors=errors,
         )
 
@@ -345,7 +438,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         )
 
     async def async_step_trigger_state(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Step to collect the trigger state."""
+        """Step to collect the trigger state via a dropdown of the entity's known states."""
         if user_input is not None:
             self._new_counter["trigger_state"] = user_input["trigger_state"]
             self._new_counter["id"] = str(uuid.uuid4())
@@ -353,9 +446,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
             return await self.async_step_init()
 
+        entity_id = self._new_counter.get("trigger_entity", "")
+        states = _get_entity_states(self.hass, entity_id)
+
         return self.async_show_form(
             step_id="trigger_state",
-            data_schema=vol.Schema({"trigger_state": str}),
+            data_schema=vol.Schema({"trigger_state": _state_selector(states)}),
         )
 
     async def async_step_select_edit(self, user_input: dict[str, Any] | None = None) -> FlowResult:
