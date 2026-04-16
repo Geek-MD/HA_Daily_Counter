@@ -72,7 +72,7 @@ def _get_entity_states(hass: HomeAssistant, entity_id: str) -> list[str]:
     return []
 
 
-def _state_selector(states: list[str]):
+def _state_selector(states: list[str]) -> type[str] | SelectSelector:
     """Return a SelectSelector for the given states list, or plain str if empty."""
     if not states:
         return str
