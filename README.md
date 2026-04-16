@@ -27,19 +27,18 @@
   - **Automations** (track automation executions)
   - **Scripts** (monitor script runs)
   - **Input Helpers** (input_boolean, input_number, input_select)
-- Choose the **state** (`on`, `off`, or custom states) that increments the counter.  
+- Choose the **trigger state** from a **smart dropdown** populated with the entity's known states (`on`/`off`, `open`/`closed`, input_select options, etc.). Custom values are always allowed.
 - Define how multiple triggers are combined with **logic operators**:  
   - **AND** → All triggers must be active.  
   - **OR** → Any trigger increments the counter.  
 - Filter entities by domain type for easy selection.
-- Search entities by name when adding additional triggers.
 - **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA (falls back to a standalone virtual device when the trigger has no associated device).
-- Assign an **area** to the counter for better organization in Home Assistant.  
 - Auto-reset counters daily at midnight (00:00 local time).  
 - Persistent values across Home Assistant restarts.  
 - Fully manageable via the UI (no YAML required).  
 - Exposed as `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon.  
-- Includes **reset** and **set** services for manual control.  
+- Includes **reset** and **set** services for manual control.
+- **Multi-language UI**: 🇬🇧 English · 🇪🇸 Español · 🇫🇷 Français · 🇵🇹 Português · 🇩🇪 Deutsch
 
 ---
 
@@ -74,11 +73,12 @@
      - **Entity Type**: Select the domain to filter entities (Binary Sensor, Sensor, Automation, Script, or Input Helpers).
    - **Step 2 – Trigger Entity**:
      - **Trigger Entity**: Entity that will increment the counter (filtered to the selected type).
-     - **Trigger State**: State value to monitor (e.g., `on`, `off`, `home`, `triggered`).
+   - **Step 3 – Trigger State**:
+     - **State to Monitor**: Select from a dropdown of the entity's known states (e.g., `on`, `off`, `open`). You can type a custom value if needed.
      - **Add Another Trigger?**: Toggle to add additional triggers from any entity domain.
 
 3. If multiple triggers are added:  
-   - Select additional entities and states from any supported domain.  
+   - For each additional trigger, first select the entity, then select its state from the dropdown.
    - Configure the **logic operator** (AND/OR) when adding the second trigger.
    - The same logic applies to all subsequent triggers.  
 

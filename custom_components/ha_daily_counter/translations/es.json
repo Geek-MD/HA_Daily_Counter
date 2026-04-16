@@ -11,20 +11,32 @@
       },
       "first_trigger": {
         "title": "Seleccionar Entidad Disparadora",
-        "description": "Selecciona la entidad y el estado que incrementarán el contador.",
+        "description": "Selecciona la entidad que incrementará el contador.",
         "data": {
-          "trigger_entity": "Entidad a Monitorizar",
+          "trigger_entity": "Entidad a Monitorizar"
+        }
+      },
+      "first_trigger_state": {
+        "title": "Seleccionar Estado Disparador",
+        "description": "Selecciona el estado que incrementará el contador. También puedes escribir un valor personalizado.",
+        "data": {
           "trigger_state": "Estado a Monitorizar",
           "add_another": "¿Agregar otro disparador?"
         }
       },
       "another_trigger": {
         "title": "Agregar Otro Disparador",
-        "description": "Define otro disparador para este contador.\nYa configurados: {previous_triggers}",
+        "description": "Selecciona una entidad adicional para este contador.\nYa configurados: {previous_triggers}",
         "data": {
           "trigger_entity": "Entidad Adicional a Monitorizar",
+          "logic": "Lógica de Disparadores"
+        }
+      },
+      "another_trigger_state": {
+        "title": "Seleccionar Estado Disparador",
+        "description": "Selecciona el estado para el disparador adicional. También puedes escribir un valor personalizado.",
+        "data": {
           "trigger_state": "Estado a Monitorizar",
-          "logic": "Lógica de Disparadores",
           "add_another": "¿Agregar otro disparador?"
         }
       },
@@ -74,7 +86,7 @@
       },
       "trigger_state": {
         "title": "Seleccionar Estado Disparador",
-        "description": "Introduce el estado que incrementará el contador.",
+        "description": "Selecciona el estado que incrementará el contador. También puedes escribir un valor personalizado.",
         "data": {
           "trigger_state": "Estado Disparador"
         }
@@ -102,7 +114,7 @@
       },
       "edit_trigger_state": {
         "title": "Editar Estado Disparador",
-        "description": "Editando contador: {counter_name}\nEstado actual: {current_value}\n\nSelecciona el nuevo estado disparador:",
+        "description": "Editando contador: {counter_name}\nEstado actual: {current_value}\n\nSelecciona el nuevo estado disparador. También puedes escribir un valor personalizado:",
         "data": {
           "trigger_state": "Estado Disparador"
         }

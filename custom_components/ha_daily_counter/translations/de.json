@@ -1,0 +1,138 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Zähler Hinzufügen",
+        "description": "Erstellen Sie einen neuen Zähler. Wählen Sie einen Namen und das Entitätsdomänen-Filter für die auslösende Entität.",
+        "data": {
+          "name": "Name",
+          "domain_filter": "Entitätstyp"
+        }
+      },
+      "first_trigger": {
+        "title": "Auslöser-Entität Auswählen",
+        "description": "Wählen Sie die Entität aus, die den Zähler erhöht.",
+        "data": {
+          "trigger_entity": "Zu Überwachende Entität"
+        }
+      },
+      "first_trigger_state": {
+        "title": "Auslöser-Zustand Auswählen",
+        "description": "Wählen Sie den Zustand aus, der den Zähler erhöht. Sie können auch einen benutzerdefinierten Wert eingeben.",
+        "data": {
+          "trigger_state": "Zu Überwachender Zustand",
+          "add_another": "Weiteren Auslöser hinzufügen?"
+        }
+      },
+      "another_trigger": {
+        "title": "Weiteren Auslöser Hinzufügen",
+        "description": "Wählen Sie eine weitere Auslöser-Entität für diesen Zähler.\nBereits konfiguriert: {previous_triggers}",
+        "data": {
+          "trigger_entity": "Weitere Zu Überwachende Entität",
+          "logic": "Auslöser-Logik"
+        }
+      },
+      "another_trigger_state": {
+        "title": "Auslöser-Zustand Auswählen",
+        "description": "Wählen Sie den Zustand für den weiteren Auslöser. Sie können auch einen benutzerdefinierten Wert eingeben.",
+        "data": {
+          "trigger_state": "Zu Überwachender Zustand",
+          "add_another": "Weiteren Auslöser hinzufügen?"
+        }
+      },
+      "finish": {
+        "title": "Zähler Abschließen",
+        "description": "Wählen Sie die Auslöser-Logik und weisen Sie optional einen Bereich zu.\nAnzahl der Auslöser: {count}",
+        "data": {
+          "logic_operator": "Auslöser-Logik",
+          "area": "Bereich Zuweisen"
+        }
+      },
+      "done": {
+        "title": "Zähler Erstellt",
+        "description": "Der Zähler {name} mit {count} Auslöser(n) wurde erfolgreich hinzugefügt."
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Zähler Verwalten",
+        "description": "Zähler dieser Integration hinzufügen, bearbeiten oder entfernen.",
+        "data": {
+          "action": "Aktion auswählen"
+        }
+      },
+      "user": {
+        "title": "Zählername",
+        "description": "Geben Sie einen Namen für den neuen Zähler ein.",
+        "data": {
+          "name": "Name"
+        }
+      },
+      "trigger_domain": {
+        "title": "Entitätstyp Auswählen",
+        "description": "Wählen Sie den Entitätsdomänen-Filter für die auslösende Entität.",
+        "data": {
+          "domain_filter": "Entitätstyp"
+        }
+      },
+      "trigger_entity": {
+        "title": "Auslöser-Entität Auswählen",
+        "description": "Wählen Sie die Entität aus, die den Zähler auslöst.",
+        "data": {
+          "trigger_entity": "Auslöser-Entität"
+        }
+      },
+      "trigger_state": {
+        "title": "Auslöser-Zustand Auswählen",
+        "description": "Wählen Sie den Zustand aus, der den Zähler erhöht. Sie können auch einen benutzerdefinierten Wert eingeben.",
+        "data": {
+          "trigger_state": "Auslöser-Zustand"
+        }
+      },
+      "select_edit": {
+        "title": "Zähler Bearbeiten",
+        "description": "Wählen Sie den Zähler aus, den Sie bearbeiten möchten.",
+        "data": {
+          "edit_target": "Zähler"
+        }
+      },
+      "edit_trigger_domain": {
+        "title": "Entitätstyp Auswählen",
+        "description": "Zähler wird bearbeitet: {counter_name}\n\nWählen Sie den Entitätsdomänen-Filter für die auslösende Entität.",
+        "data": {
+          "domain_filter": "Entitätstyp"
+        }
+      },
+      "edit_trigger_entity": {
+        "title": "Auslöser-Entität Bearbeiten",
+        "description": "Zähler wird bearbeitet: {counter_name}\nAktuelle Entität: {current_value}\n\nNeu auslösende Entität auswählen:",
+        "data": {
+          "trigger_entity": "Auslöser-Entität"
+        }
+      },
+      "edit_trigger_state": {
+        "title": "Auslöser-Zustand Bearbeiten",
+        "description": "Zähler wird bearbeitet: {counter_name}\nAktueller Zustand: {current_value}\n\nNeuen Auslöser-Zustand auswählen. Sie können auch einen benutzerdefinierten Wert eingeben:",
+        "data": {
+          "trigger_state": "Auslöser-Zustand"
+        }
+      },
+      "select_delete": {
+        "title": "Zähler Löschen",
+        "description": "Wählen Sie den Zähler aus, den Sie löschen möchten.",
+        "data": {
+          "delete_target": "Zähler"
+        }
+      },
+      "confirm_delete": {
+        "title": "Löschen Bestätigen",
+        "description": "Sind Sie sicher, dass Sie diesen Zähler löschen möchten?",
+        "data": {
+          "confirm_delete": "Löschen bestätigen"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Adicionar Contador",
+        "description": "Crie um novo contador. Escolha um nome e selecione o domínio da entidade para filtrar a entidade acionadora.",
+        "data": {
+          "name": "Nome",
+          "domain_filter": "Tipo de Entidade"
+        }
+      },
+      "first_trigger": {
+        "title": "Selecionar Entidade Acionadora",
+        "description": "Selecione a entidade que irá incrementar o contador.",
+        "data": {
+          "trigger_entity": "Entidade a Monitorizar"
+        }
+      },
+      "first_trigger_state": {
+        "title": "Selecionar Estado do Acionador",
+        "description": "Selecione o estado que irá incrementar o contador. Também pode digitar um valor personalizado.",
+        "data": {
+          "trigger_state": "Estado a Monitorizar",
+          "add_another": "Adicionar outro acionador?"
+        }
+      },
+      "another_trigger": {
+        "title": "Adicionar Outro Acionador",
+        "description": "Selecione uma entidade acionadora adicional para este contador.\nJá configurados: {previous_triggers}",
+        "data": {
+          "trigger_entity": "Entidade Adicional a Monitorizar",
+          "logic": "Lógica dos Acionadores"
+        }
+      },
+      "another_trigger_state": {
+        "title": "Selecionar Estado do Acionador",
+        "description": "Selecione o estado para o acionador adicional. Também pode digitar um valor personalizado.",
+        "data": {
+          "trigger_state": "Estado a Monitorizar",
+          "add_another": "Adicionar outro acionador?"
+        }
+      },
+      "finish": {
+        "title": "Finalizar Contador",
+        "description": "Escolha a lógica dos acionadores e atribua opcionalmente uma área.\nTotal de acionadores: {count}",
+        "data": {
+          "logic_operator": "Lógica dos Acionadores",
+          "area": "Atribuir Área"
+        }
+      },
+      "done": {
+        "title": "Contador Criado",
+        "description": "O contador {name} com {count} acionador(es) foi adicionado com sucesso."
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Gerir Contadores",
+        "description": "Adicione, edite ou remova contadores usados por esta integração.",
+        "data": {
+          "action": "Escolha uma ação"
+        }
+      },
+      "user": {
+        "title": "Nome do Contador",
+        "description": "Introduza um nome para o novo contador.",
+        "data": {
+          "name": "Nome"
+        }
+      },
+      "trigger_domain": {
+        "title": "Selecionar Tipo de Entidade",
+        "description": "Escolha o domínio da entidade para filtrar a entidade acionadora.",
+        "data": {
+          "domain_filter": "Tipo de Entidade"
+        }
+      },
+      "trigger_entity": {
+        "title": "Selecionar Entidade Acionadora",
+        "description": "Selecione a entidade que irá acionar o contador.",
+        "data": {
+          "trigger_entity": "Entidade Acionadora"
+        }
+      },
+      "trigger_state": {
+        "title": "Selecionar Estado do Acionador",
+        "description": "Selecione o estado que irá incrementar o contador. Também pode digitar um valor personalizado.",
+        "data": {
+          "trigger_state": "Estado do Acionador"
+        }
+      },
+      "select_edit": {
+        "title": "Editar Contador",
+        "description": "Selecione o contador que pretende editar.",
+        "data": {
+          "edit_target": "Contador"
+        }
+      },
+      "edit_trigger_domain": {
+        "title": "Selecionar Tipo de Entidade",
+        "description": "A editar contador: {counter_name}\n\nEscolha o domínio da entidade para filtrar a entidade acionadora.",
+        "data": {
+          "domain_filter": "Tipo de Entidade"
+        }
+      },
+      "edit_trigger_entity": {
+        "title": "Editar Entidade Acionadora",
+        "description": "A editar contador: {counter_name}\nEntidade atual: {current_value}\n\nSelecione a nova entidade acionadora:",
+        "data": {
+          "trigger_entity": "Entidade Acionadora"
+        }
+      },
+      "edit_trigger_state": {
+        "title": "Editar Estado do Acionador",
+        "description": "A editar contador: {counter_name}\nEstado atual: {current_value}\n\nSelecione o novo estado do acionador. Também pode digitar um valor personalizado:",
+        "data": {
+          "trigger_state": "Estado do Acionador"
+        }
+      },
+      "select_delete": {
+        "title": "Eliminar Contador",
+        "description": "Selecione o contador que pretende eliminar.",
+        "data": {
+          "delete_target": "Contador"
+        }
+      },
+      "confirm_delete": {
+        "title": "Confirmar Eliminação",
+        "description": "Tem a certeza que pretende eliminar este contador?",
+        "data": {
+          "confirm_delete": "Confirmar eliminação"
+        }
+      }
+    }
+  }
+}

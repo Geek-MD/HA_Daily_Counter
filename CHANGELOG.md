@@ -5,6 +5,40 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] - 2026-04-16
+
+### 🔧 Bug Fix + ✨ New Features
+
+This release fixes a critical bug introduced in earlier versions and adds two new UX features: state selection via dropdown and multi-language support.
+
+### Fixed
+- ✅ **No entities after initial setup**: `async_step_finish()` in `config_flow.py` was storing trigger data in `entry.data` instead of `entry.options`. Since `sensor.py`'s `async_setup_entry` reads from `entry.options.get("counters", [])`, no entities were created after the initial config flow. The counter is now correctly stored in `entry.options` as `{"counters": [{...}]}`.
+- ✅ **Backward compatibility for pre-v1.5.2 entries**: `sensor.py` now falls back to `entry.data` when `entry.options` has no counters, so entries created before this fix continue to work (with a logged warning to re-create the entry for a full migration).
+
+### Added
+- ✨ **State selection via dropdown**: The trigger state field is now a dropdown selector populated with the entity's known possible states, replacing the free-text input. Supported domains:
+  - `binary_sensor`, `input_boolean`, `switch`, `light`, `fan`, `lock`, `automation`, `script` → `on` / `off`
+  - `cover` → `open`, `closed`, `opening`, `closing`
+  - `alarm_control_panel` → `disarmed`, `armed_home`, `armed_away`, `armed_night`, `pending`, `triggered`
+  - `input_select` → options read from the entity's `options` attribute at runtime
+  - All other domains → current state of the entity shown as default option
+  - The selector supports `custom_value=True`, so users can always type a state not in the list.
+- ✨ **Multi-language support**: The UI now ships with translations for **5 languages**:
+  - 🇬🇧 English (`en`)
+  - 🇪🇸 Spanish (`es`)
+  - 🇫🇷 French (`fr`) — new
+  - 🇵🇹 Portuguese (`pt`) — new
+  - 🇩🇪 German (`de`) — new
+
+### Changed
+- Config flow split: `async_step_first_trigger` now only collects the entity; a new `async_step_first_trigger_state` step handles state selection via dropdown.
+- Config flow split: `async_step_another_trigger` now only collects the entity and logic; a new `async_step_another_trigger_state` step handles state selection via dropdown.
+- Options flow `async_step_trigger_state` and `async_step_edit_trigger_state` now use the same dropdown selector instead of a plain text field.
+- Updated all translation files (`en`, `es`, `strings`) to reflect the new step structure.
+- Updated version to 1.5.2 in `manifest.json`.
+
+---
+
 ## [1.5.1] - 2026-04-16
 
 ### 🔧 Bug Fix: Entry Unload / Reload Error (closes #34)

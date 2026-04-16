@@ -29,6 +29,24 @@ async def async_setup_entry(
 ) -> None:
     """Set up HA Daily Counter sensors from config entry."""
     counters = entry.options.get("counters", [])
+
+    # Fallback for entries created before v1.5.2: triggers were stored in entry.data
+    # instead of entry.options, so no entities were ever registered.
+    if not counters and entry.data.get("triggers"):
+        counters = [
+            {
+                "id": entry.entry_id,
+                "name": entry.title,
+                "triggers": entry.data.get("triggers", []),
+                "logic": entry.data.get("logic", "OR"),
+            }
+        ]
+        _LOGGER.warning(
+            "Entry '%s' was created before v1.5.2 and has no counters in options. "
+            "Loaded from entry.data as fallback. Re-create the entry to migrate.",
+            entry.title,
+        )
+
     entities: list[HADailyCounterEntity] = []
 
     for cfg in counters:
