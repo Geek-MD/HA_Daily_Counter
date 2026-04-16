@@ -5,6 +5,23 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-04-16
+
+### 🔧 Bug Fix: Entry Unload / Reload Error (closes #34)
+
+This release fixes two related bugs in `__init__.py` that caused integration unload to fail with an `AttributeError` and prevented sensors from appearing immediately after setup.
+
+### Fixed
+- ✅ **AttributeError on unload** (#34): `async_forward_entry_unloads` (non-existent plural form) replaced with the correct `async_forward_entry_unload` (singular). This caused every reload/unload of a counter entry to fail with `AttributeError: 'ConfigEntries' object has no attribute 'async_forward_entry_unloads'`.
+- ✅ **Sensor not visible after adding counter** (#34): `async_setup_entry` was wrapping `async_forward_entry_setups` in `hass.async_create_task`, scheduling setup asynchronously without awaiting it. The call is now properly awaited so the sensor entity is registered before `async_setup_entry` returns, making it visible immediately without requiring a full HA restart.
+- ✅ **Incorrect return type in unload**: `all()` was called on the `bool` result of `async_forward_entry_unload`; replaced with a direct `bool()` cast to satisfy the return type.
+
+### Changed
+- Removed unused `cast` and `Any` imports from `__init__.py`.
+- Updated version to 1.5.1 in `manifest.json`.
+
+---
+
 ## [1.5.0] - 2026-04-15
 
 ### ✨ New Feature: Attach Counter to an Existing Device (closes #34)

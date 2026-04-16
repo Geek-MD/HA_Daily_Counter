@@ -1,7 +1,6 @@
 """Init file for HA Daily Counter integration."""
 
 import logging
-from typing import Any, cast
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -13,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the integration from configuration.yaml (not used)."""
     return True
 
@@ -35,12 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up HA Daily Counter from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
-    # Compatibilidad con diferentes versiones de HA/stubs:
-    # intentamos usar la API plural si existe; para evitar errores de mypy
-    # hacemos un cast a Any en la llamada.
-    hass.async_create_task(
-        cast(Any, hass.config_entries).async_forward_entry_setups(entry, ["sensor"])
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
 
     # Register update listener to reload when options change
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
@@ -94,9 +88,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    # Llamada a la versión plural de unload si existe; usar cast para evitar chequeos estáticos.
-    unloaded = await cast(Any, hass.config_entries).async_forward_entry_unloads(entry, ["sensor"])
-    return all(unloaded)
+    return bool(await hass.config_entries.async_forward_entry_unload(entry, "sensor"))
 
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
