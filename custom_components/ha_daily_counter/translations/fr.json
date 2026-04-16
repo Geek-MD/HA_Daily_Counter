@@ -1,0 +1,138 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ajouter un Compteur",
+        "description": "Créez un nouveau compteur. Choisissez un nom et sélectionnez le domaine d'entité pour filtrer l'entité déclencheuse.",
+        "data": {
+          "name": "Nom",
+          "domain_filter": "Type d'Entité"
+        }
+      },
+      "first_trigger": {
+        "title": "Sélectionner l'Entité Déclencheuse",
+        "description": "Sélectionnez l'entité qui incrémentera le compteur.",
+        "data": {
+          "trigger_entity": "Entité à Surveiller"
+        }
+      },
+      "first_trigger_state": {
+        "title": "Sélectionner l'État Déclencheur",
+        "description": "Sélectionnez l'état qui incrémentera le compteur. Vous pouvez aussi saisir une valeur personnalisée.",
+        "data": {
+          "trigger_state": "État à Surveiller",
+          "add_another": "Ajouter un autre déclencheur ?"
+        }
+      },
+      "another_trigger": {
+        "title": "Ajouter un Autre Déclencheur",
+        "description": "Sélectionnez une entité déclencheuse supplémentaire pour ce compteur.\nDéjà configurés : {previous_triggers}",
+        "data": {
+          "trigger_entity": "Entité Supplémentaire à Surveiller",
+          "logic": "Logique des Déclencheurs"
+        }
+      },
+      "another_trigger_state": {
+        "title": "Sélectionner l'État Déclencheur",
+        "description": "Sélectionnez l'état pour le déclencheur supplémentaire. Vous pouvez aussi saisir une valeur personnalisée.",
+        "data": {
+          "trigger_state": "État à Surveiller",
+          "add_another": "Ajouter un autre déclencheur ?"
+        }
+      },
+      "finish": {
+        "title": "Finaliser le Compteur",
+        "description": "Choisissez la logique des déclencheurs et assignez éventuellement une zone.\nNombre de déclencheurs : {count}",
+        "data": {
+          "logic_operator": "Logique des Déclencheurs",
+          "area": "Assigner une Zone"
+        }
+      },
+      "done": {
+        "title": "Compteur Créé",
+        "description": "Le compteur {name} avec {count} déclencheur(s) a été ajouté avec succès."
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Gérer les Compteurs",
+        "description": "Ajoutez, modifiez ou supprimez les compteurs utilisés par cette intégration.",
+        "data": {
+          "action": "Choisissez une action"
+        }
+      },
+      "user": {
+        "title": "Nom du Compteur",
+        "description": "Entrez un nom pour le nouveau compteur.",
+        "data": {
+          "name": "Nom"
+        }
+      },
+      "trigger_domain": {
+        "title": "Sélectionner le Type d'Entité",
+        "description": "Choisissez le domaine d'entité pour filtrer l'entité déclencheuse.",
+        "data": {
+          "domain_filter": "Type d'Entité"
+        }
+      },
+      "trigger_entity": {
+        "title": "Sélectionner l'Entité Déclencheuse",
+        "description": "Sélectionnez l'entité qui déclenchera le compteur.",
+        "data": {
+          "trigger_entity": "Entité Déclencheuse"
+        }
+      },
+      "trigger_state": {
+        "title": "Sélectionner l'État Déclencheur",
+        "description": "Sélectionnez l'état qui incrémentera le compteur. Vous pouvez aussi saisir une valeur personnalisée.",
+        "data": {
+          "trigger_state": "État Déclencheur"
+        }
+      },
+      "select_edit": {
+        "title": "Modifier un Compteur",
+        "description": "Sélectionnez le compteur que vous souhaitez modifier.",
+        "data": {
+          "edit_target": "Compteur"
+        }
+      },
+      "edit_trigger_domain": {
+        "title": "Sélectionner le Type d'Entité",
+        "description": "Modification du compteur : {counter_name}\n\nChoisissez le domaine d'entité pour filtrer l'entité déclencheuse.",
+        "data": {
+          "domain_filter": "Type d'Entité"
+        }
+      },
+      "edit_trigger_entity": {
+        "title": "Modifier l'Entité Déclencheuse",
+        "description": "Modification du compteur : {counter_name}\nEntité actuelle : {current_value}\n\nSélectionnez la nouvelle entité déclencheuse :",
+        "data": {
+          "trigger_entity": "Entité Déclencheuse"
+        }
+      },
+      "edit_trigger_state": {
+        "title": "Modifier l'État Déclencheur",
+        "description": "Modification du compteur : {counter_name}\nÉtat actuel : {current_value}\n\nSélectionnez le nouvel état déclencheur. Vous pouvez aussi saisir une valeur personnalisée :",
+        "data": {
+          "trigger_state": "État Déclencheur"
+        }
+      },
+      "select_delete": {
+        "title": "Supprimer un Compteur",
+        "description": "Sélectionnez le compteur que vous souhaitez supprimer.",
+        "data": {
+          "delete_target": "Compteur"
+        }
+      },
+      "confirm_delete": {
+        "title": "Confirmer la Suppression",
+        "description": "Êtes-vous sûr de vouloir supprimer ce compteur ?",
+        "data": {
+          "confirm_delete": "Confirmer la suppression"
+        }
+      }
+    }
+  }
+}

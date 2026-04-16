@@ -535,25 +535,26 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         )
 
     async def async_step_edit_trigger_state(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Step to edit the trigger state."""
+        """Step to edit the trigger state via a dropdown of the entity's known states."""
         if user_input is not None:
             self._editing_counter["trigger_state"] = user_input["trigger_state"]
             # Update the counter in the list
             if self._selected_edit_index is not None and 0 <= self._selected_edit_index < len(self._counters):
                 self._counters[self._selected_edit_index] = self._editing_counter
-            
+
             # Reset editing state
             self._selected_edit_index = None
             self._editing_counter = {}
-            
+
             return await self.async_step_init()
 
-        # Get current trigger state value
         current_state = self._editing_counter.get("trigger_state", "")
+        entity_id = self._editing_counter.get("trigger_entity", "")
+        states = _get_entity_states(self.hass, entity_id)
 
         return self.async_show_form(
             step_id="edit_trigger_state",
-            data_schema=vol.Schema({"trigger_state": str}),
+            data_schema=vol.Schema({"trigger_state": _state_selector(states)}),
             description_placeholders={
                 "current_value": current_state,
                 "counter_name": self._editing_counter.get("name", ""),

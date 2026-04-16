@@ -7,20 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.2] - 2026-04-16
 
-### 🔧 Bug Fix: New Sensor Creates Entry Without Entities
+### 🔧 Bug Fix + ✨ New Features
 
-This release fixes a critical bug where creating a new sensor via the initial config flow generated an integration entry but registered no entities. The integration appeared in Settings → Devices & Services with zero entities and no error was shown in the registry.
+This release fixes a critical bug introduced in earlier versions and adds two new UX features: state selection via dropdown and multi-language support.
 
 ### Fixed
-- ✅ **No entities after initial setup**: `async_step_finish()` in `config_flow.py` was storing trigger data in `entry.data` (`{"triggers": [...], "logic": "..."}`) instead of `entry.options`. However, `sensor.py`'s `async_setup_entry` reads from `entry.options.get("counters", [])`, which was always empty for newly created entries. The counter is now stored correctly in `entry.options` as `{"counters": [{"id": ..., "name": ..., "triggers": [...], "logic": "..."}]}`.
-- ✅ **Backward compatibility for pre-v1.5.2 entries**: `sensor.py` now checks `entry.data` as a fallback when `entry.options` has no counters. Entries created before this fix will continue to work and log a warning recommending the user to re-create the entry to fully migrate.
+- ✅ **No entities after initial setup**: `async_step_finish()` in `config_flow.py` was storing trigger data in `entry.data` instead of `entry.options`. Since `sensor.py`'s `async_setup_entry` reads from `entry.options.get("counters", [])`, no entities were created after the initial config flow. The counter is now correctly stored in `entry.options` as `{"counters": [{...}]}`.
+- ✅ **Backward compatibility for pre-v1.5.2 entries**: `sensor.py` now falls back to `entry.data` when `entry.options` has no counters, so entries created before this fix continue to work (with a logged warning to re-create the entry for a full migration).
+
+### Added
+- ✨ **State selection via dropdown**: The trigger state field is now a dropdown selector populated with the entity's known possible states, replacing the free-text input. Supported domains:
+  - `binary_sensor`, `input_boolean`, `switch`, `light`, `fan`, `lock`, `automation`, `script` → `on` / `off`
+  - `cover` → `open`, `closed`, `opening`, `closing`
+  - `alarm_control_panel` → `disarmed`, `armed_home`, `armed_away`, `armed_night`, `pending`, `triggered`
+  - `input_select` → options read from the entity's `options` attribute at runtime
+  - All other domains → current state of the entity shown as default option
+  - The selector supports `custom_value=True`, so users can always type a state not in the list.
+- ✨ **Multi-language support**: The UI now ships with translations for **5 languages**:
+  - 🇬🇧 English (`en`)
+  - 🇪🇸 Spanish (`es`)
+  - 🇫🇷 French (`fr`) — new
+  - 🇵🇹 Portuguese (`pt`) — new
+  - 🇩🇪 German (`de`) — new
 
 ### Changed
-- `async_step_finish()` now calls `async_create_entry(title=title, data={}, options={"counters": [counter]})` so entities are immediately registered when a new integration entry is created.
+- Config flow split: `async_step_first_trigger` now only collects the entity; a new `async_step_first_trigger_state` step handles state selection via dropdown.
+- Config flow split: `async_step_another_trigger` now only collects the entity and logic; a new `async_step_another_trigger_state` step handles state selection via dropdown.
+- Options flow `async_step_trigger_state` and `async_step_edit_trigger_state` now use the same dropdown selector instead of a plain text field.
+- Updated all translation files (`en`, `es`, `strings`) to reflect the new step structure.
 - Updated version to 1.5.2 in `manifest.json`.
-
-### Who Should Upgrade?
-**All users on v1.5.1 or earlier should upgrade to v1.5.2** if they noticed that creating a new sensor resulted in an empty integration entry with no entities.
 
 ---
 
