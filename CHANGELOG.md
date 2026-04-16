@@ -5,6 +5,25 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] - 2026-04-16
+
+### 🔧 Bug Fix: New Sensor Creates Entry Without Entities
+
+This release fixes a critical bug where creating a new sensor via the initial config flow generated an integration entry but registered no entities. The integration appeared in Settings → Devices & Services with zero entities and no error was shown in the registry.
+
+### Fixed
+- ✅ **No entities after initial setup**: `async_step_finish()` in `config_flow.py` was storing trigger data in `entry.data` (`{"triggers": [...], "logic": "..."}`) instead of `entry.options`. However, `sensor.py`'s `async_setup_entry` reads from `entry.options.get("counters", [])`, which was always empty for newly created entries. The counter is now stored correctly in `entry.options` as `{"counters": [{"id": ..., "name": ..., "triggers": [...], "logic": "..."}]}`.
+- ✅ **Backward compatibility for pre-v1.5.2 entries**: `sensor.py` now checks `entry.data` as a fallback when `entry.options` has no counters. Entries created before this fix will continue to work and log a warning recommending the user to re-create the entry to fully migrate.
+
+### Changed
+- `async_step_finish()` now calls `async_create_entry(title=title, data={}, options={"counters": [counter]})` so entities are immediately registered when a new integration entry is created.
+- Updated version to 1.5.2 in `manifest.json`.
+
+### Who Should Upgrade?
+**All users on v1.5.1 or earlier should upgrade to v1.5.2** if they noticed that creating a new sensor resulted in an empty integration entry with no entities.
+
+---
+
 ## [1.5.1] - 2026-04-16
 
 ### 🔧 Bug Fix: Entry Unload / Reload Error (closes #34)

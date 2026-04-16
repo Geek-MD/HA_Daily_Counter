@@ -215,9 +215,13 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         
         try:
             title = self._name or "HA Daily Counter"
-            data = {
+
+            # Build the counter in the format expected by sensor.py / OptionsFlowHandler
+            counter = {
+                "id": str(uuid.uuid4()),
+                "name": title,
                 "triggers": self._triggers,
-                "logic": self._logic,  # AND u OR
+                "logic": self._logic,
             }
 
             _LOGGER.info(
@@ -227,7 +231,13 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 self._logic,
             )
 
-            return self.async_create_entry(title=title, data=data)
+            # Store counters in entry.options so that async_setup_entry in sensor.py
+            # can read entry.options.get("counters", []) and create entities immediately.
+            return self.async_create_entry(
+                title=title,
+                data={},
+                options={"counters": [counter]},
+            )
             
         except Exception as err:
             _LOGGER.error(
