@@ -84,7 +84,7 @@ def _state_selector(states: list[str]) -> type[str] | SelectSelector:
     )
 
 
-class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Config flow for HA Daily Counter with multiple triggers and an overall logic operator."""
 
     VERSION = 1
