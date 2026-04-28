@@ -38,7 +38,7 @@
 - Fully manageable via the UI (no YAML required).  
 - Exposed as `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon.  
 - Includes **reset** and **set** services for manual control.
-- **Multi-language UI**: 🇬🇧 English · 🇪🇸 Español · 🇫🇷 Français · 🇵🇹 Português · 🇩🇪 Deutsch
+- **Multi-language Support**: English, Spanish, French, Portuguese, and German
 
 ---
 
