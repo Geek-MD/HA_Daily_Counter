@@ -74,20 +74,29 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         self.hass = hass
         self._entry_id = entry_id
 
-        # === Retrocompatibilidad ===
-        # v1.3.0 → usa trigger_entity / trigger_state
-        # v1.3.1+ → usa triggers (lista)
-        if "trigger_entity" in counter_config:
-            self._trigger_entity: str = counter_config["trigger_entity"]
-            self._trigger_state: str = counter_config["trigger_state"]
-        elif "triggers" in counter_config and isinstance(counter_config["triggers"], list):
-            first = counter_config["triggers"][0] if counter_config["triggers"] else {}
-            self._trigger_entity = first.get("entity", "")
-            self._trigger_state = first.get("state", "")
+        # Build the canonical triggers list from whatever format the config uses.
+        # v1.3.0 stored a single trigger_entity / trigger_state pair.
+        # v1.3.1+ stores a "triggers" list.
+        if "triggers" in counter_config and isinstance(counter_config["triggers"], list):
+            self._triggers_list: list[Dict[str, str]] = counter_config["triggers"]
+        elif "trigger_entity" in counter_config:
+            self._triggers_list = [
+                {
+                    "entity": counter_config.get("trigger_entity", ""),
+                    "state": counter_config.get("trigger_state", ""),
+                }
+            ]
         else:
             _LOGGER.warning("Invalid counter config: %s", counter_config)
-            self._trigger_entity = ""
-            self._trigger_state = ""
+            self._triggers_list = []
+
+        self._logic: str = counter_config.get("logic", "OR")
+
+        # Keep a single _trigger_entity / _trigger_state for backward-compat
+        # code paths that still reference these attributes.
+        first = self._triggers_list[0] if self._triggers_list else {}
+        self._trigger_entity: str = first.get("entity", "")
+        self._trigger_state: str = first.get("state", "")
 
         self._unique_id = f"{entry_id}_{counter_config.get('id', 'unknown')}"
         self._name: str = counter_config.get("name", "Unnamed Counter")
@@ -110,12 +119,16 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     def device_info(self) -> DeviceInfo | None:
         """Return device information for Home Assistant UI.
 
-        When the trigger entity belongs to a known device, the counter sensor
-        is attached to that same device so it appears alongside its related
-        hardware in the Home Assistant device page.  If no device is found the
-        counter falls back to creating its own virtual device entry.
+        When the counter monitors a **single** entity and that entity belongs to
+        a known device, the counter sensor is attached to that device so it
+        appears alongside its related hardware in the HA device page.
+
+        When the counter monitors **multiple** entities it must not be attached
+        to any specific device (doing so would create duplicate entries for the
+        same config-entry in that device).  In that case an independent virtual
+        device is created using the counter's own unique identifier.
         """
-        if self._trigger_entity:
+        if len(self._triggers_list) == 1 and self._trigger_entity:
             ent_reg = er.async_get(self.hass)
             ent_entry = ent_reg.async_get(self._trigger_entity)
             if ent_entry and ent_entry.device_id:
@@ -140,18 +153,24 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             self._attr_native_value = int(last.state)
             _LOGGER.debug("Restored state for '%s': %d", self._name, self._attr_native_value)
 
-        # Subscribe to state change events
-        if self._trigger_entity:
+        # Subscribe to ALL configured trigger entities
+        trigger_entities = [t["entity"] for t in self._triggers_list if t.get("entity")]
+        if trigger_entities:
             self.async_on_remove(
                 async_track_state_change_event(
                     self.hass,
-                    [self._trigger_entity],
+                    trigger_entities,
                     self._handle_trigger_state_change,
                 )
             )
-            _LOGGER.debug("Subscribed to trigger '%s' for '%s'", self._trigger_entity, self._name)
+            _LOGGER.debug(
+                "Subscribed to %d trigger(s) for '%s': %s",
+                len(trigger_entities),
+                self._name,
+                trigger_entities,
+            )
         else:
-            _LOGGER.warning("Counter '%s' has no valid trigger entity", self._name)
+            _LOGGER.warning("Counter '%s' has no valid trigger entities", self._name)
 
         # Schedule daily reset
         next_reset = self._get_next_reset_time()
@@ -168,16 +187,56 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
 
     @callback
     def _handle_trigger_state_change(self, event: Any) -> None:
-        """Increment counter when trigger entity reaches specified state."""
+        """Increment counter when trigger conditions are met.
+
+        OR logic (default): increment when ANY configured trigger entity
+        transitions to its specified state.
+
+        AND logic: increment only when the entity that just changed satisfies
+        its trigger state AND every other trigger entity is already in its
+        required state simultaneously.
+        """
         new_state = event.data.get("new_state")
         if not new_state or new_state.state in (STATE_UNKNOWN, None):
             return
-        if new_state.state == self._trigger_state:
+
+        changed_entity: str = event.data.get("entity_id", "")
+
+        if self._logic == "AND":
+            # All triggers must be satisfied at the same time.
+            for trigger in self._triggers_list:
+                t_entity = trigger.get("entity", "")
+                t_state = trigger.get("state", "")
+                if t_entity == changed_entity:
+                    if new_state.state != t_state:
+                        return  # The changed entity doesn't satisfy its trigger
+                else:
+                    current = self.hass.states.get(t_entity)
+                    if not current or current.state != t_state:
+                        return  # Another trigger is not in its required state
+            # All conditions met
             self._attr_native_value += 1
             self.async_write_ha_state()
             _LOGGER.debug(
-                "Counter '%s' incremented to %d", self._name, self._attr_native_value
+                "Counter '%s' incremented to %d (AND logic)",
+                self._name,
+                self._attr_native_value,
             )
+        else:
+            # OR logic: increment when the changed entity matches any trigger.
+            for trigger in self._triggers_list:
+                if (
+                    trigger.get("entity") == changed_entity
+                    and new_state.state == trigger.get("state")
+                ):
+                    self._attr_native_value += 1
+                    self.async_write_ha_state()
+                    _LOGGER.debug(
+                        "Counter '%s' incremented to %d (OR logic)",
+                        self._name,
+                        self._attr_native_value,
+                    )
+                    break
 
     @callback
     def _reset_counter(self, now: datetime) -> None:

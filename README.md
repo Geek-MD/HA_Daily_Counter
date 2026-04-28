@@ -32,7 +32,7 @@
   - **AND** → All triggers must be active.  
   - **OR** → Any trigger increments the counter.  
 - Filter entities by domain type for easy selection.
-- **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA (falls back to a standalone virtual device when the trigger has no associated device).
+- **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA. When monitoring **multiple entities** the counter is created as an independent virtual device so it is never duplicated across several device pages.
 - Auto-reset counters daily at midnight (00:00 local time).  
 - Persistent values across Home Assistant restarts.  
 - Fully manageable via the UI (no YAML required).  
@@ -75,7 +75,7 @@
      - **Trigger Entity**: Entity that will increment the counter (filtered to the selected type).
    - **Step 3 – Trigger State**:
      - **State to Monitor**: Select from a dropdown of the entity's known states (e.g., `on`, `off`, `open`). You can type a custom value if needed.
-     - **Add Another Trigger?**: Toggle to add additional triggers from any entity domain.
+     - **Add Another Trigger?**: Toggle to add additional triggers. Subsequent entity selectors are automatically filtered to the **same domain** as the first entity.
 
 3. If multiple triggers are added:  
    - For each additional trigger, first select the entity, then select its state from the dropdown.

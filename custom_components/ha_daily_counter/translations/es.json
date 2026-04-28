@@ -88,7 +88,24 @@
         "title": "Seleccionar Estado Disparador",
         "description": "Selecciona el estado que incrementará el contador. También puedes escribir un valor personalizado.",
         "data": {
-          "trigger_state": "Estado Disparador"
+          "trigger_state": "Estado Disparador",
+          "add_another": "¿Monitorizar una entidad adicional?"
+        }
+      },
+      "new_another_trigger": {
+        "title": "Agregar Otra Entidad a Monitorizar",
+        "description": "Selecciona una entidad adicional para este contador.\nYa configurados: {previous_triggers}",
+        "data": {
+          "trigger_entity": "Entidad Adicional a Monitorizar",
+          "logic": "Lógica de Disparadores"
+        }
+      },
+      "new_another_trigger_state": {
+        "title": "Seleccionar Estado de la Entidad Adicional",
+        "description": "Selecciona el estado que incrementará el contador. También puedes escribir un valor personalizado.",
+        "data": {
+          "trigger_state": "Estado a Monitorizar",
+          "add_another": "¿Monitorizar una entidad adicional?"
         }
       },
       "select_edit": {

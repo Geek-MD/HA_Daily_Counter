@@ -5,6 +5,25 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.5] - 2026-04-28
+
+### Fixed
+- ✅ **Multi-trigger counter created duplicate device entries**: When a counter monitored more than one entity it was attached to the first entity's device, causing Home Assistant to register multiple entities under the same device entry. Counters that monitor two or more entities now create their own independent virtual device instead.
+- ✅ **Multi-trigger counters only reacted to the first entity**: `async_added_to_hass` was subscribing only to the first configured trigger entity. All trigger entities are now subscribed, and the AND / OR logic is fully applied at runtime.
+- ✅ **`add_another` option untranslated / missing in options flow for new counters**: The options-flow path for *adding* a new counter (`trigger_state` step) lacked the "Monitor an additional entity?" checkbox. It is now present and fully translated in all five languages, matching the behaviour of the initial config flow and the edit path.
+- ✅ **Domain filter not enforced for additional entities**: When adding a second (or subsequent) trigger entity, the entity selector now restricts the list to the same domain as the first entity — in both the initial config flow and the options flow (edit and add-new paths).
+
+### Changed
+- `sensor.py`: `HADailyCounterEntity` now stores the full `triggers` list and the `logic` operator; `device_info` returns a standalone virtual device when there are two or more triggers; `_handle_trigger_state_change` applies OR / AND logic across all triggers.
+- `config_flow.py` – `FlowHandler.async_step_another_trigger`: entity selector filtered to `self._domain_filter`.
+- `config_flow.py` – `OptionsFlowHandler.async_step_edit_another_trigger`: entity selector filtered to `self._editing_domain`.
+- `config_flow.py` – `OptionsFlowHandler`: new steps `async_step_new_another_trigger`, `async_step_new_another_trigger_state`, and `async_step_new_counter_finish` handle multi-trigger new counters in the options flow; new counters are now stored in the canonical `triggers`-list format.
+- `config_flow.py`: replaced deprecated `FlowResult` import with `ConfigFlowResult`; removed stale `# type: ignore[call-arg]`.
+- `mypy.ini`: updated `python_version` from 3.11 → 3.12 to match the runtime and avoid false positives from HA's own type annotations.
+- All translation files (`en`, `es`, `de`, `fr`, `pt`, `strings`) updated with the new `add_another` field in `options.step.trigger_state` and two new step entries (`new_another_trigger`, `new_another_trigger_state`).
+
+---
+
 ## [1.5.4] - 2026-04-28
 
 ### Fixed
