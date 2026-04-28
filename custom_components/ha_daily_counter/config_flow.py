@@ -355,39 +355,25 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._editing_domain: str = "binary_sensor"
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Initial step: add, edit, or delete a counter."""
+        """Initial step: directly proceed to editing the counter."""
         # Initialize counters from config_entry on first call
         if not self._counters:
             self._counters = list(self.config_entry.options.get("counters", []))
-        
-        if user_input is not None:
-            if user_input["action"] == "add":
-                return await self.async_step_user()
-            elif user_input["action"] == "edit":
-                return await self.async_step_select_edit()
-            elif user_input["action"] == "delete":
-                return await self.async_step_select_delete()
 
-            return self.async_create_entry(title="", data={"counters": self._counters})
+        # If no counters exist yet, start the add flow
+        if not self._counters:
+            return await self.async_step_user()
 
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(
-                {
-                    "action": SelectSelector(
-                        SelectSelectorConfig(
-                            options=[
-                                SelectOptionDict(value="add", label="Add counter"),
-                                SelectOptionDict(value="edit", label="Edit counter"),
-                                SelectOptionDict(value="delete", label="Delete counter"),
-                                SelectOptionDict(value="finish", label="Finish setup"),
-                            ],
-                            mode=SelectSelectorMode.DROPDOWN,
-                        )
-                    ),
-                }
-            ),
-        )
+        # If there is exactly one counter, select it automatically and go straight to editing
+        if len(self._counters) == 1:
+            self._selected_edit_index = 0
+            self._editing_counter = dict(self._counters[0])
+            current_entity = self._editing_counter.get("trigger_entity", "")
+            self._editing_domain = current_entity.split(".")[0] if current_entity else "binary_sensor"
+            return await self.async_step_edit_trigger_domain()
+
+        # Multiple counters: let the user choose which one to edit
+        return await self.async_step_select_edit()
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Step to collect the name of the new counter."""
@@ -444,7 +430,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._new_counter["id"] = str(uuid.uuid4())
             self._counters.append(self._new_counter)
 
-            return await self.async_step_init()
+            return self.async_create_entry(title="", data={"counters": self._counters})
 
         entity_id = self._new_counter.get("trigger_entity", "")
         states = _get_entity_states(self.hass, entity_id)
@@ -546,7 +532,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._selected_edit_index = None
             self._editing_counter = {}
 
-            return await self.async_step_init()
+            return self.async_create_entry(title="", data={"counters": self._counters})
 
         current_state = self._editing_counter.get("trigger_state", "")
         entity_id = self._editing_counter.get("trigger_entity", "")
@@ -564,7 +550,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_select_delete(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Step to select a counter to delete."""
         if not self._counters:
-            return await self.async_step_init()
+            return self.async_create_entry(title="", data={"counters": self._counters})
 
         if user_input is not None:
             self._selected_delete_name = user_input["delete_target"]
@@ -592,7 +578,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None and user_input.get("confirm_delete"):
             self._counters = [c for c in self._counters if c["name"] != self._selected_delete_name]
 
-        return await self.async_step_init()
+        return self.async_create_entry(title="", data={"counters": self._counters})
 
     @callback
     def async_get_options(self) -> dict[str, Any]:

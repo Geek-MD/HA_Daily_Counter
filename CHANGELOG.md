@@ -5,6 +5,16 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.3] - 2026-04-28
+
+### Fixed
+- ✅ **"Manage Counters" dialog shown on reconfigure**: When clicking *Configure* on an existing counter, the options flow was showing a "Manage Counters" dialog with add/edit/delete options instead of going directly to edit the counter. `async_step_init` now skips that menu entirely:
+  - If there is **one counter**, it is selected automatically and the edit flow starts immediately.
+  - If there are **multiple counters**, the counter-selection step is shown so the user can choose which one to edit.
+  - After editing (or adding/deleting), the flow saves and closes instead of looping back to the menu.
+
+---
+
 ## [1.5.2] - 2026-04-16
 
 ### 🔧 Bug Fix + ✨ New Features
