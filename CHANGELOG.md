@@ -5,6 +5,19 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.4] - 2026-04-28
+
+### Fixed
+- ✅ **Reconfigure: "add another entity" loop was missing**: After selecting the state to monitor during reconfiguration, the flow now asks whether to monitor an additional entity. Selecting *No* finishes the flow; selecting *Yes* repeats from the entity-selection step. Additional entities beyond the first also offer the AND/OR logic selector (on the second trigger only), mirroring the initial setup flow.
+- ✅ **Reconfigure: new entities were created instead of replacing the existing one**: The reconfiguration flow now saves the edited counter by preserving its original `id` field. Because the sensor entity's `unique_id` is derived from that `id`, Home Assistant correctly identifies the existing entity and updates it in place rather than registering a duplicate.
+
+### Changed
+- Options flow edit path refactored: `async_step_edit_trigger_state` now collects the first trigger and asks "add another?"; two new steps (`edit_another_trigger` and `edit_another_trigger_state`) handle subsequent triggers. A new `async_step_edit_finish` step performs the final save.
+- The edited counter is stored in the canonical `triggers`-list format (same as the initial config flow), removing legacy flat `trigger_entity`/`trigger_state` keys.
+- All translation files (en, es, de, fr, pt, strings) updated with the new `add_another` field and the two new step entries.
+
+---
+
 ## [1.5.3] - 2026-04-28
 
 ### Fixed

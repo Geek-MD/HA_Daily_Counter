@@ -114,9 +114,26 @@
       },
       "edit_trigger_state": {
         "title": "Modifier l'État Déclencheur",
-        "description": "Modification du compteur : {counter_name}\nÉtat actuel : {current_value}\n\nSélectionnez le nouvel état déclencheur. Vous pouvez aussi saisir une valeur personnalisée :",
+        "description": "Modification du compteur : {counter_name}\n\nSélectionnez le nouvel état déclencheur. Vous pouvez aussi saisir une valeur personnalisée :",
         "data": {
-          "trigger_state": "État Déclencheur"
+          "trigger_state": "État Déclencheur",
+          "add_another": "Surveiller une entité supplémentaire ?"
+        }
+      },
+      "edit_another_trigger": {
+        "title": "Ajouter une Autre Entité à Surveiller",
+        "description": "Sélectionnez une entité supplémentaire pour ce compteur.\nDéjà configurés : {previous_triggers}",
+        "data": {
+          "trigger_entity": "Entité Supplémentaire à Surveiller",
+          "logic": "Logique des Déclencheurs"
+        }
+      },
+      "edit_another_trigger_state": {
+        "title": "Sélectionner l'État de l'Entité Supplémentaire",
+        "description": "Modification du compteur : {counter_name}\n\nSélectionnez l'état qui incrémentera le compteur. Vous pouvez aussi saisir une valeur personnalisée :",
+        "data": {
+          "trigger_state": "État à Surveiller",
+          "add_another": "Surveiller une entité supplémentaire ?"
         }
       },
       "select_delete": {

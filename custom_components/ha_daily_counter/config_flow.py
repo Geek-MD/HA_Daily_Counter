@@ -353,6 +353,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._selected_edit_index: int | None = None
         self._editing_counter: dict[str, Any] = {}
         self._editing_domain: str = "binary_sensor"
+        self._editing_triggers: list[dict[str, str]] = []
+        self._editing_logic: str = "OR"
+        self._editing_current_entity: str = ""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Initial step: directly proceed to editing the counter."""
@@ -368,7 +371,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if len(self._counters) == 1:
             self._selected_edit_index = 0
             self._editing_counter = dict(self._counters[0])
+            self._editing_triggers = []
+            self._editing_logic = "OR"
+            self._editing_current_entity = ""
             current_entity = self._editing_counter.get("trigger_entity", "")
+            if not current_entity:
+                first = (self._editing_counter.get("triggers") or [{}])[0]
+                current_entity = first.get("entity", "")
             self._editing_domain = current_entity.split(".")[0] if current_entity else "binary_sensor"
             return await self.async_step_edit_trigger_domain()
 
@@ -451,8 +460,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 if counter["name"] == selected_name:
                     self._selected_edit_index = idx
                     self._editing_counter = dict(counter)
-                    # Pre-select the domain of the current trigger entity
+                    self._editing_triggers = []
+                    self._editing_logic = "OR"
+                    self._editing_current_entity = ""
                     current_entity = self._editing_counter.get("trigger_entity", "")
+                    if not current_entity:
+                        first = (self._editing_counter.get("triggers") or [{}])[0]
+                        current_entity = first.get("entity", "")
                     self._editing_domain = current_entity.split(".")[0] if current_entity else "binary_sensor"
                     return await self.async_step_edit_trigger_domain()
             return await self.async_step_init()
@@ -500,10 +514,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_edit_trigger_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Step to edit the trigger entity."""
         if user_input is not None:
-            self._editing_counter["trigger_entity"] = user_input["trigger_entity"]
+            self._editing_current_entity = user_input["trigger_entity"]
             return await self.async_step_edit_trigger_state()
 
         current_entity = self._editing_counter.get("trigger_entity", "")
+        if not current_entity:
+            first = (self._editing_counter.get("triggers") or [{}])[0]
+            current_entity = first.get("entity", "")
 
         return self.async_show_form(
             step_id="edit_trigger_entity",
@@ -521,31 +538,118 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         )
 
     async def async_step_edit_trigger_state(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Step to edit the trigger state via a dropdown of the entity's known states."""
+        """Step to edit the trigger state.  Asks whether to add another entity afterwards."""
         if user_input is not None:
-            self._editing_counter["trigger_state"] = user_input["trigger_state"]
-            # Update the counter in the list
-            if self._selected_edit_index is not None and 0 <= self._selected_edit_index < len(self._counters):
-                self._counters[self._selected_edit_index] = self._editing_counter
+            self._editing_triggers.append(
+                {
+                    "id": str(uuid.uuid4()),
+                    "entity": self._editing_current_entity,
+                    "state": user_input[ATTR_TRIGGER_STATE],
+                }
+            )
+            if user_input.get("add_another", False):
+                return await self.async_step_edit_another_trigger()
+            return await self.async_step_edit_finish()
 
-            # Reset editing state
-            self._selected_edit_index = None
-            self._editing_counter = {}
-
-            return self.async_create_entry(title="", data={"counters": self._counters})
-
-        current_state = self._editing_counter.get("trigger_state", "")
-        entity_id = self._editing_counter.get("trigger_entity", "")
-        states = _get_entity_states(self.hass, entity_id)
+        states = _get_entity_states(self.hass, self._editing_current_entity)
 
         return self.async_show_form(
             step_id="edit_trigger_state",
-            data_schema=vol.Schema({"trigger_state": _state_selector(states)}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    vol.Optional("add_another", default=False): bool,
+                }
+            ),
             description_placeholders={
-                "current_value": current_state,
                 "counter_name": self._editing_counter.get("name", ""),
             },
         )
+
+    async def async_step_edit_another_trigger(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Repeatable step to add an extra monitored entity while editing a counter."""
+        if user_input is not None:
+            if len(self._editing_triggers) == 1 and "logic" in user_input:
+                self._editing_logic = user_input.get("logic", "OR")
+            self._editing_current_entity = user_input[ATTR_TRIGGER_ENTITY]
+            return await self.async_step_edit_another_trigger_state()
+
+        prev_friendly: list[str] = []
+        for t in self._editing_triggers:
+            try:
+                state = self.hass.states.get(t["entity"])
+                if state and state.name:
+                    prev_friendly.append(f"{state.name} ({t['state']})")
+                else:
+                    prev_friendly.append(f"{t['entity']} ({t['state']})")
+            except Exception as err:  # noqa: BLE001
+                _LOGGER.warning("Error getting friendly name for %s: %s", t.get("entity"), err)
+                prev_friendly.append(t.get("entity", "?"))
+
+        is_first_additional = len(self._editing_triggers) == 1
+        schema_dict: dict[Any, Any] = {
+            vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(EntitySelectorConfig()),
+        }
+        if is_first_additional:
+            schema_dict[vol.Optional("logic", default="OR")] = vol.In(LOGIC_OPTIONS)
+
+        return self.async_show_form(
+            step_id="edit_another_trigger",
+            data_schema=vol.Schema(schema_dict),
+            description_placeholders={"previous_triggers": ", ".join(prev_friendly)},
+        )
+
+    async def async_step_edit_another_trigger_state(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """State selection step for an additional trigger while editing a counter."""
+        if user_input is not None:
+            self._editing_triggers.append(
+                {
+                    "id": str(uuid.uuid4()),
+                    "entity": self._editing_current_entity,
+                    "state": user_input[ATTR_TRIGGER_STATE],
+                }
+            )
+            if user_input.get("add_another", False):
+                return await self.async_step_edit_another_trigger()
+            return await self.async_step_edit_finish()
+
+        states = _get_entity_states(self.hass, self._editing_current_entity)
+
+        return self.async_show_form(
+            step_id="edit_another_trigger_state",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    vol.Optional("add_another", default=False): bool,
+                }
+            ),
+            description_placeholders={
+                "counter_name": self._editing_counter.get("name", ""),
+            },
+        )
+
+    async def async_step_edit_finish(self) -> FlowResult:
+        """Save the edited counter preserving its original id and name."""
+        updated_counter: dict[str, Any] = {
+            "id": self._editing_counter.get("id", str(uuid.uuid4())),
+            "name": self._editing_counter.get("name", ""),
+            "triggers": self._editing_triggers,
+            "logic": self._editing_logic,
+        }
+
+        if self._selected_edit_index is not None and 0 <= self._selected_edit_index < len(self._counters):
+            self._counters[self._selected_edit_index] = updated_counter
+
+        # Reset editing state
+        self._selected_edit_index = None
+        self._editing_counter = {}
+        self._editing_triggers = []
+
+        return self.async_create_entry(title="", data={"counters": self._counters})
 
     async def async_step_select_delete(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Step to select a counter to delete."""

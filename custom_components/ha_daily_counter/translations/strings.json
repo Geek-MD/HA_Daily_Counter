@@ -114,9 +114,26 @@
       },
       "edit_trigger_state": {
         "title": "Edit Trigger State",
-        "description": "Editing counter: {counter_name}\nCurrent state: {current_value}\n\nSelect the new trigger state. You can also type a custom value:",
+        "description": "Editing counter: {counter_name}\n\nSelect the new trigger state. You can also type a custom value:",
         "data": {
-          "trigger_state": "Trigger State"
+          "trigger_state": "Trigger State",
+          "add_another": "Monitor an additional entity?"
+        }
+      },
+      "edit_another_trigger": {
+        "title": "Add Another Monitored Entity",
+        "description": "Select an additional entity for this counter.\nAlready configured: {previous_triggers}",
+        "data": {
+          "trigger_entity": "Additional Entity to Monitor",
+          "logic": "Trigger Logic"
+        }
+      },
+      "edit_another_trigger_state": {
+        "title": "Select State for Additional Entity",
+        "description": "Editing counter: {counter_name}\n\nSelect the state that will increment the counter. You can also type a custom value:",
+        "data": {
+          "trigger_state": "State to Monitor",
+          "add_another": "Monitor an additional entity?"
         }
       },
       "select_delete": {

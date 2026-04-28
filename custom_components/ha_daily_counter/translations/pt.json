@@ -114,9 +114,26 @@
       },
       "edit_trigger_state": {
         "title": "Editar Estado do Acionador",
-        "description": "A editar contador: {counter_name}\nEstado atual: {current_value}\n\nSelecione o novo estado do acionador. Também pode digitar um valor personalizado:",
+        "description": "A editar contador: {counter_name}\n\nSelecione o novo estado do acionador. Também pode digitar um valor personalizado:",
         "data": {
-          "trigger_state": "Estado do Acionador"
+          "trigger_state": "Estado do Acionador",
+          "add_another": "Monitorizar uma entidade adicional?"
+        }
+      },
+      "edit_another_trigger": {
+        "title": "Adicionar Outra Entidade a Monitorizar",
+        "description": "Selecione uma entidade adicional para este contador.\nJá configurados: {previous_triggers}",
+        "data": {
+          "trigger_entity": "Entidade Adicional a Monitorizar",
+          "logic": "Lógica dos Acionadores"
+        }
+      },
+      "edit_another_trigger_state": {
+        "title": "Selecionar Estado da Entidade Adicional",
+        "description": "A editar contador: {counter_name}\n\nSelecione o estado que irá incrementar o contador. Também pode digitar um valor personalizado:",
+        "data": {
+          "trigger_state": "Estado a Monitorizar",
+          "add_another": "Monitorizar uma entidade adicional?"
         }
       },
       "select_delete": {
