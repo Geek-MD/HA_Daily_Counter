@@ -88,7 +88,24 @@
         "title": "Select Trigger State",
         "description": "Select the state that will increment the counter. You can also type a custom value.",
         "data": {
-          "trigger_state": "Trigger State"
+          "trigger_state": "Trigger State",
+          "add_another": "Monitor an additional entity?"
+        }
+      },
+      "new_another_trigger": {
+        "title": "Add Another Monitored Entity",
+        "description": "Select an additional entity for this counter.\nAlready configured: {previous_triggers}",
+        "data": {
+          "trigger_entity": "Additional Entity to Monitor",
+          "logic": "Trigger Logic"
+        }
+      },
+      "new_another_trigger_state": {
+        "title": "Select State for Additional Entity",
+        "description": "Select the state that will increment the counter. You can also type a custom value.",
+        "data": {
+          "trigger_state": "State to Monitor",
+          "add_another": "Monitor an additional entity?"
         }
       },
       "select_edit": {

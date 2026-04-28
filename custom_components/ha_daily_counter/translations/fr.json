@@ -88,7 +88,24 @@
         "title": "Sélectionner l'État Déclencheur",
         "description": "Sélectionnez l'état qui incrémentera le compteur. Vous pouvez aussi saisir une valeur personnalisée.",
         "data": {
-          "trigger_state": "État Déclencheur"
+          "trigger_state": "État Déclencheur",
+          "add_another": "Surveiller une entité supplémentaire ?"
+        }
+      },
+      "new_another_trigger": {
+        "title": "Ajouter une Autre Entité à Surveiller",
+        "description": "Sélectionnez une entité supplémentaire pour ce compteur.\nDéjà configurés : {previous_triggers}",
+        "data": {
+          "trigger_entity": "Entité Supplémentaire à Surveiller",
+          "logic": "Logique des Déclencheurs"
+        }
+      },
+      "new_another_trigger_state": {
+        "title": "Sélectionner l'État de l'Entité Supplémentaire",
+        "description": "Sélectionnez l'état qui incrémentera le compteur. Vous pouvez aussi saisir une valeur personnalisée.",
+        "data": {
+          "trigger_state": "État à Surveiller",
+          "add_another": "Surveiller une entité supplémentaire ?"
         }
       },
       "select_edit": {

@@ -88,7 +88,24 @@
         "title": "Auslöser-Zustand Auswählen",
         "description": "Wählen Sie den Zustand aus, der den Zähler erhöht. Sie können auch einen benutzerdefinierten Wert eingeben.",
         "data": {
-          "trigger_state": "Auslöser-Zustand"
+          "trigger_state": "Auslöser-Zustand",
+          "add_another": "Eine weitere Entität überwachen?"
+        }
+      },
+      "new_another_trigger": {
+        "title": "Weitere Zu Überwachende Entität Hinzufügen",
+        "description": "Wählen Sie eine weitere Entität für diesen Zähler.\nBereits konfiguriert: {previous_triggers}",
+        "data": {
+          "trigger_entity": "Weitere Zu Überwachende Entität",
+          "logic": "Auslöser-Logik"
+        }
+      },
+      "new_another_trigger_state": {
+        "title": "Zustand der Weiteren Entität Auswählen",
+        "description": "Wählen Sie den Zustand aus, der den Zähler erhöht. Sie können auch einen benutzerdefinierten Wert eingeben.",
+        "data": {
+          "trigger_state": "Zu Überwachender Zustand",
+          "add_another": "Eine weitere Entität überwachen?"
         }
       },
       "select_edit": {
