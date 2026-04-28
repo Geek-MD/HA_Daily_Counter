@@ -485,7 +485,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     prev_friendly.append(f"{state.name} ({t['state']})")
                 else:
                     prev_friendly.append(f"{t['entity']} ({t['state']})")
-            except Exception as err:  # noqa: BLE001
+            except (KeyError, AttributeError) as err:
                 _LOGGER.warning("Error getting friendly name for %s: %s", t.get("entity"), err)
                 prev_friendly.append(t.get("entity", "?"))
 

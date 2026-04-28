@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -69,7 +69,7 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         self,
         hass: HomeAssistant,
         entry_id: str,
-        counter_config: Dict[str, Any],
+        counter_config: dict[str, Any],
     ) -> None:
         self.hass = hass
         self._entry_id = entry_id
@@ -78,7 +78,7 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         # v1.3.0 stored a single trigger_entity / trigger_state pair.
         # v1.3.1+ stores a "triggers" list.
         if "triggers" in counter_config and isinstance(counter_config["triggers"], list):
-            self._triggers_list: list[Dict[str, str]] = counter_config["triggers"]
+            self._triggers_list: list[dict[str, str]] = counter_config["triggers"]
         elif "trigger_entity" in counter_config:
             self._triggers_list = [
                 {
