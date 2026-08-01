@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
@@ -61,8 +61,11 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     """Sensor that counts trigger events and resets daily at local midnight."""
 
     _attr_icon = "mdi:counter"
-    _attr_state_class = "total_increasing"
-    _attr_native_unit_of_measurement = None
+    # A numeric unit and a supported state class make the entity eligible for
+    # Recorder long-term statistics. Home Assistant records every state written
+    # by this entity in its database (unless the user explicitly excludes it).
+    _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_native_unit_of_measurement = "events"
     _attr_should_poll = False
 
     def __init__(
@@ -174,16 +177,32 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
 
         # Schedule daily reset
         next_reset = self._get_next_reset_time()
-        self._cancel_reset = async_track_point_in_utc_time(
-            self.hass,
-            self._reset_counter,
-            next_reset,
-        )
+        self.async_on_remove(self._cancel_scheduled_reset)
+        self._schedule_reset(next_reset)
         _LOGGER.debug("Scheduled reset for '%s' at %s", self._name, next_reset)
+
+        # Publish the restored value explicitly. Besides making it immediately
+        # available, this creates a Recorder state after a Home Assistant restart.
+        self.async_write_ha_state()
 
         # Cache this entity for service access
         self.hass.data.setdefault(DOMAIN, {})[self.entity_id] = self
         _LOGGER.debug("Cached entity '%s' for services", self.entity_id)
+
+    def _schedule_reset(self, reset_at: datetime) -> None:
+        """Schedule the next daily reset."""
+        self._cancel_reset = async_track_point_in_utc_time(
+            self.hass,
+            self._reset_counter,
+            reset_at,
+        )
+
+    @callback
+    def _cancel_scheduled_reset(self) -> None:
+        """Cancel the currently scheduled reset when the entity is unloaded."""
+        if self._cancel_reset is not None:
+            self._cancel_reset()
+            self._cancel_reset = None
 
     @callback
     def _handle_trigger_state_change(self, event: Any) -> None:
@@ -246,11 +265,7 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         _LOGGER.info("Counter '%s' reset to 0", self._name)
 
         next_reset = self._get_next_reset_time()
-        self._cancel_reset = async_track_point_in_utc_time(
-            self.hass,
-            self._reset_counter,
-            next_reset,
-        )
+        self._schedule_reset(next_reset)
         _LOGGER.debug("Next reset for '%s' scheduled at %s", self._name, next_reset)
 
     def _get_next_reset_time(self) -> datetime:

@@ -5,6 +5,16 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.6] - 2026-08-01
+
+### Fixed
+- Counter sensors now declare the supported `total_increasing` state class through Home Assistant's `SensorStateClass` API and expose the numeric `events` unit, making them eligible for Recorder long-term statistics.
+- The restored counter value is explicitly published when the entity starts, ensuring Recorder receives a state after every Home Assistant restart.
+- Daily-reset listeners are now registered for cleanup when an entity is unloaded, preventing stale callbacks after an integration reload.
+
+### Notes
+- Home Assistant records these sensors in its database by default. Users who exclude the integration or entity in their `recorder` configuration must remove that exclusion to collect history and statistics.
+
 ## [1.5.5] - 2026-04-28
 
 ### Fixed

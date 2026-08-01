@@ -36,7 +36,7 @@
 - Auto-reset counters daily at midnight (00:00 local time).  
 - Persistent values across Home Assistant restarts.  
 - Fully manageable via the UI (no YAML required).  
-- Exposed as `sensor` entities with `state_class: total_increasing` and `mdi:counter` icon.  
+- Exposed as `sensor` entities with `state_class: total_increasing`, the `events` unit and `mdi:counter` icon, so Home Assistant Recorder can generate long-term statistics.
 - Includes **reset** and **set** services for manual control.
 - **Multi-language Support**: English, Spanish, French, Portuguese, and German
 
