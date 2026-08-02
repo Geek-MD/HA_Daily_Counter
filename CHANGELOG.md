@@ -5,6 +5,15 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.7] - 2026-08-02
+
+### Added
+- Added `switch` to the entity-domain selector so switch state changes can be monitored directly.
+- Added the other finite-state domains already supported by the smart state selector—`light`, `fan`, `cover`, `lock`, and `alarm_control_panel`—to the entity-domain selector.
+
+### Fixed
+- Lock entities now offer their actual lock states instead of the generic `on` / `off` choices, and the alarm-control-panel list includes its arming, disarming, vacation, and custom-bypass states. Custom states remain available.
+
 ## [1.5.6] - 2026-08-01
 
 ### Fixed
