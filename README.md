@@ -24,6 +24,8 @@
 - Configure **one or more trigger entities** from multiple domains:
   - **Binary Sensors** (doors, windows, motion detectors)
   - **Sensors** (temperature, humidity, etc.)
+  - **Switches, Lights, and Fans**
+  - **Covers, Locks, and Alarm Control Panels**
   - **Automations** (track automation executions)
   - **Scripts** (monitor script runs)
   - **Input Helpers** (input_boolean, input_number, input_select)
@@ -70,7 +72,7 @@
 2. Fill in the multi-step form:  
    - **Step 1 – Counter Setup**:
      - **Name**: Friendly name of the counter.
-     - **Entity Type**: Select the domain to filter entities (Binary Sensor, Sensor, Automation, Script, or Input Helpers).
+     - **Entity Type**: Select the domain to filter entities (Binary Sensor, Sensor, Switch, Light, Fan, Cover, Lock, Alarm Control Panel, Automation, Script, or Input Helpers).
    - **Step 2 – Trigger Entity**:
      - **Trigger Entity**: Entity that will increment the counter (filtered to the selected type).
    - **Step 3 – Trigger State**:

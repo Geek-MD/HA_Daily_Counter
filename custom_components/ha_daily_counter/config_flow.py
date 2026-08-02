@@ -28,6 +28,12 @@ LOGIC_OPTIONS = ["AND", "OR"]  # Only AND and OR, OR by default
 DOMAIN_OPTIONS = [
     SelectOptionDict(value="binary_sensor", label="Binary Sensor"),
     SelectOptionDict(value="sensor", label="Sensor"),
+    SelectOptionDict(value="switch", label="Switch"),
+    SelectOptionDict(value="light", label="Light"),
+    SelectOptionDict(value="fan", label="Fan"),
+    SelectOptionDict(value="cover", label="Cover"),
+    SelectOptionDict(value="lock", label="Lock"),
+    SelectOptionDict(value="alarm_control_panel", label="Alarm Control Panel"),
     SelectOptionDict(value="automation", label="Automation"),
     SelectOptionDict(value="script", label="Script"),
     SelectOptionDict(value="input_boolean", label="Input Boolean"),
@@ -55,15 +61,35 @@ def _get_entity_states(hass: HomeAssistant, entity_id: str) -> list[str]:
         "switch",
         "light",
         "fan",
-        "lock",
         "automation",
         "script",
     ):
         return ["on", "off"]
+    if domain == "lock":
+        return [
+            "locked",
+            "unlocked",
+            "locking",
+            "unlocking",
+            "jammed",
+            "open",
+            "opening",
+        ]
     if domain == "cover":
         return ["open", "closed", "opening", "closing"]
     if domain == "alarm_control_panel":
-        return ["disarmed", "armed_home", "armed_away", "armed_night", "pending", "triggered"]
+        return [
+            "disarmed",
+            "armed_home",
+            "armed_away",
+            "armed_night",
+            "armed_vacation",
+            "armed_custom_bypass",
+            "pending",
+            "arming",
+            "disarming",
+            "triggered",
+        ]
     if domain == "input_select" and state_obj:
         return list(state_obj.attributes.get("options", [state_obj.state]))
     if state_obj:
