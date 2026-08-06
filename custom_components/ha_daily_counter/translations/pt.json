@@ -1,4 +1,15 @@
 {
+  "selector": {
+    "reset_cycle": {
+      "options": {
+        "quarter-hourly": "A cada 15 minutos", "hourly": "A cada hora",
+        "daily": "Diariamente", "weekly": "Semanalmente", "monthly": "Mensalmente",
+        "bimonthly": "A cada dois meses", "quarterly": "Trimestralmente",
+        "yearly": "Anualmente", "none": "Sem reinício automático"
+      }
+    }
+  },
+  "entity": {"button": {"reset": {"name": "Reiniciar"}}},
   "config": {
     "step": {
       "user": {
@@ -39,6 +50,11 @@
           "trigger_state": "Estado a Monitorizar",
           "add_another": "Adicionar outro acionador?"
         }
+      },
+      "reset_cycle": {
+        "title": "Frequência de reinício",
+        "description": "Escolha com que frequência o contador volta a zero.",
+        "data": {"reset_cycle": "Frequência de reinício"}
       },
       "finish": {
         "title": "Finalizar Contador",
@@ -108,6 +124,11 @@
           "add_another": "Monitorizar uma entidade adicional?"
         }
       },
+      "new_reset_cycle": {
+        "title": "Frequência de reinício",
+        "description": "Escolha com que frequência o contador volta a zero.",
+        "data": {"reset_cycle": "Frequência de reinício"}
+      },
       "select_edit": {
         "title": "Editar Contador",
         "description": "Selecione o contador que pretende editar.",
@@ -152,6 +173,11 @@
           "trigger_state": "Estado a Monitorizar",
           "add_another": "Monitorizar uma entidade adicional?"
         }
+      },
+      "edit_reset_cycle": {
+        "title": "Frequência de reinício",
+        "description": "Editando contador: {counter_name}\n\nEscolha com que frequência ele volta a zero.",
+        "data": {"reset_cycle": "Frequência de reinício"}
       },
       "select_delete": {
         "title": "Eliminar Contador",

@@ -18,11 +18,29 @@ from homeassistant.helpers.selector import (
     SelectSelectorMode,
 )
 
-from .const import ATTR_TRIGGER_ENTITY, ATTR_TRIGGER_STATE, DOMAIN
+from .const import (
+    ATTR_TRIGGER_ENTITY,
+    ATTR_TRIGGER_STATE,
+    CONF_RESET_CYCLE,
+    DEFAULT_RESET_CYCLE,
+    DOMAIN,
+    RESET_CYCLES,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 LOGIC_OPTIONS = ["AND", "OR"]  # Only AND and OR, OR by default
+
+
+def _reset_cycle_selector() -> SelectSelector:
+    """Return the translated reset-cycle selector."""
+    return SelectSelector(
+        SelectSelectorConfig(
+            options=RESET_CYCLES,
+            mode=SelectSelectorMode.DROPDOWN,
+            translation_key="reset_cycle",
+        )
+    )
 
 # Domain options for entity filtering
 DOMAIN_OPTIONS = [
@@ -127,6 +145,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         self._logic: str = "OR"  # Logic selected only when adding the second trigger
         self._domain_filter: str = "binary_sensor"  # Domain filter selected by user
         self._current_trigger_entity: str = ""  # Entity selected in the current trigger step
+        self._reset_cycle: str = DEFAULT_RESET_CYCLE
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -219,7 +238,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 )
                 if user_input.get("add_another", False):
                     return await self.async_step_another_trigger()
-                return await self.async_step_finish()
+                return await self.async_step_reset_cycle()
             except Exception as err:
                 _LOGGER.error("Error in first_trigger_state step: %s", err, exc_info=True)
                 errors["base"] = "unknown"
@@ -310,7 +329,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 )
                 if user_input.get("add_another", False):
                     return await self.async_step_another_trigger()
-                return await self.async_step_finish()
+                return await self.async_step_reset_cycle()
             except Exception as err:
                 _LOGGER.error("Error in another_trigger_state step: %s", err, exc_info=True)
                 errors["base"] = "unknown"
@@ -329,6 +348,25 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
             errors=errors,
         )
 
+    async def async_step_reset_cycle(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Select how often this counter resets."""
+        if user_input is not None:
+            self._reset_cycle = user_input[CONF_RESET_CYCLE]
+            return await self.async_step_finish()
+
+        return self.async_show_form(
+            step_id="reset_cycle",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_RESET_CYCLE, default=self._reset_cycle
+                    ): _reset_cycle_selector(),
+                }
+            ),
+        )
+
     async def async_step_finish(self) -> ConfigFlowResult:
         """Finaliza el flujo y crea la entry con los triggers y la lógica seleccionada en el primer paso."""
         _LOGGER.debug("Config flow step 'finish' started")
@@ -342,6 +380,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 "name": title,
                 "triggers": self._triggers,
                 "logic": self._logic,
+                CONF_RESET_CYCLE: self._reset_cycle,
             }
 
             _LOGGER.info(
@@ -379,6 +418,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._new_counter_triggers: list[dict[str, str]] = []
         self._new_counter_logic: str = "OR"
         self._new_counter_current_entity: str = ""
+        self._new_counter_reset_cycle: str = DEFAULT_RESET_CYCLE
         self._selected_delete_name: str | None = None
         self._selected_edit_index: int | None = None
         self._editing_counter: dict[str, Any] = {}
@@ -386,6 +426,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._editing_triggers: list[dict[str, str]] = []
         self._editing_logic: str = "OR"
         self._editing_current_entity: str = ""
+        self._editing_reset_cycle: str = DEFAULT_RESET_CYCLE
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Initial step: directly proceed to editing the counter."""
@@ -404,6 +445,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._editing_triggers = []
             self._editing_logic = "OR"
             self._editing_current_entity = ""
+            self._editing_reset_cycle = self._editing_counter.get(
+                CONF_RESET_CYCLE, DEFAULT_RESET_CYCLE
+            )
             current_entity = self._editing_counter.get("trigger_entity", "")
             if not current_entity:
                 first = (self._editing_counter.get("triggers") or [{}])[0]
@@ -476,7 +520,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             )
             if user_input.get("add_another", False):
                 return await self.async_step_new_another_trigger()
-            return await self.async_step_new_counter_finish()
+            return await self.async_step_new_reset_cycle()
 
         states = _get_entity_states(self.hass, self._new_counter_current_entity)
 
@@ -544,7 +588,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             )
             if user_input.get("add_another", False):
                 return await self.async_step_new_another_trigger()
-            return await self.async_step_new_counter_finish()
+            return await self.async_step_new_reset_cycle()
 
         states = _get_entity_states(self.hass, self._new_counter_current_entity)
 
@@ -561,6 +605,25 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             },
         )
 
+    async def async_step_new_reset_cycle(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Select the reset cycle for a new counter."""
+        if user_input is not None:
+            self._new_counter_reset_cycle = user_input[CONF_RESET_CYCLE]
+            return await self.async_step_new_counter_finish()
+
+        return self.async_show_form(
+            step_id="new_reset_cycle",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_RESET_CYCLE, default=self._new_counter_reset_cycle
+                    ): _reset_cycle_selector(),
+                }
+            ),
+        )
+
     async def async_step_new_counter_finish(self) -> ConfigFlowResult:
         """Finalise a new counter created through the options flow."""
         counter: dict[str, Any] = {
@@ -568,6 +631,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             "name": self._new_counter.get("name", "Unnamed Counter"),
             "triggers": self._new_counter_triggers,
             "logic": self._new_counter_logic,
+            CONF_RESET_CYCLE: self._new_counter_reset_cycle,
         }
         self._counters.append(counter)
 
@@ -593,6 +657,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     self._editing_triggers = []
                     self._editing_logic = "OR"
                     self._editing_current_entity = ""
+                    self._editing_reset_cycle = self._editing_counter.get(
+                        CONF_RESET_CYCLE, DEFAULT_RESET_CYCLE
+                    )
                     current_entity = self._editing_counter.get("trigger_entity", "")
                     if not current_entity:
                         first = (self._editing_counter.get("triggers") or [{}])[0]
@@ -679,7 +746,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             )
             if user_input.get("add_another", False):
                 return await self.async_step_edit_another_trigger()
-            return await self.async_step_edit_finish()
+            return await self.async_step_edit_reset_cycle()
 
         states = _get_entity_states(self.hass, self._editing_current_entity)
 
@@ -747,7 +814,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             )
             if user_input.get("add_another", False):
                 return await self.async_step_edit_another_trigger()
-            return await self.async_step_edit_finish()
+            return await self.async_step_edit_reset_cycle()
 
         states = _get_entity_states(self.hass, self._editing_current_entity)
 
@@ -764,6 +831,28 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             },
         )
 
+    async def async_step_edit_reset_cycle(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Select the reset cycle while editing a counter."""
+        if user_input is not None:
+            self._editing_reset_cycle = user_input[CONF_RESET_CYCLE]
+            return await self.async_step_edit_finish()
+
+        return self.async_show_form(
+            step_id="edit_reset_cycle",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_RESET_CYCLE, default=self._editing_reset_cycle
+                    ): _reset_cycle_selector(),
+                }
+            ),
+            description_placeholders={
+                "counter_name": self._editing_counter.get("name", ""),
+            },
+        )
+
     async def async_step_edit_finish(self) -> ConfigFlowResult:
         """Save the edited counter preserving its original id and name."""
         updated_counter: dict[str, Any] = {
@@ -771,6 +860,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             "name": self._editing_counter.get("name", ""),
             "triggers": self._editing_triggers,
             "logic": self._editing_logic,
+            CONF_RESET_CYCLE: self._editing_reset_cycle,
         }
 
         if self._selected_edit_index is not None and 0 <= self._selected_edit_index < len(self._counters):

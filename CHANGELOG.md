@@ -5,6 +5,18 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-08-06
+
+### Added
+- Added a reset-frequency selector to counter creation and editing with quarter-hourly, hourly, daily, weekly, monthly, bimonthly, quarterly, yearly, and no-automatic-reset cycles.
+- Added translated reset-cycle labels and configuration steps in English, Spanish, French, Portuguese, and German.
+- Added a translated Reset button entity for every counter, allowing users to start a new manual cycle directly from the Home Assistant UI (for example, after refilling a water softener).
+
+### Changed
+- Existing counters without a stored reset cycle continue to reset daily for full backward compatibility.
+- Reset boundaries use Home Assistant's local timezone. Weekly periods begin on Monday; calendar periods begin on the first day of the corresponding month or year.
+- Restored values from a previous period are discarded when Home Assistant was offline at the scheduled reset boundary.
+
 ## [1.5.7] - 2026-08-02
 
 ### Added

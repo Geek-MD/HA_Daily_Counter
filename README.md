@@ -14,7 +14,7 @@
 
 # HA Daily Counter
 
-**HA Daily Counter** is a custom integration for Home Assistant that provides **daily-resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more. Now with **multiple trigger support** and **custom logic operators**.
+**HA Daily Counter** is a custom integration for Home Assistant that provides **automatically resettable counters**, perfect for tracking repetitive actions like door openings, light switches, sensor triggers, and more. Now with **configurable reset cycles**, **multiple trigger support**, and **custom logic operators**.
 
 ---
 
@@ -35,11 +35,12 @@
   - **OR** → Any trigger increments the counter.  
 - Filter entities by domain type for easy selection.
 - **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA. When monitoring **multiple entities** the counter is created as an independent virtual device so it is never duplicated across several device pages.
-- Auto-reset counters daily at midnight (00:00 local time).  
+- Choose a reset cycle for each counter: every 15 minutes, hourly, daily, weekly, monthly, every two months, quarterly, yearly, or no automatic reset.
 - Persistent values across Home Assistant restarts.  
 - Fully manageable via the UI (no YAML required).  
 - Exposed as `sensor` entities with `state_class: total_increasing`, the `events` unit and `mdi:counter` icon, so Home Assistant Recorder can generate long-term statistics.
 - Includes **reset** and **set** services for manual control.
+- Creates a **Reset** button entity for each counter, so manual cycles such as refilling a water softener can be restarted directly from the UI.
 - **Multi-language Support**: English, Spanish, French, Portuguese, and German
 
 ---
@@ -78,6 +79,9 @@
    - **Step 3 – Trigger State**:
      - **State to Monitor**: Select from a dropdown of the entity's known states (e.g., `on`, `off`, `open`). You can type a custom value if needed.
      - **Add Another Trigger?**: Toggle to add additional triggers. Subsequent entity selectors are automatically filtered to the **same domain** as the first entity.
+   - **Step 4 – Reset Frequency**:
+     - Choose when the counter returns to zero. Daily remains the default for backward compatibility.
+     - Weekly cycles start on Monday. Monthly, bimonthly, quarterly, and yearly cycles start on the first day of their calendar period. All boundaries use Home Assistant's local timezone.
 
 3. If multiple triggers are added:  
    - For each additional trigger, first select the entity, then select its state from the dropdown.
@@ -95,6 +99,7 @@
 - Monitor script runs (e.g., count "Night mode" script executions).
 - Require two conditions (e.g., window open **AND** heater on) to increment.  
 - Use multiple binary sensors to track activity across different zones.  
+- Count washing-machine cycles between water-softener refills, using the counter's **Reset** button after each refill.
 
 ---
 
@@ -129,7 +134,7 @@ data:
 
 - The counter increases by `+1` when its triggers match the configured states.  
 - If multiple triggers are configured, the logic operator defines how they combine.  
-- Counters reset to **0 every midnight** (local time).  
+- Counters reset to **0 at the configured period boundary** in Home Assistant's local timezone.
 - Values persist across Home Assistant restarts.  
 
 ---

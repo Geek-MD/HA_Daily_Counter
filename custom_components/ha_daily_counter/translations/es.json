@@ -1,4 +1,20 @@
 {
+  "selector": {
+    "reset_cycle": {
+      "options": {
+        "quarter-hourly": "Cada 15 minutos",
+        "hourly": "Cada hora",
+        "daily": "Diariamente",
+        "weekly": "Semanalmente",
+        "monthly": "Mensualmente",
+        "bimonthly": "Cada dos meses",
+        "quarterly": "Trimestralmente",
+        "yearly": "Anualmente",
+        "none": "Sin reinicio automático"
+      }
+    }
+  },
+  "entity": {"button": {"reset": {"name": "Reiniciar"}}},
   "config": {
     "step": {
       "user": {
@@ -39,6 +55,11 @@
           "trigger_state": "Estado a Monitorizar",
           "add_another": "¿Agregar otro disparador?"
         }
+      },
+      "reset_cycle": {
+        "title": "Frecuencia de Reinicio",
+        "description": "Elige cada cuánto se reinicia el contador a cero.",
+        "data": {"reset_cycle": "Frecuencia de reinicio"}
       },
       "finish": {
         "title": "Finalizar Contador",
@@ -108,6 +129,11 @@
           "add_another": "¿Monitorizar una entidad adicional?"
         }
       },
+      "new_reset_cycle": {
+        "title": "Frecuencia de Reinicio",
+        "description": "Elige cada cuánto se reinicia el contador a cero.",
+        "data": {"reset_cycle": "Frecuencia de reinicio"}
+      },
       "select_edit": {
         "title": "Editar Contador",
         "description": "Selecciona el contador que quieres editar.",
@@ -152,6 +178,11 @@
           "trigger_state": "Estado a Monitorizar",
           "add_another": "¿Monitorizar una entidad adicional?"
         }
+      },
+      "edit_reset_cycle": {
+        "title": "Frecuencia de Reinicio",
+        "description": "Editando contador: {counter_name}\n\nElige cada cuánto se reinicia a cero.",
+        "data": {"reset_cycle": "Frecuencia de reinicio"}
       },
       "select_delete": {
         "title": "Eliminar Contador",

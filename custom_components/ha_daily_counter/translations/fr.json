@@ -1,4 +1,15 @@
 {
+  "selector": {
+    "reset_cycle": {
+      "options": {
+        "quarter-hourly": "Toutes les 15 minutes", "hourly": "Toutes les heures",
+        "daily": "Quotidien", "weekly": "Hebdomadaire", "monthly": "Mensuel",
+        "bimonthly": "Tous les deux mois", "quarterly": "Trimestriel",
+        "yearly": "Annuel", "none": "Sans réinitialisation automatique"
+      }
+    }
+  },
+  "entity": {"button": {"reset": {"name": "Réinitialiser"}}},
   "config": {
     "step": {
       "user": {
@@ -39,6 +50,11 @@
           "trigger_state": "État à Surveiller",
           "add_another": "Ajouter un autre déclencheur ?"
         }
+      },
+      "reset_cycle": {
+        "title": "Fréquence de réinitialisation",
+        "description": "Choisissez la fréquence de remise à zéro du compteur.",
+        "data": {"reset_cycle": "Fréquence de réinitialisation"}
       },
       "finish": {
         "title": "Finaliser le Compteur",
@@ -108,6 +124,11 @@
           "add_another": "Surveiller une entité supplémentaire ?"
         }
       },
+      "new_reset_cycle": {
+        "title": "Fréquence de réinitialisation",
+        "description": "Choisissez la fréquence de remise à zéro du compteur.",
+        "data": {"reset_cycle": "Fréquence de réinitialisation"}
+      },
       "select_edit": {
         "title": "Modifier un Compteur",
         "description": "Sélectionnez le compteur que vous souhaitez modifier.",
@@ -152,6 +173,11 @@
           "trigger_state": "État à Surveiller",
           "add_another": "Surveiller une entité supplémentaire ?"
         }
+      },
+      "edit_reset_cycle": {
+        "title": "Fréquence de réinitialisation",
+        "description": "Modification du compteur : {counter_name}\n\nChoisissez la fréquence de remise à zéro.",
+        "data": {"reset_cycle": "Fréquence de réinitialisation"}
       },
       "select_delete": {
         "title": "Supprimer un Compteur",
