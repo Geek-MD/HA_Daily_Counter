@@ -1,4 +1,20 @@
 {
+  "selector": {
+    "reset_cycle": {
+      "options": {
+        "quarter-hourly": "Every 15 minutes",
+        "hourly": "Hourly",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "bimonthly": "Every two months",
+        "quarterly": "Quarterly",
+        "yearly": "Yearly",
+        "none": "No automatic reset"
+      }
+    }
+  },
+  "entity": {"button": {"reset": {"name": "Reset"}}},
   "config": {
     "step": {
       "user": {
@@ -39,6 +55,11 @@
           "trigger_state": "State to Monitor",
           "add_another": "Add another trigger?"
         }
+      },
+      "reset_cycle": {
+        "title": "Reset Frequency",
+        "description": "Choose how often the counter resets to zero.",
+        "data": {"reset_cycle": "Reset frequency"}
       },
       "finish": {
         "title": "Finalize Counter",
@@ -108,6 +129,11 @@
           "add_another": "Monitor an additional entity?"
         }
       },
+      "new_reset_cycle": {
+        "title": "Reset Frequency",
+        "description": "Choose how often the counter resets to zero.",
+        "data": {"reset_cycle": "Reset frequency"}
+      },
       "select_edit": {
         "title": "Edit Counter",
         "description": "Select the counter you want to edit.",
@@ -152,6 +178,11 @@
           "trigger_state": "State to Monitor",
           "add_another": "Monitor an additional entity?"
         }
+      },
+      "edit_reset_cycle": {
+        "title": "Reset Frequency",
+        "description": "Editing counter: {counter_name}\n\nChoose how often it resets to zero.",
+        "data": {"reset_cycle": "Reset frequency"}
       },
       "select_delete": {
         "title": "Delete Counter",

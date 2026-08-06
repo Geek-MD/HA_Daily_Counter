@@ -1,4 +1,15 @@
 {
+  "selector": {
+    "reset_cycle": {
+      "options": {
+        "quarter-hourly": "Alle 15 Minuten", "hourly": "Stündlich",
+        "daily": "Täglich", "weekly": "Wöchentlich", "monthly": "Monatlich",
+        "bimonthly": "Alle zwei Monate", "quarterly": "Vierteljährlich",
+        "yearly": "Jährlich", "none": "Keine automatische Zurücksetzung"
+      }
+    }
+  },
+  "entity": {"button": {"reset": {"name": "Zurücksetzen"}}},
   "config": {
     "step": {
       "user": {
@@ -39,6 +50,11 @@
           "trigger_state": "Zu Überwachender Zustand",
           "add_another": "Weiteren Auslöser hinzufügen?"
         }
+      },
+      "reset_cycle": {
+        "title": "Zurücksetzintervall",
+        "description": "Lege fest, wie oft der Zähler auf null zurückgesetzt wird.",
+        "data": {"reset_cycle": "Zurücksetzintervall"}
       },
       "finish": {
         "title": "Zähler Abschließen",
@@ -108,6 +124,11 @@
           "add_another": "Eine weitere Entität überwachen?"
         }
       },
+      "new_reset_cycle": {
+        "title": "Zurücksetzintervall",
+        "description": "Lege fest, wie oft der Zähler auf null zurückgesetzt wird.",
+        "data": {"reset_cycle": "Zurücksetzintervall"}
+      },
       "select_edit": {
         "title": "Zähler Bearbeiten",
         "description": "Wählen Sie den Zähler aus, den Sie bearbeiten möchten.",
@@ -152,6 +173,11 @@
           "trigger_state": "Zu Überwachender Zustand",
           "add_another": "Eine weitere Entität überwachen?"
         }
+      },
+      "edit_reset_cycle": {
+        "title": "Zurücksetzintervall",
+        "description": "Zähler wird bearbeitet: {counter_name}\n\nLege das Zurücksetzintervall fest.",
+        "data": {"reset_cycle": "Zurücksetzintervall"}
       },
       "select_delete": {
         "title": "Zähler Löschen",

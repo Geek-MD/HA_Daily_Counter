@@ -3,6 +3,7 @@
 import logging
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 
@@ -11,6 +12,7 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+PLATFORMS = [Platform.SENSOR, Platform.BUTTON]
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the integration from configuration.yaml (not used)."""
@@ -34,7 +36,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up HA Daily Counter from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
-    await hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # Register update listener to reload when options change
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
@@ -48,8 +50,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         entity = hass.data[DOMAIN].get(entity_id)
         if entity:
-            entity._attr_native_value = 0  # noqa: SLF001 (private access is fine here)
-            entity.async_write_ha_state()
+            entity.async_reset_counter()
             _LOGGER.info("Manual reset of counter '%s'", entity_id)
         else:
             _LOGGER.warning("Entity '%s' not found for reset.", entity_id)
@@ -88,7 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    return bool(await hass.config_entries.async_forward_entry_unload(entry, "sensor"))
+    return bool(await hass.config_entries.async_unload_platforms(entry, PLATFORMS))
 
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:

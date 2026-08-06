@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
@@ -17,7 +17,13 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN
+from .const import (
+    CONF_RESET_CYCLE,
+    DEFAULT_RESET_CYCLE,
+    DOMAIN,
+    RESET_CYCLES,
+)
+from .reset import current_period_start, next_reset_time
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -58,7 +64,7 @@ async def async_setup_entry(
 
 
 class HADailyCounterEntity(SensorEntity, RestoreEntity):
-    """Sensor that counts trigger events and resets daily at local midnight."""
+    """Sensor that counts trigger events and resets on a configured cycle."""
 
     _attr_icon = "mdi:counter"
     # A numeric unit and a supported state class make the entity eligible for
@@ -94,6 +100,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             self._triggers_list = []
 
         self._logic: str = counter_config.get("logic", "OR")
+        self._reset_cycle: str = counter_config.get(
+            CONF_RESET_CYCLE, DEFAULT_RESET_CYCLE
+        )
 
         # Keep a single _trigger_entity / _trigger_state for backward-compat
         # code paths that still reference these attributes.
@@ -153,8 +162,21 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
 
         # Restore last state
         if (last := await self.async_get_last_state()) and last.state.isdigit():
-            self._attr_native_value = int(last.state)
-            _LOGGER.debug("Restored state for '%s': %d", self._name, self._attr_native_value)
+            period_start = current_period_start(dt_util.now(), self._reset_cycle)
+            if period_start is None or last.last_updated >= period_start:
+                self._attr_native_value = int(last.state)
+                _LOGGER.debug(
+                    "Restored state for '%s': %d",
+                    self._name,
+                    self._attr_native_value,
+                )
+            else:
+                _LOGGER.info(
+                    "Counter '%s' started a new %s period while Home Assistant "
+                    "was offline; previous value was not restored",
+                    self._name,
+                    self._reset_cycle,
+                )
 
         # Subscribe to ALL configured trigger entities
         trigger_entities = [t["entity"] for t in self._triggers_list if t.get("entity")]
@@ -175,11 +197,13 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         else:
             _LOGGER.warning("Counter '%s' has no valid trigger entities", self._name)
 
-        # Schedule daily reset
+        # Schedule the configured reset cycle. Entries created before this option
+        # existed retain the original daily behaviour.
         next_reset = self._get_next_reset_time()
         self.async_on_remove(self._cancel_scheduled_reset)
-        self._schedule_reset(next_reset)
-        _LOGGER.debug("Scheduled reset for '%s' at %s", self._name, next_reset)
+        if next_reset is not None:
+            self._schedule_reset(next_reset)
+            _LOGGER.debug("Scheduled reset for '%s' at %s", self._name, next_reset)
 
         # Publish the restored value explicitly. Besides making it immediately
         # available, this creates a Recorder state after a Home Assistant restart.
@@ -187,10 +211,11 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
 
         # Cache this entity for service access
         self.hass.data.setdefault(DOMAIN, {})[self.entity_id] = self
+        self.hass.data[DOMAIN][self._unique_id] = self
         _LOGGER.debug("Cached entity '%s' for services", self.entity_id)
 
     def _schedule_reset(self, reset_at: datetime) -> None:
-        """Schedule the next daily reset."""
+        """Schedule the next reset."""
         self._cancel_reset = async_track_point_in_utc_time(
             self.hass,
             self._reset_counter,
@@ -260,18 +285,26 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     @callback
     def _reset_counter(self, now: datetime) -> None:
         """Reset the counter to 0 and reschedule next reset."""
-        self._attr_native_value = 0
-        self.async_write_ha_state()
+        self.async_reset_counter()
         _LOGGER.info("Counter '%s' reset to 0", self._name)
 
         next_reset = self._get_next_reset_time()
-        self._schedule_reset(next_reset)
-        _LOGGER.debug("Next reset for '%s' scheduled at %s", self._name, next_reset)
+        if next_reset is not None:
+            self._schedule_reset(next_reset)
+            _LOGGER.debug("Next reset for '%s' scheduled at %s", self._name, next_reset)
 
-    def _get_next_reset_time(self) -> datetime:
-        """Return the next local midnight for reset."""
-        now: datetime = dt_util.now()
-        reset: datetime = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        if reset <= now:
-            reset += timedelta(days=1)
-        return reset
+    @callback
+    def async_reset_counter(self) -> None:
+        """Reset the counter from a button, service, or scheduled callback."""
+        self._attr_native_value = 0
+        self.async_write_ha_state()
+
+    def _get_next_reset_time(self) -> datetime | None:
+        """Return the next reset boundary in Home Assistant's local timezone."""
+        if self._reset_cycle not in RESET_CYCLES:
+            _LOGGER.warning(
+                "Unknown reset cycle '%s' for '%s'; using daily",
+                self._reset_cycle,
+                self._name,
+            )
+        return next_reset_time(dt_util.now(), self._reset_cycle)
