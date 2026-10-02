@@ -5,6 +5,11 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-10-02
+
+### Fixed
+- Counter events are now recorded only when an entity transitions into its configured state. Attribute-only updates that leave the entity in the same state no longer increment OR or AND counters (#46).
+
 ## [1.6.0] - 2026-08-06
 
 ### Added

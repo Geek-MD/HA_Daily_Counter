@@ -24,6 +24,7 @@ from .const import (
     RESET_CYCLES,
 )
 from .reset import current_period_start, next_reset_time
+from .trigger import entered_target_state
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -244,6 +245,7 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         if not new_state or new_state.state in (STATE_UNKNOWN, None):
             return
 
+        old_state = event.data.get("old_state")
         changed_entity: str = event.data.get("entity_id", "")
 
         if self._logic == "AND":
@@ -252,8 +254,12 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
                 t_entity = trigger.get("entity", "")
                 t_state = trigger.get("state", "")
                 if t_entity == changed_entity:
-                    if new_state.state != t_state:
-                        return  # The changed entity doesn't satisfy its trigger
+                    if not entered_target_state(
+                        old_state.state if old_state else None,
+                        new_state.state,
+                        t_state,
+                    ):
+                        return  # The changed entity didn't enter its trigger state
                 else:
                     current = self.hass.states.get(t_entity)
                     if not current or current.state != t_state:
@@ -271,7 +277,11 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             for trigger in self._triggers_list:
                 if (
                     trigger.get("entity") == changed_entity
-                    and new_state.state == trigger.get("state")
+                    and entered_target_state(
+                        old_state.state if old_state else None,
+                        new_state.state,
+                        trigger.get("state", ""),
+                    )
                 ):
                     self._attr_native_value += 1
                     self.async_write_ha_state()
