@@ -4,7 +4,7 @@ import logging
 import uuid
 from typing import Any
 
-import voluptuous as vol
+import probatio
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import CONF_NAME
@@ -163,10 +163,10 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 _LOGGER.error("Error in user step: %s", err, exc_info=True)
                 errors["base"] = "unknown"
 
-        data_schema = vol.Schema(
+        data_schema = probatio.Schema(
             {
-                vol.Required(CONF_NAME): str,
-                vol.Required("domain_filter", default=self._domain_filter): SelectSelector(
+                probatio.Required(CONF_NAME): str,
+                probatio.Required("domain_filter", default=self._domain_filter): SelectSelector(
                     SelectSelectorConfig(
                         options=DOMAIN_OPTIONS,
                         mode=SelectSelectorMode.DROPDOWN,
@@ -197,9 +197,9 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 errors["base"] = "unknown"
 
         try:
-            data_schema = vol.Schema(
+            data_schema = probatio.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+                    probatio.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
                         EntitySelectorConfig(domain=[self._domain_filter])
                     ),
                 }
@@ -207,9 +207,9 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         except Exception as err:
             _LOGGER.error("Error creating first_trigger schema: %s", err, exc_info=True)
             errors["base"] = "unknown"
-            data_schema = vol.Schema(
+            data_schema = probatio.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(EntitySelectorConfig()),
+                    probatio.Required(ATTR_TRIGGER_ENTITY): EntitySelector(EntitySelectorConfig()),
                 }
             )
 
@@ -244,10 +244,10 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 errors["base"] = "unknown"
 
         states = _get_entity_states(self.hass, self._current_trigger_entity)
-        data_schema = vol.Schema(
+        data_schema = probatio.Schema(
             {
-                vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
-                vol.Optional("add_another", default=False): bool,
+                probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                probatio.Optional("add_another", default=False): bool,
             }
         )
 
@@ -296,16 +296,16 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         # Show logic selector only when adding the second trigger
         is_first_additional = len(self._triggers) == 1
         schema_dict: dict[Any, Any] = {
-            vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+            probatio.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
                 EntitySelectorConfig(domain=[self._domain_filter])
             ),
         }
         if is_first_additional:
-            schema_dict[vol.Optional("logic", default="OR")] = vol.In(LOGIC_OPTIONS)
+            schema_dict[probatio.Optional("logic", default="OR")] = probatio.In(LOGIC_OPTIONS)
 
         return self.async_show_form(
             step_id="another_trigger",
-            data_schema=vol.Schema(schema_dict),
+            data_schema=probatio.Schema(schema_dict),
             description_placeholders={"previous_triggers": ", ".join(prev_friendly)},
             errors=errors,
         )
@@ -335,10 +335,10 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 errors["base"] = "unknown"
 
         states = _get_entity_states(self.hass, self._current_trigger_entity)
-        data_schema = vol.Schema(
+        data_schema = probatio.Schema(
             {
-                vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
-                vol.Optional("add_another", default=False): bool,
+                probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                probatio.Optional("add_another", default=False): bool,
             }
         )
 
@@ -358,9 +358,9 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
 
         return self.async_show_form(
             step_id="reset_cycle",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required(
+                    probatio.Required(
                         CONF_RESET_CYCLE, default=self._reset_cycle
                     ): _reset_cycle_selector(),
                 }
@@ -466,7 +466,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({"name": str}),
+            data_schema=probatio.Schema({"name": str}),
         )
 
     async def async_step_trigger_domain(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
@@ -477,9 +477,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="trigger_domain",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required("domain_filter", default=self._new_counter_domain): SelectSelector(
+                    probatio.Required("domain_filter", default=self._new_counter_domain): SelectSelector(
                         SelectSelectorConfig(
                             options=DOMAIN_OPTIONS,
                             mode=SelectSelectorMode.DROPDOWN,
@@ -499,7 +499,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="trigger_entity",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
                     "trigger_entity": EntitySelector(
                         EntitySelectorConfig(domain=[self._new_counter_domain])
@@ -526,10 +526,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="trigger_state",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required("trigger_state"): _state_selector(states),
-                    vol.Optional("add_another", default=False): bool,
+                    probatio.Required("trigger_state"): _state_selector(states),
+                    probatio.Optional("add_another", default=False): bool,
                 }
             ),
         )
@@ -561,16 +561,16 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         is_first_additional = len(self._new_counter_triggers) == 1
         schema_dict: dict[Any, Any] = {
-            vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+            probatio.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
                 EntitySelectorConfig(domain=[self._new_counter_domain])
             ),
         }
         if is_first_additional:
-            schema_dict[vol.Optional("logic", default="OR")] = vol.In(LOGIC_OPTIONS)
+            schema_dict[probatio.Optional("logic", default="OR")] = probatio.In(LOGIC_OPTIONS)
 
         return self.async_show_form(
             step_id="new_another_trigger",
-            data_schema=vol.Schema(schema_dict),
+            data_schema=probatio.Schema(schema_dict),
             description_placeholders={"previous_triggers": ", ".join(prev_friendly)},
         )
 
@@ -594,10 +594,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="new_another_trigger_state",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
-                    vol.Optional("add_another", default=False): bool,
+                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    probatio.Optional("add_another", default=False): bool,
                 }
             ),
             description_placeholders={
@@ -615,9 +615,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="new_reset_cycle",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required(
+                    probatio.Required(
                         CONF_RESET_CYCLE, default=self._new_counter_reset_cycle
                     ): _reset_cycle_selector(),
                 }
@@ -670,7 +670,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="select_edit",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
                     "edit_target": SelectSelector(
                         SelectSelectorConfig(
@@ -693,9 +693,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="edit_trigger_domain",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required("domain_filter", default=self._editing_domain): SelectSelector(
+                    probatio.Required("domain_filter", default=self._editing_domain): SelectSelector(
                         SelectSelectorConfig(
                             options=DOMAIN_OPTIONS,
                             mode=SelectSelectorMode.DROPDOWN,
@@ -721,7 +721,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="edit_trigger_entity",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
                     "trigger_entity": EntitySelector(
                         EntitySelectorConfig(domain=[self._editing_domain])
@@ -752,10 +752,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="edit_trigger_state",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
-                    vol.Optional("add_another", default=False): bool,
+                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    probatio.Optional("add_another", default=False): bool,
                 }
             ),
             description_placeholders={
@@ -787,16 +787,16 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         is_first_additional = len(self._editing_triggers) == 1
         schema_dict: dict[Any, Any] = {
-            vol.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
+            probatio.Required(ATTR_TRIGGER_ENTITY): EntitySelector(
                 EntitySelectorConfig(domain=[self._editing_domain])
             ),
         }
         if is_first_additional:
-            schema_dict[vol.Optional("logic", default="OR")] = vol.In(LOGIC_OPTIONS)
+            schema_dict[probatio.Optional("logic", default="OR")] = probatio.In(LOGIC_OPTIONS)
 
         return self.async_show_form(
             step_id="edit_another_trigger",
-            data_schema=vol.Schema(schema_dict),
+            data_schema=probatio.Schema(schema_dict),
             description_placeholders={"previous_triggers": ", ".join(prev_friendly)},
         )
 
@@ -820,10 +820,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="edit_another_trigger_state",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required(ATTR_TRIGGER_STATE): _state_selector(states),
-                    vol.Optional("add_another", default=False): bool,
+                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    probatio.Optional("add_another", default=False): bool,
                 }
             ),
             description_placeholders={
@@ -841,9 +841,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="edit_reset_cycle",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
-                    vol.Required(
+                    probatio.Required(
                         CONF_RESET_CYCLE, default=self._editing_reset_cycle
                     ): _reset_cycle_selector(),
                 }
@@ -884,7 +884,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="select_delete",
-            data_schema=vol.Schema(
+            data_schema=probatio.Schema(
                 {
                     "delete_target": SelectSelector(
                         SelectSelectorConfig(
