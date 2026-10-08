@@ -42,6 +42,11 @@
 - Includes **reset** and **set** services for manual control.
 - Creates a **Reset** button entity for each counter, so manual cycles such as refilling a water softener can be restarted directly from the UI.
 - **Multi-language Support**: English, Spanish, French, Portuguese, and German
+- Native [**Probatio**](https://probatio.frenck.dev/) validation for configuration and options flows.
+
+### Requirements
+
+- Home Assistant **2026.9.0 or newer**. This integration uses the Probatio validation engine included with Home Assistant starting in 2026.9; see the [Home Assistant developer announcement](https://developers.home-assistant.io/blog/2026/09/30/probatio-validation-engine/).
 
 ---
 

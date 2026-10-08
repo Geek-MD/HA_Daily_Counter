@@ -5,6 +5,16 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-08
+
+### Changed
+- Replaced Voluptuous with Probatio for all config-flow and options-flow schema validation.
+- Raised the minimum supported Home Assistant version to 2026.9.0, the first release that ships with Probatio as its validation engine.
+- Updated the development and CI environment to Python 3.12 or newer, as required by Probatio.
+
+### Removed
+- Removed the direct Voluptuous development dependency.
+
 ## [1.6.1] - 2026-10-02
 
 ### Fixed
