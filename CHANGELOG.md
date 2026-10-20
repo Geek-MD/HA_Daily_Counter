@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Counter sensors now expose a unitless integer state. Home Assistant treats the monitored event count as a number without displaying the `events` unit.
-- Existing entity IDs, unique IDs, reset behaviour, history, and long-term statistics remain unchanged.
+- Single-entity counters and their reset buttons now link directly to the monitored entity's device, instead of creating a separate duplicate device.
+- Recorder metadata is migrated from the legacy `events` unit to a unitless statistic so existing long-term history continues without interruption.
+- Existing entity IDs, unique IDs, reset behaviour, and stored history remain unchanged.
 
 ## [1.7.0] - 2026-10-08
 

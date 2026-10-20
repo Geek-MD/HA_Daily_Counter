@@ -5,8 +5,7 @@ from typing import Any
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -56,18 +55,18 @@ class HADailyCounterResetButton(ButtonEntity):
         if not triggers and counter_config.get("trigger_entity"):
             triggers = [{"entity": counter_config["trigger_entity"]}]
         self._triggers: list[dict[str, Any]] = triggers
+        source_entity = (
+            self._triggers[0].get("entity") if len(self._triggers) == 1 else None
+        )
+        self.device_entry = (
+            async_entity_id_to_device(hass, source_entity) if source_entity else None
+        )
 
     @property
-    def device_info(self) -> DeviceInfo:
-        """Attach the button to the same device as its counter sensor."""
-        if len(self._triggers) == 1 and (
-            trigger_entity := self._triggers[0].get("entity")
-        ):
-            entity_entry = er.async_get(self.hass).async_get(trigger_entity)
-            if entity_entry and entity_entry.device_id:
-                device = dr.async_get(self.hass).async_get(entity_entry.device_id)
-                if device and device.identifiers:
-                    return DeviceInfo(identifiers=set(device.identifiers))
+    def device_info(self) -> DeviceInfo | None:
+        """Return fallback device information when no source device is available."""
+        if self.device_entry is not None:
+            return None
 
         return DeviceInfo(
             identifiers={(DOMAIN, self._counter_unique_id)},
