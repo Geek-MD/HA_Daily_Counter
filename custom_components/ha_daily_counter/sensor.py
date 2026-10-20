@@ -2,12 +2,13 @@ import logging
 from datetime import datetime
 from typing import Any
 
+from homeassistant.components.recorder import DOMAIN as RECORDER_DOMAIN
+from homeassistant.components.recorder.statistics import async_update_statistics_metadata
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
@@ -15,6 +16,7 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
 )
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.setup import async_when_setup
 from homeassistant.util import dt as dt_util
 
 from .const import (
@@ -68,11 +70,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     """Sensor that counts trigger events and resets on a configured cycle."""
 
     _attr_icon = "mdi:counter"
-    # A numeric unit and a supported state class make the entity eligible for
-    # Recorder long-term statistics. Home Assistant records every state written
-    # by this entity in its database (unless the user explicitly excludes it).
+    # A supported state class makes the integer state eligible for Recorder
+    # long-term statistics without exposing a display unit.
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
-    _attr_native_unit_of_measurement = "events"
     _attr_should_poll = False
 
     def __init__(
@@ -110,6 +110,11 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         first = self._triggers_list[0] if self._triggers_list else {}
         self._trigger_entity: str = first.get("entity", "")
         self._trigger_state: str = first.get("state", "")
+        self.device_entry = (
+            async_entity_id_to_device(hass, self._trigger_entity)
+            if len(self._triggers_list) == 1 and self._trigger_entity
+            else None
+        )
 
         self._unique_id = f"{entry_id}_{counter_config.get('id', 'unknown')}"
         self._name: str = counter_config.get("name", "Unnamed Counter")
@@ -130,25 +135,14 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
 
     @property
     def device_info(self) -> DeviceInfo | None:
-        """Return device information for Home Assistant UI.
+        """Return fallback device information for Home Assistant UI.
 
-        When the counter monitors a **single** entity and that entity belongs to
-        a known device, the counter sensor is attached to that device so it
-        appears alongside its related hardware in the HA device page.
-
-        When the counter monitors **multiple** entities it must not be attached
-        to any specific device (doing so would create duplicate entries for the
-        same config-entry in that device).  In that case an independent virtual
-        device is created using the counter's own unique identifier.
+        Single-trigger counters link directly to the source entity's device
+        through device_entry. Counters without a source device, or with
+        triggers from multiple devices, use an independent virtual device.
         """
-        if len(self._triggers_list) == 1 and self._trigger_entity:
-            ent_reg = er.async_get(self.hass)
-            ent_entry = ent_reg.async_get(self._trigger_entity)
-            if ent_entry and ent_entry.device_id:
-                dev_reg = dr.async_get(self.hass)
-                device = dev_reg.async_get(ent_entry.device_id)
-                if device and device.identifiers:
-                    return DeviceInfo(identifiers=set(device.identifiers))
+        if self.device_entry is not None:
+            return None
 
         return DeviceInfo(
             identifiers={(DOMAIN, self._unique_id)},
@@ -210,10 +204,29 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         # available, this creates a Recorder state after a Home Assistant restart.
         self.async_write_ha_state()
 
+        # Remove the legacy "events" unit from Recorder metadata after the
+        # recorder component is ready, preserving existing long-term statistics.
+        async_when_setup(
+            self.hass,
+            RECORDER_DOMAIN,
+            self._async_migrate_statistics_unit,
+        )
+
         # Cache this entity for service access
         self.hass.data.setdefault(DOMAIN, {})[self.entity_id] = self
         self.hass.data[DOMAIN][self._unique_id] = self
         _LOGGER.debug("Cached entity '%s' for services", self.entity_id)
+
+    async def _async_migrate_statistics_unit(
+        self, hass: HomeAssistant, _component: str
+    ) -> None:
+        """Migrate legacy Recorder metadata to a unitless numeric statistic."""
+        async_update_statistics_metadata(
+            hass,
+            self.entity_id,
+            new_unit_class=None,
+            new_unit_of_measurement=None,
+        )
 
     def _schedule_reset(self, reset_at: datetime) -> None:
         """Schedule the next reset."""
