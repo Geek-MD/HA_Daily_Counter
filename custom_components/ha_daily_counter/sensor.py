@@ -68,11 +68,9 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
     """Sensor that counts trigger events and resets on a configured cycle."""
 
     _attr_icon = "mdi:counter"
-    # A numeric unit and a supported state class make the entity eligible for
-    # Recorder long-term statistics. Home Assistant records every state written
-    # by this entity in its database (unless the user explicitly excludes it).
+    # A supported state class makes the integer state eligible for Recorder
+    # long-term statistics without exposing a display unit.
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
-    _attr_native_unit_of_measurement = "events"
     _attr_should_poll = False
 
     def __init__(
