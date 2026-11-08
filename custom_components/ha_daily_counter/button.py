@@ -4,12 +4,15 @@ from typing import Any
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_entity_registry_updated_event
 
 from .const import DOMAIN
+from .device_link import source_registry_update_requires_sync, sync_device_link
 
 
 async def async_setup_entry(
@@ -55,11 +58,13 @@ class HADailyCounterResetButton(ButtonEntity):
         if not triggers and counter_config.get("trigger_entity"):
             triggers = [{"entity": counter_config["trigger_entity"]}]
         self._triggers: list[dict[str, Any]] = triggers
-        source_entity = (
+        self._source_entity: str | None = (
             self._triggers[0].get("entity") if len(self._triggers) == 1 else None
         )
         self.device_entry = (
-            async_entity_id_to_device(hass, source_entity) if source_entity else None
+            async_entity_id_to_device(hass, self._source_entity)
+            if self._source_entity
+            else None
         )
 
     @property
@@ -74,6 +79,34 @@ class HADailyCounterResetButton(ButtonEntity):
             manufacturer="Geek-MD",
             model="HA Daily Counter",
         )
+
+    async def async_added_to_hass(self) -> None:
+        """Follow the source entity when its device is recreated."""
+        await super().async_added_to_hass()
+
+        if self._source_entity:
+            self._sync_device_link()
+            self.async_on_remove(
+                async_track_entity_registry_updated_event(
+                    self.hass,
+                    self._source_entity,
+                    self._handle_source_registry_update,
+                )
+            )
+
+    @callback
+    def _handle_source_registry_update(self, event: Any) -> None:
+        """Relink when the source entity is created or changes device."""
+        if source_registry_update_requires_sync(event.data):
+            self._sync_device_link()
+
+    @callback
+    def _sync_device_link(self) -> None:
+        """Keep the reset button on its source entity's device."""
+        if self._source_entity is None:
+            return
+        ent_reg = er.async_get(self.hass)
+        sync_device_link(ent_reg, self._source_entity, self.entity_id)
 
     async def async_press(self) -> None:
         """Reset the corresponding counter to zero."""

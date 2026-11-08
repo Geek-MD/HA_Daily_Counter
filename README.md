@@ -34,7 +34,7 @@
   - **AND** → All triggers must be active.  
   - **OR** → Any trigger increments the counter.  
 - Filter entities by domain type for easy selection.
-- **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA. When monitoring **multiple entities** the counter is created as an independent virtual device so it is never duplicated across several device pages.
+- **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA and automatically follows it if the source device is recreated after an integration reload failure. When monitoring **multiple entities** the counter is created as an independent virtual device so it is never duplicated across several device pages.
 - Choose a reset cycle for each counter: every 15 minutes, hourly, daily, weekly, monthly, every two months, quarterly, yearly, or no automatic reset.
 - Persistent values across Home Assistant restarts.  
 - Fully manageable via the UI (no YAML required).  
@@ -153,6 +153,7 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 | Contribution | Contributor |
 |---|---|
+| Bug report: restore the device attachment after the source device is recreated ([#53](https://github.com/Geek-MD/HA_Daily_Counter/issues/53)) | [@alsmaison](https://github.com/alsmaison) |
 | Feature request: attach counter to existing device ([#34](https://github.com/Geek-MD/HA_Daily_Counter/issues/34)) | [@alsmaison](https://github.com/alsmaison) |
 | Only binary sensor entities are shown when selecting a different entity type ([#31](https://github.com/Geek-MD/HA_Daily_Counter/issues/31)) | [@ikswokinok](https://github.com/ikswokinok) |
 

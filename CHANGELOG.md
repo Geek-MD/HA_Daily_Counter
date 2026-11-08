@@ -5,6 +5,12 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 2026-11-08
+
+### Fixed
+- Single-trigger counters and their reset buttons now follow their source entity in Home Assistant's entity registry. If the source integration removes and recreates its device during a failed reload, both entities are automatically attached to the replacement device without reconfiguring or reloading HA Daily Counter (#53).
+- Counters whose source entity has no device retain their independent virtual fallback device, and multi-trigger counters remain independent as before.
+
 ## [1.7.1] - 2026-10-20
 
 ### Fixed
