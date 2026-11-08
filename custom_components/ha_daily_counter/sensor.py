@@ -8,10 +8,12 @@ from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
+    async_track_entity_registry_updated_event,
     async_track_point_in_utc_time,
     async_track_state_change_event,
 )
@@ -25,6 +27,7 @@ from .const import (
     DOMAIN,
     RESET_CYCLES,
 )
+from .device_link import source_registry_update_requires_sync, sync_device_link
 from .reset import current_period_start, next_reset_time
 from .trigger import entered_target_state
 
@@ -212,6 +215,20 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             self._async_migrate_statistics_unit,
         )
 
+        # A source integration can temporarily remove and later recreate its
+        # device during a failed reload. Home Assistant then detaches this entity
+        # from the removed device. Follow the source entity's registry entry so
+        # the counter is linked to the replacement device without being reloaded.
+        if len(self._triggers_list) == 1 and self._trigger_entity:
+            self._sync_device_link()
+            self.async_on_remove(
+                async_track_entity_registry_updated_event(
+                    self.hass,
+                    self._trigger_entity,
+                    self._handle_source_registry_update,
+                )
+            )
+
         # Cache this entity for service access
         self.hass.data.setdefault(DOMAIN, {})[self.entity_id] = self
         self.hass.data[DOMAIN][self._unique_id] = self
@@ -226,6 +243,29 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
             self.entity_id,
             new_unit_class=None,
             new_unit_of_measurement=None,
+        )
+
+    @callback
+    def _handle_source_registry_update(self, event: Any) -> None:
+        """Relink when the source entity is created or changes device."""
+        if source_registry_update_requires_sync(event.data):
+            self._sync_device_link()
+
+    @callback
+    def _sync_device_link(self) -> None:
+        """Keep a single-trigger counter on its source entity's device."""
+        ent_reg = er.async_get(self.hass)
+        if not sync_device_link(
+            ent_reg,
+            self._trigger_entity,
+            self.entity_id,
+        ):
+            return
+
+        _LOGGER.debug(
+            "Relinking counter '%s' to the device of '%s'",
+            self.entity_id,
+            self._trigger_entity,
         )
 
     def _schedule_reset(self, reset_at: datetime) -> None:
