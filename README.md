@@ -4,13 +4,14 @@
 
 [![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/LICENSE)
-<!-- ha-marketplace:exclude-start -->
-[![Open your Home Assistant instance and open HA Daily Counter in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Geek-MD&repository=HA_Daily_Counter&category=integration)
-<!-- ha-marketplace:exclude-end -->
 
 [![Ruff + Mypy + Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/validate.yaml/badge.svg)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/validate.yaml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
+
+<!-- ha-marketplace:exclude-start -->
+[![Open your Home Assistant instance and open HA Daily Counter in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Geek-MD&repository=HA_Daily_Counter&category=integration)
+<!-- ha-marketplace:exclude-end -->
 
 ![](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/custom_components/ha_daily_counter/brand/logo.png)
 
