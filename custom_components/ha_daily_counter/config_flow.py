@@ -12,6 +12,9 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.selector import (
     EntitySelector,
     EntitySelectorConfig,
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
     SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
@@ -21,7 +24,13 @@ from homeassistant.helpers.selector import (
 from .const import (
     ATTR_TRIGGER_ENTITY,
     ATTR_TRIGGER_STATE,
+    CONF_COUNT_MODE,
+    CONF_MAX_CHANGES,
     CONF_RESET_CYCLE,
+    COUNT_MODE_LIMITED,
+    COUNT_MODES,
+    DEFAULT_COUNT_MODE,
+    DEFAULT_MAX_CHANGES,
     DEFAULT_RESET_CYCLE,
     DOMAIN,
     RESET_CYCLES,
@@ -40,6 +49,24 @@ def _reset_cycle_selector() -> SelectSelector:
             mode=SelectSelectorMode.DROPDOWN,
             translation_key="reset_cycle",
         )
+    )
+
+
+def _count_mode_selector() -> SelectSelector:
+    """Return the translated count-mode selector."""
+    return SelectSelector(
+        SelectSelectorConfig(
+            options=COUNT_MODES,
+            mode=SelectSelectorMode.DROPDOWN,
+            translation_key="count_mode",
+        )
+    )
+
+
+def _max_changes_selector() -> NumberSelector:
+    """Return a positive integer selector for the per-cycle limit."""
+    return NumberSelector(
+        NumberSelectorConfig(min=1, step=1, mode=NumberSelectorMode.BOX)
     )
 
 # Domain options for entity filtering
@@ -146,6 +173,8 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         self._domain_filter: str = "binary_sensor"  # Domain filter selected by user
         self._current_trigger_entity: str = ""  # Entity selected in the current trigger step
         self._reset_cycle: str = DEFAULT_RESET_CYCLE
+        self._count_mode: str = DEFAULT_COUNT_MODE
+        self._max_changes: int = DEFAULT_MAX_CHANGES
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -354,7 +383,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         """Select how often this counter resets."""
         if user_input is not None:
             self._reset_cycle = user_input[CONF_RESET_CYCLE]
-            return await self.async_step_finish()
+            return await self.async_step_count_mode()
 
         return self.async_show_form(
             step_id="reset_cycle",
@@ -363,6 +392,46 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                     probatio.Required(
                         CONF_RESET_CYCLE, default=self._reset_cycle
                     ): _reset_cycle_selector(),
+                }
+            ),
+        )
+
+    async def async_step_count_mode(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose whether all changes or a limited number are counted per cycle."""
+        if user_input is not None:
+            self._count_mode = user_input[CONF_COUNT_MODE]
+            if self._count_mode == COUNT_MODE_LIMITED:
+                return await self.async_step_max_changes()
+            return await self.async_step_finish()
+
+        return self.async_show_form(
+            step_id="count_mode",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(
+                        CONF_COUNT_MODE, default=self._count_mode
+                    ): _count_mode_selector(),
+                }
+            ),
+        )
+
+    async def async_step_max_changes(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose the maximum number of changes counted per cycle."""
+        if user_input is not None:
+            self._max_changes = max(1, int(user_input[CONF_MAX_CHANGES]))
+            return await self.async_step_finish()
+
+        return self.async_show_form(
+            step_id="max_changes",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(
+                        CONF_MAX_CHANGES, default=self._max_changes
+                    ): _max_changes_selector(),
                 }
             ),
         )
@@ -381,6 +450,8 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 "triggers": self._triggers,
                 "logic": self._logic,
                 CONF_RESET_CYCLE: self._reset_cycle,
+                CONF_COUNT_MODE: self._count_mode,
+                CONF_MAX_CHANGES: self._max_changes,
             }
 
             _LOGGER.info(
@@ -419,6 +490,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._new_counter_logic: str = "OR"
         self._new_counter_current_entity: str = ""
         self._new_counter_reset_cycle: str = DEFAULT_RESET_CYCLE
+        self._new_counter_count_mode: str = DEFAULT_COUNT_MODE
+        self._new_counter_max_changes: int = DEFAULT_MAX_CHANGES
         self._selected_delete_name: str | None = None
         self._selected_edit_index: int | None = None
         self._editing_counter: dict[str, Any] = {}
@@ -427,12 +500,28 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._editing_logic: str = "OR"
         self._editing_current_entity: str = ""
         self._editing_reset_cycle: str = DEFAULT_RESET_CYCLE
+        self._editing_count_mode: str = DEFAULT_COUNT_MODE
+        self._editing_max_changes: int = DEFAULT_MAX_CHANGES
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Initial step: directly proceed to editing the counter."""
         # Initialize counters from config_entry on first call
         if not self._counters:
             self._counters = list(self.config_entry.options.get("counters", []))
+            if not self._counters and self.config_entry.data.get("triggers"):
+                self._counters = [
+                    {
+                        "id": self.config_entry.entry_id,
+                        "name": self.config_entry.title,
+                        "triggers": self.config_entry.data.get("triggers", []),
+                        "logic": self.config_entry.data.get("logic", "OR"),
+                        CONF_RESET_CYCLE: self.config_entry.data.get(
+                            CONF_RESET_CYCLE, DEFAULT_RESET_CYCLE
+                        ),
+                        CONF_COUNT_MODE: DEFAULT_COUNT_MODE,
+                        CONF_MAX_CHANGES: DEFAULT_MAX_CHANGES,
+                    }
+                ]
 
         # If no counters exist yet, start the add flow
         if not self._counters:
@@ -447,6 +536,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._editing_current_entity = ""
             self._editing_reset_cycle = self._editing_counter.get(
                 CONF_RESET_CYCLE, DEFAULT_RESET_CYCLE
+            )
+            self._editing_count_mode = self._editing_counter.get(
+                CONF_COUNT_MODE, DEFAULT_COUNT_MODE
+            )
+            self._editing_max_changes = self._editing_counter.get(
+                CONF_MAX_CHANGES, DEFAULT_MAX_CHANGES
             )
             current_entity = self._editing_counter.get("trigger_entity", "")
             if not current_entity:
@@ -611,7 +706,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Select the reset cycle for a new counter."""
         if user_input is not None:
             self._new_counter_reset_cycle = user_input[CONF_RESET_CYCLE]
-            return await self.async_step_new_counter_finish()
+            return await self.async_step_new_count_mode()
 
         return self.async_show_form(
             step_id="new_reset_cycle",
@@ -624,6 +719,48 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             ),
         )
 
+    async def async_step_new_count_mode(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose the count mode for a new counter."""
+        if user_input is not None:
+            self._new_counter_count_mode = user_input[CONF_COUNT_MODE]
+            if self._new_counter_count_mode == COUNT_MODE_LIMITED:
+                return await self.async_step_new_max_changes()
+            return await self.async_step_new_counter_finish()
+
+        return self.async_show_form(
+            step_id="new_count_mode",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(
+                        CONF_COUNT_MODE, default=self._new_counter_count_mode
+                    ): _count_mode_selector(),
+                }
+            ),
+        )
+
+    async def async_step_new_max_changes(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose the per-cycle limit for a new counter."""
+        if user_input is not None:
+            self._new_counter_max_changes = max(
+                1, int(user_input[CONF_MAX_CHANGES])
+            )
+            return await self.async_step_new_counter_finish()
+
+        return self.async_show_form(
+            step_id="new_max_changes",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(
+                        CONF_MAX_CHANGES, default=self._new_counter_max_changes
+                    ): _max_changes_selector(),
+                }
+            ),
+        )
+
     async def async_step_new_counter_finish(self) -> ConfigFlowResult:
         """Finalise a new counter created through the options flow."""
         counter: dict[str, Any] = {
@@ -632,6 +769,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             "triggers": self._new_counter_triggers,
             "logic": self._new_counter_logic,
             CONF_RESET_CYCLE: self._new_counter_reset_cycle,
+            CONF_COUNT_MODE: self._new_counter_count_mode,
+            CONF_MAX_CHANGES: self._new_counter_max_changes,
         }
         self._counters.append(counter)
 
@@ -659,6 +798,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     self._editing_current_entity = ""
                     self._editing_reset_cycle = self._editing_counter.get(
                         CONF_RESET_CYCLE, DEFAULT_RESET_CYCLE
+                    )
+                    self._editing_count_mode = self._editing_counter.get(
+                        CONF_COUNT_MODE, DEFAULT_COUNT_MODE
+                    )
+                    self._editing_max_changes = self._editing_counter.get(
+                        CONF_MAX_CHANGES, DEFAULT_MAX_CHANGES
                     )
                     current_entity = self._editing_counter.get("trigger_entity", "")
                     if not current_entity:
@@ -837,7 +982,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Select the reset cycle while editing a counter."""
         if user_input is not None:
             self._editing_reset_cycle = user_input[CONF_RESET_CYCLE]
-            return await self.async_step_edit_finish()
+            return await self.async_step_edit_count_mode()
 
         return self.async_show_form(
             step_id="edit_reset_cycle",
@@ -853,6 +998,54 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             },
         )
 
+    async def async_step_edit_count_mode(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose the count mode while editing a counter."""
+        if user_input is not None:
+            self._editing_count_mode = user_input[CONF_COUNT_MODE]
+            if self._editing_count_mode == COUNT_MODE_LIMITED:
+                return await self.async_step_edit_max_changes()
+            return await self.async_step_edit_finish()
+
+        return self.async_show_form(
+            step_id="edit_count_mode",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(
+                        CONF_COUNT_MODE, default=self._editing_count_mode
+                    ): _count_mode_selector(),
+                }
+            ),
+            description_placeholders={
+                "counter_name": self._editing_counter.get("name", ""),
+            },
+        )
+
+    async def async_step_edit_max_changes(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose the per-cycle limit while editing a counter."""
+        if user_input is not None:
+            self._editing_max_changes = max(
+                1, int(user_input[CONF_MAX_CHANGES])
+            )
+            return await self.async_step_edit_finish()
+
+        return self.async_show_form(
+            step_id="edit_max_changes",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(
+                        CONF_MAX_CHANGES, default=self._editing_max_changes
+                    ): _max_changes_selector(),
+                }
+            ),
+            description_placeholders={
+                "counter_name": self._editing_counter.get("name", ""),
+            },
+        )
+
     async def async_step_edit_finish(self) -> ConfigFlowResult:
         """Save the edited counter preserving its original id and name."""
         updated_counter: dict[str, Any] = {
@@ -861,6 +1054,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             "triggers": self._editing_triggers,
             "logic": self._editing_logic,
             CONF_RESET_CYCLE: self._editing_reset_cycle,
+            CONF_COUNT_MODE: self._editing_count_mode,
+            CONF_MAX_CHANGES: self._editing_max_changes,
         }
 
         if self._selected_edit_index is not None and 0 <= self._selected_edit_index < len(self._counters):

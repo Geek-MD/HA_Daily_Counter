@@ -12,6 +12,12 @@
         "yearly": "Anualmente",
         "none": "Sin reinicio automático"
       }
+    },
+    "count_mode": {
+      "options": {
+        "all": "Contabilizar todos los cambios",
+        "limited": "Contabilizar una cantidad limitada de cambios"
+      }
     }
   },
   "entity": {"button": {"reset": {"name": "Reiniciar"}}},
@@ -60,6 +66,16 @@
         "title": "Frecuencia de Reinicio",
         "description": "Elige cada cuánto se reinicia el contador a cero.",
         "data": {"reset_cycle": "Frecuencia de reinicio"}
+      },
+      "count_mode": {
+        "title": "Cambios por ciclo",
+        "description": "Elige si se contabilizan todos los cambios coincidentes o sólo una cantidad limitada durante cada ciclo de reinicio.",
+        "data": {"count_mode": "Cambios a contabilizar"}
+      },
+      "max_changes": {
+        "title": "Límite de cambios",
+        "description": "Define el número máximo de cambios coincidentes que se contabilizarán durante cada ciclo de reinicio.",
+        "data": {"max_changes_per_cycle": "Máximo de cambios por ciclo"}
       },
       "finish": {
         "title": "Finalizar Contador",
@@ -134,6 +150,16 @@
         "description": "Elige cada cuánto se reinicia el contador a cero.",
         "data": {"reset_cycle": "Frecuencia de reinicio"}
       },
+      "new_count_mode": {
+        "title": "Cambios por ciclo",
+        "description": "Elige si se contabilizan todos los cambios coincidentes o sólo una cantidad limitada durante cada ciclo de reinicio.",
+        "data": {"count_mode": "Cambios a contabilizar"}
+      },
+      "new_max_changes": {
+        "title": "Límite de cambios",
+        "description": "Define el número máximo de cambios coincidentes que se contabilizarán durante cada ciclo de reinicio.",
+        "data": {"max_changes_per_cycle": "Máximo de cambios por ciclo"}
+      },
       "select_edit": {
         "title": "Editar Contador",
         "description": "Selecciona el contador que quieres editar.",
@@ -183,6 +209,16 @@
         "title": "Frecuencia de Reinicio",
         "description": "Editando contador: {counter_name}\n\nElige cada cuánto se reinicia a cero.",
         "data": {"reset_cycle": "Frecuencia de reinicio"}
+      },
+      "edit_count_mode": {
+        "title": "Cambios por ciclo",
+        "description": "Editando contador: {counter_name}\n\nElige si se contabilizan todos los cambios coincidentes o sólo una cantidad limitada durante cada ciclo. Los contadores existentes conservan todos los cambios por defecto.",
+        "data": {"count_mode": "Cambios a contabilizar"}
+      },
+      "edit_max_changes": {
+        "title": "Límite de cambios",
+        "description": "Editando contador: {counter_name}\n\nDefine el número máximo de cambios coincidentes que se contabilizarán durante cada ciclo.",
+        "data": {"max_changes_per_cycle": "Máximo de cambios por ciclo"}
       },
       "select_delete": {
         "title": "Eliminar Contador",

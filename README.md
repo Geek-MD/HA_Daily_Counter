@@ -36,8 +36,9 @@
 - Filter entities by domain type for easy selection.
 - **Auto-associate** the counter sensor with the trigger entity's device — the counter appears on the device's page in HA and automatically follows it if the source device is recreated after an integration reload failure. When monitoring **multiple entities** the counter is created as an independent virtual device so it is never duplicated across several device pages.
 - Choose a reset cycle for each counter: every 15 minutes, hourly, daily, weekly, monthly, every two months, quarterly, yearly, or no automatic reset.
+- Count either **all matching changes** or only a configurable maximum per reset cycle (default limit: `1`).
 - Persistent values across Home Assistant restarts.  
-- Fully manageable via the UI (no YAML required).  
+- Fully manageable and reconfigurable via the UI (no YAML required). Existing counters can opt into the new per-cycle limit without being recreated.
 - Exposed as `sensor` entities with `state_class: total_increasing`, the `events` unit and `mdi:counter` icon, so Home Assistant Recorder can generate long-term statistics.
 - Includes **reset** and **set** services for manual control.
 - Creates a **Reset** button entity for each counter, so manual cycles such as refilling a water softener can be restarted directly from the UI.
@@ -87,11 +88,16 @@
    - **Step 4 – Reset Frequency**:
      - Choose when the counter returns to zero. Daily remains the default for backward compatibility.
      - Weekly cycles start on Monday. Monthly, bimonthly, quarterly, and yearly cycles start on the first day of their calendar period. All boundaries use Home Assistant's local timezone.
+   - **Step 5 – Changes per Cycle**:
+     - Choose **Count all changes** or **Count a limited number of changes**.
+     - When limited counting is selected, set the maximum number of changes for each reset cycle. The default and minimum value is `1`.
 
 3. If multiple triggers are added:  
    - For each additional trigger, first select the entity, then select its state from the dropdown.
    - Configure the **logic operator** (AND/OR) when adding the second trigger.
    - The same logic applies to all subsequent triggers.  
+
+To migrate an existing counter, open **Settings → Devices & Services → HA Daily Counter → Configure**. Complete the reconfiguration flow and select the desired mode under **Changes per Cycle**. Existing counters default to **Count all changes**, so upgrading does not change their behaviour until the user opts into a limit.
 
 ---
 
@@ -138,6 +144,7 @@ data:
 ## 📊 How It Works
 
 - The counter increases by `+1` when its triggers match the configured states.  
+- In limited mode, matching changes are ignored after the configured maximum is reached. Scheduled, button, and service resets start a new counting cycle.
 - If multiple triggers are configured, the logic operator defines how they combine.  
 - Counters reset to **0 at the configured period boundary** in Home Assistant's local timezone.
 - Values persist across Home Assistant restarts.  

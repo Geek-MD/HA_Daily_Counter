@@ -5,6 +5,18 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-11-08
+
+### Added
+- Added a per-counter choice between counting every matching entity change and counting only a configurable maximum during each reset cycle (#48).
+- Added a positive integer limit with a default and minimum value of 1; the limit applies consistently to OR and AND trigger logic.
+- Added the new settings to the reconfiguration flow so users can migrate existing counters, including legacy entries whose triggers are still stored in entry data, without recreating their entities or losing their unique IDs.
+- Added translated configuration steps in English, Spanish, French, Portuguese, and German.
+
+### Changed
+- Existing counters without the new settings remain unlimited by default, preserving their current behaviour until the user explicitly enables a limit.
+- Scheduled, button, and service resets clear the counter and begin a new limited-counting cycle.
+
 ## [1.7.2] - 2026-11-08
 
 ### Fixed

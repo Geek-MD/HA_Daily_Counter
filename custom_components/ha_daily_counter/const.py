@@ -5,6 +5,12 @@ DOMAIN = "ha_daily_counter"
 # Config Options
 CONF_NAME = "name"
 CONF_RESET_CYCLE = "reset_cycle"
+CONF_COUNT_MODE = "count_mode"
+CONF_MAX_CHANGES = "max_changes_per_cycle"
+
+COUNT_MODE_ALL = "all"
+COUNT_MODE_LIMITED = "limited"
+COUNT_MODES = [COUNT_MODE_ALL, COUNT_MODE_LIMITED]
 
 RESET_CYCLE_QUARTER_HOURLY = "quarter-hourly"
 RESET_CYCLE_HOURLY = "hourly"
@@ -35,3 +41,5 @@ ATTR_TRIGGER_STATE = "trigger_state"
 # Defaults
 DEFAULT_NAME = "Daily Counter"
 DEFAULT_RESET_CYCLE = RESET_CYCLE_DAILY
+DEFAULT_COUNT_MODE = COUNT_MODE_ALL
+DEFAULT_MAX_CHANGES = 1
