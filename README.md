@@ -189,11 +189,20 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 ## 🙏 Credits & Community
 
+Thanks to the community members whose reports, feature ideas, and technical analysis have directly improved HA Daily Counter:
+
 | Contribution | Contributor |
 |---|---|
-| Bug report: restore the device attachment after the source device is recreated ([#53](https://github.com/Geek-MD/HA_Daily_Counter/issues/53)) | [@alsmaison](https://github.com/alsmaison) |
-| Feature request: attach counter to existing device ([#34](https://github.com/Geek-MD/HA_Daily_Counter/issues/34)) | [@alsmaison](https://github.com/alsmaison) |
-| Only binary sensor entities are shown when selecting a different entity type ([#31](https://github.com/Geek-MD/HA_Daily_Counter/issues/31)) | [@ikswokinok](https://github.com/ikswokinok) |
+| Bug report: entity selection only showed binary sensors after choosing another domain ([#31](https://github.com/Geek-MD/HA_Daily_Counter/issues/31)) | [@ikswokinok](https://github.com/ikswokinok) |
+| Feature request: attach a counter to the monitored entity's device ([#34](https://github.com/Geek-MD/HA_Daily_Counter/issues/34)) | [@alsmaison](https://github.com/alsmaison) |
+| Feature request: configurable reset cycles instead of daily-only counters ([#43](https://github.com/Geek-MD/HA_Daily_Counter/issues/43)) | [@alsmaison](https://github.com/alsmaison) |
+| Feature request: a Reset button for manually started cycles ([#44](https://github.com/Geek-MD/HA_Daily_Counter/issues/44)) | [@alsmaison](https://github.com/alsmaison) |
+| Regression report: counters were no longer attached to the monitored device ([#46](https://github.com/Geek-MD/HA_Daily_Counter/issues/46)) | [@alsmaison](https://github.com/alsmaison) |
+| Feature request: limit the number of counted events per reset cycle ([#48](https://github.com/Geek-MD/HA_Daily_Counter/issues/48)) | [@alsmaison](https://github.com/alsmaison) |
+| Technical analysis and implementation guidance for Home Assistant's in-place entity ID lifecycle ([#50](https://github.com/Geek-MD/HA_Daily_Counter/issues/50)) | [@emontnemery](https://github.com/emontnemery) |
+| Feature request: optional Diagnostic entity classification ([#52](https://github.com/Geek-MD/HA_Daily_Counter/issues/52)) | [@alsmaison](https://github.com/alsmaison) |
+| Bug report: restore device attachment after the source device is recreated ([#53](https://github.com/Geek-MD/HA_Daily_Counter/issues/53)) | [@alsmaison](https://github.com/alsmaison) |
+| Feature request: optional usage-time tracking alongside event counts ([#57](https://github.com/Geek-MD/HA_Daily_Counter/issues/57)) | [@alsmaison](https://github.com/alsmaison) |
 
 ---
 
