@@ -19,6 +19,8 @@
 
 **HA Daily Counter** is a custom integration for Home Assistant that provides **automatically resettable counters** and optional **usage-time sensors**, perfect for tracking repetitive actions and how long equipment remains active. Now with **configurable reset cycles**, **multiple trigger support**, and **custom logic operators**.
 
+Version **1.9.1** declares the helper classification used by the Home Assistant 2026.11 Marketplace.
+
 ---
 
 ## ✨ Features
