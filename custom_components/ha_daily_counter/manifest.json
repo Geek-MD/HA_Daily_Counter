@@ -2,6 +2,7 @@
   "domain": "ha_daily_counter",
   "name": "HA Daily Counter",
   "after_dependencies": ["recorder"],
+  "categories": ["helpers.calculate_value"],
   "codeowners": ["@Geek-MD"],
   "config_flow": true,
   "dependencies": [],
