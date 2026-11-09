@@ -20,7 +20,10 @@
       }
     }
   },
-  "entity": {"button": {"reset": {"name": "Reiniciar"}}},
+  "entity": {
+    "button": {"reset": {"name": "Reiniciar"}},
+    "sensor": {"usage_time": {"name": "Tiempo de uso de {counter_name}"}}
+  },
   "config": {
     "step": {
       "user": {
@@ -76,6 +79,19 @@
         "title": "Límite de cambios",
         "description": "Define el número máximo de cambios coincidentes que se contabilizarán durante cada ciclo de reinicio.",
         "data": {"max_changes_per_cycle": "Máximo de cambios por ciclo"}
+      },
+      "additional_options": {
+        "title": "Sensores adicionales y clasificación",
+        "description": "Opcionalmente clasifica el contador y su botón de reinicio como entidades de diagnóstico o crea un sensor de tiempo de uso.",
+        "data": {
+          "diagnostic": "Clasificar las entidades como diagnóstico",
+          "track_usage_time": "Crear sensor de tiempo de uso"
+        }
+      },
+      "usage_state": {
+        "title": "Estado para medir el uso",
+        "description": "Selecciona el estado de {entity_id} cuyo tiempo activo será acumulado.",
+        "data": {"usage_state": "Estado a medir"}
       },
       "finish": {
         "title": "Finalizar Contador",
@@ -160,6 +176,19 @@
         "description": "Define el número máximo de cambios coincidentes que se contabilizarán durante cada ciclo de reinicio.",
         "data": {"max_changes_per_cycle": "Máximo de cambios por ciclo"}
       },
+      "new_additional_options": {
+        "title": "Sensores adicionales y clasificación",
+        "description": "Opcionalmente clasifica el contador y su botón de reinicio como entidades de diagnóstico o crea un sensor de tiempo de uso.",
+        "data": {
+          "diagnostic": "Clasificar las entidades como diagnóstico",
+          "track_usage_time": "Crear sensor de tiempo de uso"
+        }
+      },
+      "new_usage_state": {
+        "title": "Estado para medir el uso",
+        "description": "Selecciona el estado de {entity_id} cuyo tiempo activo será acumulado.",
+        "data": {"usage_state": "Estado a medir"}
+      },
       "select_edit": {
         "title": "Editar Contador",
         "description": "Selecciona el contador que quieres editar.",
@@ -219,6 +248,19 @@
         "title": "Límite de cambios",
         "description": "Editando contador: {counter_name}\n\nDefine el número máximo de cambios coincidentes que se contabilizarán durante cada ciclo.",
         "data": {"max_changes_per_cycle": "Máximo de cambios por ciclo"}
+      },
+      "edit_additional_options": {
+        "title": "Sensores adicionales y clasificación",
+        "description": "Editando contador: {counter_name}\n\nOpcionalmente clasifica sus entidades como diagnóstico o crea un sensor de tiempo de uso.",
+        "data": {
+          "diagnostic": "Clasificar las entidades como diagnóstico",
+          "track_usage_time": "Crear sensor de tiempo de uso"
+        }
+      },
+      "edit_usage_state": {
+        "title": "Estado para medir el uso",
+        "description": "Editando contador: {counter_name}\n\nSelecciona el estado de {entity_id} cuyo tiempo activo será acumulado.",
+        "data": {"usage_state": "Estado a medir"}
       },
       "select_delete": {
         "title": "Eliminar Contador",

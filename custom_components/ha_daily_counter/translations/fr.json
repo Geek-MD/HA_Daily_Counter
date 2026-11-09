@@ -15,7 +15,10 @@
       }
     }
   },
-  "entity": {"button": {"reset": {"name": "Réinitialiser"}}},
+  "entity": {
+    "button": {"reset": {"name": "Réinitialiser"}},
+    "sensor": {"usage_time": {"name": "Temps d'utilisation de {counter_name}"}}
+  },
   "config": {
     "step": {
       "user": {
@@ -71,6 +74,19 @@
         "title": "Limite de changements",
         "description": "Définissez le nombre maximal de changements correspondants comptés pendant chaque cycle de réinitialisation.",
         "data": {"max_changes_per_cycle": "Maximum de changements par cycle"}
+      },
+      "additional_options": {
+        "title": "Capteurs supplémentaires et classification",
+        "description": "Classez éventuellement le compteur et son bouton de réinitialisation comme entités de diagnostic ou créez un capteur de temps d'utilisation.",
+        "data": {
+          "diagnostic": "Classer les entités comme diagnostic",
+          "track_usage_time": "Créer un capteur de temps d'utilisation"
+        }
+      },
+      "usage_state": {
+        "title": "État d'utilisation",
+        "description": "Sélectionnez l'état de {entity_id} dont le temps actif sera cumulé.",
+        "data": {"usage_state": "État à mesurer"}
       },
       "finish": {
         "title": "Finaliser le Compteur",
@@ -155,6 +171,19 @@
         "description": "Définissez le nombre maximal de changements correspondants comptés pendant chaque cycle de réinitialisation.",
         "data": {"max_changes_per_cycle": "Maximum de changements par cycle"}
       },
+      "new_additional_options": {
+        "title": "Capteurs supplémentaires et classification",
+        "description": "Classez éventuellement le compteur et son bouton de réinitialisation comme entités de diagnostic ou créez un capteur de temps d'utilisation.",
+        "data": {
+          "diagnostic": "Classer les entités comme diagnostic",
+          "track_usage_time": "Créer un capteur de temps d'utilisation"
+        }
+      },
+      "new_usage_state": {
+        "title": "État d'utilisation",
+        "description": "Sélectionnez l'état de {entity_id} dont le temps actif sera cumulé.",
+        "data": {"usage_state": "État à mesurer"}
+      },
       "select_edit": {
         "title": "Modifier un Compteur",
         "description": "Sélectionnez le compteur que vous souhaitez modifier.",
@@ -214,6 +243,19 @@
         "title": "Limite de changements",
         "description": "Modification du compteur : {counter_name}\n\nDéfinissez le nombre maximal de changements correspondants comptés par cycle.",
         "data": {"max_changes_per_cycle": "Maximum de changements par cycle"}
+      },
+      "edit_additional_options": {
+        "title": "Capteurs supplémentaires et classification",
+        "description": "Modification du compteur : {counter_name}\n\nClassez éventuellement ses entités comme diagnostic ou créez un capteur de temps d'utilisation.",
+        "data": {
+          "diagnostic": "Classer les entités comme diagnostic",
+          "track_usage_time": "Créer un capteur de temps d'utilisation"
+        }
+      },
+      "edit_usage_state": {
+        "title": "État d'utilisation",
+        "description": "Modification du compteur : {counter_name}\n\nSélectionnez l'état de {entity_id} dont le temps actif sera cumulé.",
+        "data": {"usage_state": "État à mesurer"}
       },
       "select_delete": {
         "title": "Supprimer un Compteur",

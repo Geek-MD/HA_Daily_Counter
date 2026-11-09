@@ -20,7 +20,10 @@
       }
     }
   },
-  "entity": {"button": {"reset": {"name": "Reset"}}},
+  "entity": {
+    "button": {"reset": {"name": "Reset"}},
+    "sensor": {"usage_time": {"name": "{counter_name} Usage time"}}
+  },
   "config": {
     "step": {
       "user": {
@@ -76,6 +79,19 @@
         "title": "Change Limit",
         "description": "Choose the maximum number of matching changes counted during each reset cycle.",
         "data": {"max_changes_per_cycle": "Maximum changes per cycle"}
+      },
+      "additional_options": {
+        "title": "Additional Sensors and Classification",
+        "description": "Optionally classify the counter and Reset button as diagnostic entities or create a usage-time sensor.",
+        "data": {
+          "diagnostic": "Classify entities as diagnostic",
+          "track_usage_time": "Create usage-time sensor"
+        }
+      },
+      "usage_state": {
+        "title": "Usage State",
+        "description": "Select the state of {entity_id} whose active time will be accumulated.",
+        "data": {"usage_state": "State to measure"}
       },
       "finish": {
         "title": "Finalize Counter",
@@ -160,6 +176,19 @@
         "description": "Choose the maximum number of matching changes counted during each reset cycle.",
         "data": {"max_changes_per_cycle": "Maximum changes per cycle"}
       },
+      "new_additional_options": {
+        "title": "Additional Sensors and Classification",
+        "description": "Optionally classify the counter and Reset button as diagnostic entities or create a usage-time sensor.",
+        "data": {
+          "diagnostic": "Classify entities as diagnostic",
+          "track_usage_time": "Create usage-time sensor"
+        }
+      },
+      "new_usage_state": {
+        "title": "Usage State",
+        "description": "Select the state of {entity_id} whose active time will be accumulated.",
+        "data": {"usage_state": "State to measure"}
+      },
       "select_edit": {
         "title": "Edit Counter",
         "description": "Select the counter you want to edit.",
@@ -219,6 +248,19 @@
         "title": "Change Limit",
         "description": "Editing counter: {counter_name}\n\nChoose the maximum number of matching changes counted during each reset cycle.",
         "data": {"max_changes_per_cycle": "Maximum changes per cycle"}
+      },
+      "edit_additional_options": {
+        "title": "Additional Sensors and Classification",
+        "description": "Editing counter: {counter_name}\n\nOptionally classify its entities as diagnostic or create a usage-time sensor.",
+        "data": {
+          "diagnostic": "Classify entities as diagnostic",
+          "track_usage_time": "Create usage-time sensor"
+        }
+      },
+      "edit_usage_state": {
+        "title": "Usage State",
+        "description": "Editing counter: {counter_name}\n\nSelect the state of {entity_id} whose active time will be accumulated.",
+        "data": {"usage_state": "State to measure"}
       },
       "select_delete": {
         "title": "Delete Counter",

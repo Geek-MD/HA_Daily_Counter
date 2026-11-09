@@ -15,7 +15,10 @@
       }
     }
   },
-  "entity": {"button": {"reset": {"name": "Zurücksetzen"}}},
+  "entity": {
+    "button": {"reset": {"name": "Zurücksetzen"}},
+    "sensor": {"usage_time": {"name": "Nutzungszeit von {counter_name}"}}
+  },
   "config": {
     "step": {
       "user": {
@@ -71,6 +74,19 @@
         "title": "Änderungslimit",
         "description": "Legen Sie die maximale Anzahl passender Änderungen pro Zurücksetzzyklus fest.",
         "data": {"max_changes_per_cycle": "Maximale Änderungen pro Zyklus"}
+      },
+      "additional_options": {
+        "title": "Zusätzliche Sensoren und Klassifizierung",
+        "description": "Klassifizieren Sie den Zähler und seine Reset-Taste optional als Diagnoseentitäten oder erstellen Sie einen Nutzungszeitsensor.",
+        "data": {
+          "diagnostic": "Entitäten als Diagnose klassifizieren",
+          "track_usage_time": "Nutzungszeitsensor erstellen"
+        }
+      },
+      "usage_state": {
+        "title": "Nutzungszustand",
+        "description": "Wählen Sie den Zustand von {entity_id}, dessen aktive Zeit summiert wird.",
+        "data": {"usage_state": "Zu messender Zustand"}
       },
       "finish": {
         "title": "Zähler Abschließen",
@@ -155,6 +171,19 @@
         "description": "Legen Sie die maximale Anzahl passender Änderungen pro Zurücksetzzyklus fest.",
         "data": {"max_changes_per_cycle": "Maximale Änderungen pro Zyklus"}
       },
+      "new_additional_options": {
+        "title": "Zusätzliche Sensoren und Klassifizierung",
+        "description": "Klassifizieren Sie den Zähler und seine Reset-Taste optional als Diagnoseentitäten oder erstellen Sie einen Nutzungszeitsensor.",
+        "data": {
+          "diagnostic": "Entitäten als Diagnose klassifizieren",
+          "track_usage_time": "Nutzungszeitsensor erstellen"
+        }
+      },
+      "new_usage_state": {
+        "title": "Nutzungszustand",
+        "description": "Wählen Sie den Zustand von {entity_id}, dessen aktive Zeit summiert wird.",
+        "data": {"usage_state": "Zu messender Zustand"}
+      },
       "select_edit": {
         "title": "Zähler Bearbeiten",
         "description": "Wählen Sie den Zähler aus, den Sie bearbeiten möchten.",
@@ -214,6 +243,19 @@
         "title": "Änderungslimit",
         "description": "Zähler wird bearbeitet: {counter_name}\n\nLegen Sie die maximale Anzahl passender Änderungen pro Zyklus fest.",
         "data": {"max_changes_per_cycle": "Maximale Änderungen pro Zyklus"}
+      },
+      "edit_additional_options": {
+        "title": "Zusätzliche Sensoren und Klassifizierung",
+        "description": "Zähler wird bearbeitet: {counter_name}\n\nKlassifizieren Sie seine Entitäten optional als Diagnose oder erstellen Sie einen Nutzungszeitsensor.",
+        "data": {
+          "diagnostic": "Entitäten als Diagnose klassifizieren",
+          "track_usage_time": "Nutzungszeitsensor erstellen"
+        }
+      },
+      "edit_usage_state": {
+        "title": "Nutzungszustand",
+        "description": "Zähler wird bearbeitet: {counter_name}\n\nWählen Sie den Zustand von {entity_id}, dessen aktive Zeit summiert wird.",
+        "data": {"usage_state": "Zu messender Zustand"}
       },
       "select_delete": {
         "title": "Zähler Löschen",
