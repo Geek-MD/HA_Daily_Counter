@@ -8,7 +8,7 @@ import probatio
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
 from homeassistant.helpers.selector import (
     EntitySelector,
     EntitySelectorConfig,
@@ -19,19 +19,26 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    StateSelector,
+    StateSelectorConfig,
 )
 
 from .const import (
     ATTR_TRIGGER_ENTITY,
     ATTR_TRIGGER_STATE,
     CONF_COUNT_MODE,
+    CONF_DIAGNOSTIC,
     CONF_MAX_CHANGES,
     CONF_RESET_CYCLE,
+    CONF_TRACK_USAGE_TIME,
+    CONF_USAGE_STATE,
     COUNT_MODE_LIMITED,
     COUNT_MODES,
     DEFAULT_COUNT_MODE,
+    DEFAULT_DIAGNOSTIC,
     DEFAULT_MAX_CHANGES,
     DEFAULT_RESET_CYCLE,
+    DEFAULT_TRACK_USAGE_TIME,
     DOMAIN,
     RESET_CYCLES,
 )
@@ -87,72 +94,9 @@ DOMAIN_OPTIONS = [
 ]
 
 
-def _get_entity_states(hass: HomeAssistant, entity_id: str) -> list[str]:
-    """Return a list of known/possible states for the given entity.
-
-    For domains with well-known finite states the list is hardcoded.
-    For input_select the runtime options attribute is used.
-    For all other domains the entity's current state is returned as the
-    only option so the user always has a sensible starting point.
-    """
-    if not entity_id:
-        return []
-    domain = entity_id.split(".")[0]
-    state_obj = hass.states.get(entity_id)
-
-    if domain in (
-        "binary_sensor",
-        "input_boolean",
-        "switch",
-        "light",
-        "fan",
-        "automation",
-        "script",
-    ):
-        return ["on", "off"]
-    if domain == "lock":
-        return [
-            "locked",
-            "unlocked",
-            "locking",
-            "unlocking",
-            "jammed",
-            "open",
-            "opening",
-        ]
-    if domain == "cover":
-        return ["open", "closed", "opening", "closing"]
-    if domain == "alarm_control_panel":
-        return [
-            "disarmed",
-            "armed_home",
-            "armed_away",
-            "armed_night",
-            "armed_vacation",
-            "armed_custom_bypass",
-            "pending",
-            "arming",
-            "disarming",
-            "triggered",
-        ]
-    if domain == "input_select" and state_obj:
-        return list(state_obj.attributes.get("options", [state_obj.state]))
-    if state_obj:
-        return [state_obj.state]
-    return []
-
-
-def _state_selector(states: list[str]) -> type[str] | SelectSelector:
-    """Return a SelectSelector for the given states list, or plain str if empty."""
-    if not states:
-        return str
-    return SelectSelector(
-        SelectSelectorConfig(
-            options=[SelectOptionDict(value=s, label=s) for s in states],
-            mode=SelectSelectorMode.DROPDOWN,
-            custom_value=True,
-        )
-    )
+def _state_selector(entity_id: str) -> StateSelector:
+    """Return Home Assistant's dynamic state selector for an entity."""
+    return StateSelector(StateSelectorConfig(entity_id=entity_id))
 
 
 class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
@@ -175,6 +119,9 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         self._reset_cycle: str = DEFAULT_RESET_CYCLE
         self._count_mode: str = DEFAULT_COUNT_MODE
         self._max_changes: int = DEFAULT_MAX_CHANGES
+        self._diagnostic: bool = DEFAULT_DIAGNOSTIC
+        self._track_usage_time: bool = DEFAULT_TRACK_USAGE_TIME
+        self._usage_state: str = ""
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -272,10 +219,11 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 _LOGGER.error("Error in first_trigger_state step: %s", err, exc_info=True)
                 errors["base"] = "unknown"
 
-        states = _get_entity_states(self.hass, self._current_trigger_entity)
         data_schema = probatio.Schema(
             {
-                probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                probatio.Required(ATTR_TRIGGER_STATE): _state_selector(
+                    self._current_trigger_entity
+                ),
                 probatio.Optional("add_another", default=False): bool,
             }
         )
@@ -363,10 +311,11 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 _LOGGER.error("Error in another_trigger_state step: %s", err, exc_info=True)
                 errors["base"] = "unknown"
 
-        states = _get_entity_states(self.hass, self._current_trigger_entity)
         data_schema = probatio.Schema(
             {
-                probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                probatio.Required(ATTR_TRIGGER_STATE): _state_selector(
+                    self._current_trigger_entity
+                ),
                 probatio.Optional("add_another", default=False): bool,
             }
         )
@@ -404,7 +353,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
             self._count_mode = user_input[CONF_COUNT_MODE]
             if self._count_mode == COUNT_MODE_LIMITED:
                 return await self.async_step_max_changes()
-            return await self.async_step_finish()
+            return await self.async_step_additional_options()
 
         return self.async_show_form(
             step_id="count_mode",
@@ -423,7 +372,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
         """Choose the maximum number of changes counted per cycle."""
         if user_input is not None:
             self._max_changes = max(1, int(user_input[CONF_MAX_CHANGES]))
-            return await self.async_step_finish()
+            return await self.async_step_additional_options()
 
         return self.async_show_form(
             step_id="max_changes",
@@ -434,6 +383,48 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                     ): _max_changes_selector(),
                 }
             ),
+        )
+
+    async def async_step_additional_options(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose optional diagnostic and usage-time entities."""
+        if user_input is not None:
+            self._diagnostic = user_input.get(CONF_DIAGNOSTIC, False)
+            self._track_usage_time = user_input.get(CONF_TRACK_USAGE_TIME, False)
+            if self._track_usage_time:
+                return await self.async_step_usage_state()
+            return await self.async_step_finish()
+
+        return self.async_show_form(
+            step_id="additional_options",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Optional(
+                        CONF_DIAGNOSTIC, default=self._diagnostic
+                    ): bool,
+                    probatio.Optional(
+                        CONF_TRACK_USAGE_TIME, default=self._track_usage_time
+                    ): bool,
+                }
+            ),
+        )
+
+    async def async_step_usage_state(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Select the primary entity state whose duration will be accumulated."""
+        if user_input is not None:
+            self._usage_state = user_input[CONF_USAGE_STATE]
+            return await self.async_step_finish()
+
+        primary_entity = self._triggers[0]["entity"] if self._triggers else ""
+        return self.async_show_form(
+            step_id="usage_state",
+            data_schema=probatio.Schema(
+                {probatio.Required(CONF_USAGE_STATE): _state_selector(primary_entity)}
+            ),
+            description_placeholders={"entity_id": primary_entity},
         )
 
     async def async_step_finish(self) -> ConfigFlowResult:
@@ -452,6 +443,9 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[cal
                 CONF_RESET_CYCLE: self._reset_cycle,
                 CONF_COUNT_MODE: self._count_mode,
                 CONF_MAX_CHANGES: self._max_changes,
+                CONF_DIAGNOSTIC: self._diagnostic,
+                CONF_TRACK_USAGE_TIME: self._track_usage_time,
+                CONF_USAGE_STATE: self._usage_state,
             }
 
             _LOGGER.info(
@@ -492,6 +486,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._new_counter_reset_cycle: str = DEFAULT_RESET_CYCLE
         self._new_counter_count_mode: str = DEFAULT_COUNT_MODE
         self._new_counter_max_changes: int = DEFAULT_MAX_CHANGES
+        self._new_counter_diagnostic: bool = DEFAULT_DIAGNOSTIC
+        self._new_counter_track_usage_time: bool = DEFAULT_TRACK_USAGE_TIME
+        self._new_counter_usage_state: str = ""
         self._selected_delete_name: str | None = None
         self._selected_edit_index: int | None = None
         self._editing_counter: dict[str, Any] = {}
@@ -502,6 +499,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._editing_reset_cycle: str = DEFAULT_RESET_CYCLE
         self._editing_count_mode: str = DEFAULT_COUNT_MODE
         self._editing_max_changes: int = DEFAULT_MAX_CHANGES
+        self._editing_diagnostic: bool = DEFAULT_DIAGNOSTIC
+        self._editing_track_usage_time: bool = DEFAULT_TRACK_USAGE_TIME
+        self._editing_usage_state: str = ""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Initial step: directly proceed to editing the counter."""
@@ -520,6 +520,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         ),
                         CONF_COUNT_MODE: DEFAULT_COUNT_MODE,
                         CONF_MAX_CHANGES: DEFAULT_MAX_CHANGES,
+                        CONF_DIAGNOSTIC: DEFAULT_DIAGNOSTIC,
+                        CONF_TRACK_USAGE_TIME: DEFAULT_TRACK_USAGE_TIME,
                     }
                 ]
 
@@ -542,6 +544,15 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             )
             self._editing_max_changes = self._editing_counter.get(
                 CONF_MAX_CHANGES, DEFAULT_MAX_CHANGES
+            )
+            self._editing_diagnostic = self._editing_counter.get(
+                CONF_DIAGNOSTIC, DEFAULT_DIAGNOSTIC
+            )
+            self._editing_track_usage_time = self._editing_counter.get(
+                CONF_TRACK_USAGE_TIME, DEFAULT_TRACK_USAGE_TIME
+            )
+            self._editing_usage_state = self._editing_counter.get(
+                CONF_USAGE_STATE, ""
             )
             current_entity = self._editing_counter.get("trigger_entity", "")
             if not current_entity:
@@ -617,13 +628,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return await self.async_step_new_another_trigger()
             return await self.async_step_new_reset_cycle()
 
-        states = _get_entity_states(self.hass, self._new_counter_current_entity)
-
         return self.async_show_form(
             step_id="trigger_state",
             data_schema=probatio.Schema(
                 {
-                    probatio.Required("trigger_state"): _state_selector(states),
+                    probatio.Required("trigger_state"): _state_selector(
+                        self._new_counter_current_entity
+                    ),
                     probatio.Optional("add_another", default=False): bool,
                 }
             ),
@@ -685,13 +696,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return await self.async_step_new_another_trigger()
             return await self.async_step_new_reset_cycle()
 
-        states = _get_entity_states(self.hass, self._new_counter_current_entity)
-
         return self.async_show_form(
             step_id="new_another_trigger_state",
             data_schema=probatio.Schema(
                 {
-                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(
+                        self._new_counter_current_entity
+                    ),
                     probatio.Optional("add_another", default=False): bool,
                 }
             ),
@@ -727,7 +738,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._new_counter_count_mode = user_input[CONF_COUNT_MODE]
             if self._new_counter_count_mode == COUNT_MODE_LIMITED:
                 return await self.async_step_new_max_changes()
-            return await self.async_step_new_counter_finish()
+            return await self.async_step_new_additional_options()
 
         return self.async_show_form(
             step_id="new_count_mode",
@@ -748,7 +759,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._new_counter_max_changes = max(
                 1, int(user_input[CONF_MAX_CHANGES])
             )
-            return await self.async_step_new_counter_finish()
+            return await self.async_step_new_additional_options()
 
         return self.async_show_form(
             step_id="new_max_changes",
@@ -761,6 +772,56 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             ),
         )
 
+    async def async_step_new_additional_options(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose optional entities for a new counter."""
+        if user_input is not None:
+            self._new_counter_diagnostic = user_input.get(CONF_DIAGNOSTIC, False)
+            self._new_counter_track_usage_time = user_input.get(
+                CONF_TRACK_USAGE_TIME, False
+            )
+            if self._new_counter_track_usage_time:
+                return await self.async_step_new_usage_state()
+            return await self.async_step_new_counter_finish()
+
+        return self.async_show_form(
+            step_id="new_additional_options",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Optional(
+                        CONF_DIAGNOSTIC, default=self._new_counter_diagnostic
+                    ): bool,
+                    probatio.Optional(
+                        CONF_TRACK_USAGE_TIME,
+                        default=self._new_counter_track_usage_time,
+                    ): bool,
+                }
+            ),
+        )
+
+    async def async_step_new_usage_state(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Select the usage state for a new counter's primary entity."""
+        if user_input is not None:
+            self._new_counter_usage_state = user_input[CONF_USAGE_STATE]
+            return await self.async_step_new_counter_finish()
+
+        primary_entity = (
+            self._new_counter_triggers[0]["entity"]
+            if self._new_counter_triggers
+            else ""
+        )
+        schema: dict[Any, Any] = {
+            probatio.Required(CONF_USAGE_STATE): _state_selector(primary_entity)
+        }
+        return self.async_show_form(
+            step_id="new_usage_state",
+            data_schema=probatio.Schema(schema),
+            description_placeholders={"entity_id": primary_entity},
+        )
+
     async def async_step_new_counter_finish(self) -> ConfigFlowResult:
         """Finalise a new counter created through the options flow."""
         counter: dict[str, Any] = {
@@ -771,6 +832,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             CONF_RESET_CYCLE: self._new_counter_reset_cycle,
             CONF_COUNT_MODE: self._new_counter_count_mode,
             CONF_MAX_CHANGES: self._new_counter_max_changes,
+            CONF_DIAGNOSTIC: self._new_counter_diagnostic,
+            CONF_TRACK_USAGE_TIME: self._new_counter_track_usage_time,
+            CONF_USAGE_STATE: self._new_counter_usage_state,
         }
         self._counters.append(counter)
 
@@ -804,6 +868,15 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     )
                     self._editing_max_changes = self._editing_counter.get(
                         CONF_MAX_CHANGES, DEFAULT_MAX_CHANGES
+                    )
+                    self._editing_diagnostic = self._editing_counter.get(
+                        CONF_DIAGNOSTIC, DEFAULT_DIAGNOSTIC
+                    )
+                    self._editing_track_usage_time = self._editing_counter.get(
+                        CONF_TRACK_USAGE_TIME, DEFAULT_TRACK_USAGE_TIME
+                    )
+                    self._editing_usage_state = self._editing_counter.get(
+                        CONF_USAGE_STATE, ""
                     )
                     current_entity = self._editing_counter.get("trigger_entity", "")
                     if not current_entity:
@@ -893,13 +966,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return await self.async_step_edit_another_trigger()
             return await self.async_step_edit_reset_cycle()
 
-        states = _get_entity_states(self.hass, self._editing_current_entity)
-
         return self.async_show_form(
             step_id="edit_trigger_state",
             data_schema=probatio.Schema(
                 {
-                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(
+                        self._editing_current_entity
+                    ),
                     probatio.Optional("add_another", default=False): bool,
                 }
             ),
@@ -961,13 +1034,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return await self.async_step_edit_another_trigger()
             return await self.async_step_edit_reset_cycle()
 
-        states = _get_entity_states(self.hass, self._editing_current_entity)
-
         return self.async_show_form(
             step_id="edit_another_trigger_state",
             data_schema=probatio.Schema(
                 {
-                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(states),
+                    probatio.Required(ATTR_TRIGGER_STATE): _state_selector(
+                        self._editing_current_entity
+                    ),
                     probatio.Optional("add_another", default=False): bool,
                 }
             ),
@@ -1006,7 +1079,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._editing_count_mode = user_input[CONF_COUNT_MODE]
             if self._editing_count_mode == COUNT_MODE_LIMITED:
                 return await self.async_step_edit_max_changes()
-            return await self.async_step_edit_finish()
+            return await self.async_step_edit_additional_options()
 
         return self.async_show_form(
             step_id="edit_count_mode",
@@ -1030,7 +1103,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._editing_max_changes = max(
                 1, int(user_input[CONF_MAX_CHANGES])
             )
-            return await self.async_step_edit_finish()
+            return await self.async_step_edit_additional_options()
 
         return self.async_show_form(
             step_id="edit_max_changes",
@@ -1046,6 +1119,68 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             },
         )
 
+    async def async_step_edit_additional_options(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose optional entities while editing a counter."""
+        if user_input is not None:
+            self._editing_diagnostic = user_input.get(CONF_DIAGNOSTIC, False)
+            self._editing_track_usage_time = user_input.get(
+                CONF_TRACK_USAGE_TIME, False
+            )
+            if self._editing_track_usage_time:
+                return await self.async_step_edit_usage_state()
+            self._editing_usage_state = ""
+            return await self.async_step_edit_finish()
+
+        return self.async_show_form(
+            step_id="edit_additional_options",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Optional(
+                        CONF_DIAGNOSTIC, default=self._editing_diagnostic
+                    ): bool,
+                    probatio.Optional(
+                        CONF_TRACK_USAGE_TIME,
+                        default=self._editing_track_usage_time,
+                    ): bool,
+                }
+            ),
+            description_placeholders={
+                "counter_name": self._editing_counter.get("name", ""),
+            },
+        )
+
+    async def async_step_edit_usage_state(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Select the usage state while editing a counter."""
+        if user_input is not None:
+            self._editing_usage_state = user_input[CONF_USAGE_STATE]
+            return await self.async_step_edit_finish()
+
+        primary_entity = (
+            self._editing_triggers[0]["entity"] if self._editing_triggers else ""
+        )
+        schema_key = (
+            probatio.Required(
+                CONF_USAGE_STATE,
+                default=self._editing_usage_state,
+            )
+            if self._editing_usage_state
+            else probatio.Required(CONF_USAGE_STATE)
+        )
+        return self.async_show_form(
+            step_id="edit_usage_state",
+            data_schema=probatio.Schema(
+                {schema_key: _state_selector(primary_entity)}
+            ),
+            description_placeholders={
+                "counter_name": self._editing_counter.get("name", ""),
+                "entity_id": primary_entity,
+            },
+        )
+
     async def async_step_edit_finish(self) -> ConfigFlowResult:
         """Save the edited counter preserving its original id and name."""
         updated_counter: dict[str, Any] = {
@@ -1056,6 +1191,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             CONF_RESET_CYCLE: self._editing_reset_cycle,
             CONF_COUNT_MODE: self._editing_count_mode,
             CONF_MAX_CHANGES: self._editing_max_changes,
+            CONF_DIAGNOSTIC: self._editing_diagnostic,
+            CONF_TRACK_USAGE_TIME: self._editing_track_usage_time,
+            CONF_USAGE_STATE: self._editing_usage_state,
         }
 
         if self._selected_edit_index is not None and 0 <= self._selected_edit_index < len(self._counters):

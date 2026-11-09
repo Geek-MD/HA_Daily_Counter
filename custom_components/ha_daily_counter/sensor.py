@@ -6,7 +6,7 @@ from homeassistant.components.recorder import DOMAIN as RECORDER_DOMAIN
 from homeassistant.components.recorder.statistics import async_update_statistics_metadata
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNKNOWN
+from homeassistant.const import STATE_UNKNOWN, EntityCategory, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device import async_entity_id_to_device
@@ -23,9 +23,13 @@ from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_COUNT_MODE,
+    CONF_DIAGNOSTIC,
     CONF_MAX_CHANGES,
     CONF_RESET_CYCLE,
+    CONF_TRACK_USAGE_TIME,
+    CONF_USAGE_STATE,
     DEFAULT_COUNT_MODE,
+    DEFAULT_DIAGNOSTIC,
     DEFAULT_MAX_CHANGES,
     DEFAULT_RESET_CYCLE,
     DOMAIN,
@@ -36,6 +40,8 @@ from .device_link import source_registry_update_requires_sync, sync_device_link
 from .entity_cache import cache_entity, rekey_cached_entity, remove_cached_entity
 from .reset import current_period_start, next_reset_time
 from .trigger import entered_target_state
+from .usage_sensor import HAUsageTimeEntity
+from .usage_time import usage_time_cache_key
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,11 +71,30 @@ async def async_setup_entry(
             entry.title,
         )
 
-    entities: list[HADailyCounterEntity] = []
+    enabled_usage_unique_ids = {
+        f"{entry.entry_id}_{cfg.get('id', 'unknown')}_usage_time"
+        for cfg in counters
+        if cfg.get(CONF_TRACK_USAGE_TIME, False) and cfg.get(CONF_USAGE_STATE)
+    }
+    entity_registry = er.async_get(hass)
+    for registry_entry in er.async_entries_for_config_entry(
+        entity_registry, entry.entry_id
+    ):
+        if (
+            registry_entry.domain == Platform.SENSOR
+            and registry_entry.platform == DOMAIN
+            and registry_entry.unique_id.endswith("_usage_time")
+            and registry_entry.unique_id not in enabled_usage_unique_ids
+        ):
+            entity_registry.async_remove(registry_entry.entity_id)
+
+    entities: list[SensorEntity] = []
 
     for cfg in counters:
         entity = HADailyCounterEntity(hass, entry.entry_id, cfg)
         entities.append(entity)
+        if cfg.get(CONF_TRACK_USAGE_TIME, False) and cfg.get(CONF_USAGE_STATE):
+            entities.append(HAUsageTimeEntity(hass, entry.entry_id, cfg))
 
     if entities:
         async_add_entities(entities)
@@ -115,6 +140,11 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         )
         self._count_mode: str = counter_config.get(
             CONF_COUNT_MODE, DEFAULT_COUNT_MODE
+        )
+        self._attr_entity_category = (
+            EntityCategory.DIAGNOSTIC
+            if counter_config.get(CONF_DIAGNOSTIC, DEFAULT_DIAGNOSTIC)
+            else None
         )
         try:
             self._max_changes = max(
@@ -417,6 +447,11 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         """Reset the counter from a button, service, or scheduled callback."""
         self._attr_native_value = 0
         self.async_write_ha_state()
+        usage_sensor = self.hass.data.get(DOMAIN, {}).get(
+            usage_time_cache_key(self._unique_id)
+        )
+        if usage_sensor is not None:
+            usage_sensor.async_reset_usage_time()
 
     def _get_next_reset_time(self) -> datetime | None:
         """Return the next reset boundary in Home Assistant's local timezone."""

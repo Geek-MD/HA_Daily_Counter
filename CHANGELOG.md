@@ -5,6 +5,19 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-11-09
+
+### Added
+- Added an optional **Diagnostic** checkbox for each counter. When enabled, the counter sensor, its Reset button, and its optional usage-time sensor are classified as diagnostic entities; existing and new counters remain primary entities by default (#52).
+- Added an optional usage-time sensor that accumulates the hours during which the primary monitored entity remains in a user-selected state (#57).
+- Added Home Assistant's native dynamic state selector to both counter triggers and usage-time tracking. The choices follow the selected entity while the stored state remains a plain string for full compatibility with existing counters and custom states.
+- Added translated configuration, reconfiguration, and entity names in English, Spanish, French, Portuguese, and German.
+
+### Changed
+- Usage-time sensors share their counter's reset cycle and device association. Scheduled resets, the Reset button, and the `reset_counter` service reset both values together.
+- Active usage duration is published every minute, persists across Home Assistant restarts in the same reset period, and does not include time while Home Assistant was offline.
+- Reconfiguring the monitored entity or usage state starts a fresh duration measurement, and disabling the optional sensor removes its stale entity-registry entry.
+
 ## [1.8.1] - 2026-11-08
 
 ### Fixed

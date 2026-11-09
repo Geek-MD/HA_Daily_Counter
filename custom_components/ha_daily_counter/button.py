@@ -4,6 +4,7 @@ from typing import Any
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device import async_entity_id_to_device
@@ -11,8 +12,9 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_entity_registry_updated_event
 
-from .const import DOMAIN
+from .const import CONF_DIAGNOSTIC, DEFAULT_DIAGNOSTIC, DOMAIN
 from .device_link import source_registry_update_requires_sync, sync_device_link
+from .usage_time import usage_time_cache_key
 
 
 async def async_setup_entry(
@@ -53,6 +55,11 @@ class HADailyCounterResetButton(ButtonEntity):
         self.hass = hass
         self._counter_unique_id = f"{entry_id}_{counter_config.get('id', 'unknown')}"
         self._attr_unique_id = f"{self._counter_unique_id}_reset"
+        self._attr_entity_category = (
+            EntityCategory.DIAGNOSTIC
+            if counter_config.get(CONF_DIAGNOSTIC, DEFAULT_DIAGNOSTIC)
+            else None
+        )
         self._counter_name: str = counter_config.get("name", "Unnamed Counter")
         triggers = counter_config.get("triggers", [])
         if not triggers and counter_config.get("trigger_entity"):
@@ -118,3 +125,9 @@ class HADailyCounterResetButton(ButtonEntity):
         counter = self.hass.data.get(DOMAIN, {}).get(self._counter_unique_id)
         if counter is not None:
             counter.async_reset_counter()
+            return
+        usage_sensor = self.hass.data.get(DOMAIN, {}).get(
+            usage_time_cache_key(self._counter_unique_id)
+        )
+        if usage_sensor is not None:
+            usage_sensor.async_reset_usage_time()
