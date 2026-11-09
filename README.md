@@ -39,6 +39,7 @@
 - Count either **all matching changes** or only a configurable maximum per reset cycle (default limit: `1`).
 - Persistent values across Home Assistant restarts.  
 - Fully manageable and reconfigurable via the UI (no YAML required). Existing counters can opt into the new per-cycle limit without being recreated.
+- Renaming a counter entity in Home Assistant takes effect in place; integration services immediately follow its new entity ID.
 - Exposed as `sensor` entities with `state_class: total_increasing`, the `events` unit and `mdi:counter` icon, so Home Assistant Recorder can generate long-term statistics.
 - Includes **reset** and **set** services for manual control.
 - Creates a **Reset** button entity for each counter, so manual cycles such as refilling a water softener can be restarted directly from the UI.

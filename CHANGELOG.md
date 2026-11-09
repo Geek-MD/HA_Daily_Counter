@@ -5,6 +5,13 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-11-08
+
+### Fixed
+- Counter sensors now opt in to Home Assistant's in-place `entity_id` changes and immediately re-key the service cache when renamed, so `reset_counter` and `set_counter` continue working with the new entity ID (#50).
+- Reset buttons also opt in to the new lifecycle, avoiding an unnecessary remove-and-add cycle when their entity IDs are renamed.
+- Counter unloads now remove both mutable entity-ID and stable unique-ID cache entries without deleting a replacement entity that reused either key.
+
 ## [1.8.0] - 2026-11-08
 
 ### Added
