@@ -95,6 +95,11 @@ class HADailyCounterResetButton(ButtonEntity):
             )
 
     @callback
+    def async_entity_id_changed(self, old_entity_id: str) -> None:
+        """Opt in to in-place entity ID changes."""
+        super().async_entity_id_changed(old_entity_id)
+
+    @callback
     def _handle_source_registry_update(self, event: Any) -> None:
         """Relink when the source entity is created or changes device."""
         if source_registry_update_requires_sync(event.data):

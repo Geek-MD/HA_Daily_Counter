@@ -33,6 +33,7 @@ from .const import (
 )
 from .counting import can_increment
 from .device_link import source_registry_update_requires_sync, sync_device_link
+from .entity_cache import cache_entity, rekey_cached_entity, remove_cached_entity
 from .reset import current_period_start, next_reset_time
 from .trigger import entered_target_state
 
@@ -243,10 +244,40 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
                 )
             )
 
-        # Cache this entity for service access
-        self.hass.data.setdefault(DOMAIN, {})[self.entity_id] = self
-        self.hass.data[DOMAIN][self._unique_id] = self
+        # Cache this entity for service and reset-button access. The entity ID can
+        # change in place, while the unique ID remains a stable internal lookup.
+        cache_entity(
+            self.hass.data.setdefault(DOMAIN, {}),
+            self.entity_id,
+            self._unique_id,
+            self,
+        )
+        self.async_on_remove(self._remove_from_service_cache)
         _LOGGER.debug("Cached entity '%s' for services", self.entity_id)
+
+    @callback
+    def async_entity_id_changed(self, old_entity_id: str) -> None:
+        """Re-key service access after an in-place entity registry rename."""
+        super().async_entity_id_changed(old_entity_id)
+        rekey_cached_entity(
+            self.hass.data.setdefault(DOMAIN, {}),
+            old_entity_id,
+            self.entity_id,
+            self,
+        )
+        _LOGGER.debug(
+            "Updated service cache for renamed counter '%s' -> '%s'",
+            old_entity_id,
+            self.entity_id,
+        )
+
+    @callback
+    def _remove_from_service_cache(self) -> None:
+        """Remove this counter's mutable and stable service-cache keys."""
+        cache = self.hass.data.get(DOMAIN)
+        if cache is None:
+            return
+        remove_cached_entity(cache, self.entity_id, self._unique_id, self)
 
     async def _async_migrate_statistics_unit(
         self, hass: HomeAssistant, _component: str
