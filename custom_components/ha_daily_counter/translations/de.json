@@ -7,6 +7,12 @@
         "bimonthly": "Alle zwei Monate", "quarterly": "Vierteljährlich",
         "yearly": "Jährlich", "none": "Keine automatische Zurücksetzung"
       }
+    },
+    "count_mode": {
+      "options": {
+        "all": "Alle Änderungen zählen",
+        "limited": "Eine begrenzte Anzahl von Änderungen zählen"
+      }
     }
   },
   "entity": {"button": {"reset": {"name": "Zurücksetzen"}}},
@@ -55,6 +61,16 @@
         "title": "Zurücksetzintervall",
         "description": "Lege fest, wie oft der Zähler auf null zurückgesetzt wird.",
         "data": {"reset_cycle": "Zurücksetzintervall"}
+      },
+      "count_mode": {
+        "title": "Änderungen pro Zyklus",
+        "description": "Wählen Sie, ob alle passenden Änderungen oder nur eine begrenzte Anzahl pro Zurücksetzzyklus gezählt werden.",
+        "data": {"count_mode": "Zu zählende Änderungen"}
+      },
+      "max_changes": {
+        "title": "Änderungslimit",
+        "description": "Legen Sie die maximale Anzahl passender Änderungen pro Zurücksetzzyklus fest.",
+        "data": {"max_changes_per_cycle": "Maximale Änderungen pro Zyklus"}
       },
       "finish": {
         "title": "Zähler Abschließen",
@@ -129,6 +145,16 @@
         "description": "Lege fest, wie oft der Zähler auf null zurückgesetzt wird.",
         "data": {"reset_cycle": "Zurücksetzintervall"}
       },
+      "new_count_mode": {
+        "title": "Änderungen pro Zyklus",
+        "description": "Wählen Sie, ob alle passenden Änderungen oder nur eine begrenzte Anzahl pro Zurücksetzzyklus gezählt werden.",
+        "data": {"count_mode": "Zu zählende Änderungen"}
+      },
+      "new_max_changes": {
+        "title": "Änderungslimit",
+        "description": "Legen Sie die maximale Anzahl passender Änderungen pro Zurücksetzzyklus fest.",
+        "data": {"max_changes_per_cycle": "Maximale Änderungen pro Zyklus"}
+      },
       "select_edit": {
         "title": "Zähler Bearbeiten",
         "description": "Wählen Sie den Zähler aus, den Sie bearbeiten möchten.",
@@ -178,6 +204,16 @@
         "title": "Zurücksetzintervall",
         "description": "Zähler wird bearbeitet: {counter_name}\n\nLege das Zurücksetzintervall fest.",
         "data": {"reset_cycle": "Zurücksetzintervall"}
+      },
+      "edit_count_mode": {
+        "title": "Änderungen pro Zyklus",
+        "description": "Zähler wird bearbeitet: {counter_name}\n\nWählen Sie, ob alle passenden Änderungen oder nur eine begrenzte Anzahl pro Zyklus gezählt werden. Bestehende Zähler zählen standardmäßig alle Änderungen.",
+        "data": {"count_mode": "Zu zählende Änderungen"}
+      },
+      "edit_max_changes": {
+        "title": "Änderungslimit",
+        "description": "Zähler wird bearbeitet: {counter_name}\n\nLegen Sie die maximale Anzahl passender Änderungen pro Zyklus fest.",
+        "data": {"max_changes_per_cycle": "Maximale Änderungen pro Zyklus"}
       },
       "select_delete": {
         "title": "Zähler Löschen",

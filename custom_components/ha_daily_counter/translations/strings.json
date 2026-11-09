@@ -12,6 +12,12 @@
         "yearly": "Yearly",
         "none": "No automatic reset"
       }
+    },
+    "count_mode": {
+      "options": {
+        "all": "Count all changes",
+        "limited": "Count a limited number of changes"
+      }
     }
   },
   "entity": {"button": {"reset": {"name": "Reset"}}},
@@ -60,6 +66,16 @@
         "title": "Reset Frequency",
         "description": "Choose how often the counter resets to zero.",
         "data": {"reset_cycle": "Reset frequency"}
+      },
+      "count_mode": {
+        "title": "Changes per Cycle",
+        "description": "Choose whether to count every matching change or only a limited number during each reset cycle.",
+        "data": {"count_mode": "Changes to count"}
+      },
+      "max_changes": {
+        "title": "Change Limit",
+        "description": "Choose the maximum number of matching changes counted during each reset cycle.",
+        "data": {"max_changes_per_cycle": "Maximum changes per cycle"}
       },
       "finish": {
         "title": "Finalize Counter",
@@ -134,6 +150,16 @@
         "description": "Choose how often the counter resets to zero.",
         "data": {"reset_cycle": "Reset frequency"}
       },
+      "new_count_mode": {
+        "title": "Changes per Cycle",
+        "description": "Choose whether to count every matching change or only a limited number during each reset cycle.",
+        "data": {"count_mode": "Changes to count"}
+      },
+      "new_max_changes": {
+        "title": "Change Limit",
+        "description": "Choose the maximum number of matching changes counted during each reset cycle.",
+        "data": {"max_changes_per_cycle": "Maximum changes per cycle"}
+      },
       "select_edit": {
         "title": "Edit Counter",
         "description": "Select the counter you want to edit.",
@@ -183,6 +209,16 @@
         "title": "Reset Frequency",
         "description": "Editing counter: {counter_name}\n\nChoose how often it resets to zero.",
         "data": {"reset_cycle": "Reset frequency"}
+      },
+      "edit_count_mode": {
+        "title": "Changes per Cycle",
+        "description": "Editing counter: {counter_name}\n\nChoose whether to count every matching change or only a limited number during each reset cycle. Existing counters default to counting all changes.",
+        "data": {"count_mode": "Changes to count"}
+      },
+      "edit_max_changes": {
+        "title": "Change Limit",
+        "description": "Editing counter: {counter_name}\n\nChoose the maximum number of matching changes counted during each reset cycle.",
+        "data": {"max_changes_per_cycle": "Maximum changes per cycle"}
       },
       "select_delete": {
         "title": "Delete Counter",

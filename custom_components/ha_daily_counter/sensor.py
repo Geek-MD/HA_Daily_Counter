@@ -22,11 +22,16 @@ from homeassistant.setup import async_when_setup
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CONF_COUNT_MODE,
+    CONF_MAX_CHANGES,
     CONF_RESET_CYCLE,
+    DEFAULT_COUNT_MODE,
+    DEFAULT_MAX_CHANGES,
     DEFAULT_RESET_CYCLE,
     DOMAIN,
     RESET_CYCLES,
 )
+from .counting import can_increment
 from .device_link import source_registry_update_requires_sync, sync_device_link
 from .reset import current_period_start, next_reset_time
 from .trigger import entered_target_state
@@ -107,6 +112,15 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
         self._reset_cycle: str = counter_config.get(
             CONF_RESET_CYCLE, DEFAULT_RESET_CYCLE
         )
+        self._count_mode: str = counter_config.get(
+            CONF_COUNT_MODE, DEFAULT_COUNT_MODE
+        )
+        try:
+            self._max_changes = max(
+                1, int(counter_config.get(CONF_MAX_CHANGES, DEFAULT_MAX_CHANGES))
+            )
+        except (TypeError, ValueError):
+            self._max_changes = DEFAULT_MAX_CHANGES
 
         # Keep a single _trigger_entity / _trigger_state for backward-compat
         # code paths that still reference these attributes.
@@ -318,13 +332,7 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
                     if not current or current.state != t_state:
                         return  # Another trigger is not in its required state
             # All conditions met
-            self._attr_native_value += 1
-            self.async_write_ha_state()
-            _LOGGER.debug(
-                "Counter '%s' incremented to %d (AND logic)",
-                self._name,
-                self._attr_native_value,
-            )
+            self._increment_counter("AND")
         else:
             # OR logic: increment when the changed entity matches any trigger.
             for trigger in self._triggers_list:
@@ -336,14 +344,31 @@ class HADailyCounterEntity(SensorEntity, RestoreEntity):
                         trigger.get("state", ""),
                     )
                 ):
-                    self._attr_native_value += 1
-                    self.async_write_ha_state()
-                    _LOGGER.debug(
-                        "Counter '%s' incremented to %d (OR logic)",
-                        self._name,
-                        self._attr_native_value,
-                    )
+                    self._increment_counter("OR")
                     break
+
+    @callback
+    def _increment_counter(self, logic: str) -> None:
+        """Increment once unless the configured cycle limit has been reached."""
+        if not can_increment(
+            self._attr_native_value, self._count_mode, self._max_changes
+        ):
+            _LOGGER.debug(
+                "Counter '%s' ignored a matching transition because its "
+                "per-cycle limit of %d was reached",
+                self._name,
+                self._max_changes,
+            )
+            return
+
+        self._attr_native_value += 1
+        self.async_write_ha_state()
+        _LOGGER.debug(
+            "Counter '%s' incremented to %d (%s logic)",
+            self._name,
+            self._attr_native_value,
+            logic,
+        )
 
     @callback
     def _reset_counter(self, now: datetime) -> None:

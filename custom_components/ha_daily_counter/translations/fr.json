@@ -7,6 +7,12 @@
         "bimonthly": "Tous les deux mois", "quarterly": "Trimestriel",
         "yearly": "Annuel", "none": "Sans réinitialisation automatique"
       }
+    },
+    "count_mode": {
+      "options": {
+        "all": "Compter tous les changements",
+        "limited": "Compter un nombre limité de changements"
+      }
     }
   },
   "entity": {"button": {"reset": {"name": "Réinitialiser"}}},
@@ -55,6 +61,16 @@
         "title": "Fréquence de réinitialisation",
         "description": "Choisissez la fréquence de remise à zéro du compteur.",
         "data": {"reset_cycle": "Fréquence de réinitialisation"}
+      },
+      "count_mode": {
+        "title": "Changements par cycle",
+        "description": "Choisissez de compter tous les changements correspondants ou seulement un nombre limité pendant chaque cycle de réinitialisation.",
+        "data": {"count_mode": "Changements à compter"}
+      },
+      "max_changes": {
+        "title": "Limite de changements",
+        "description": "Définissez le nombre maximal de changements correspondants comptés pendant chaque cycle de réinitialisation.",
+        "data": {"max_changes_per_cycle": "Maximum de changements par cycle"}
       },
       "finish": {
         "title": "Finaliser le Compteur",
@@ -129,6 +145,16 @@
         "description": "Choisissez la fréquence de remise à zéro du compteur.",
         "data": {"reset_cycle": "Fréquence de réinitialisation"}
       },
+      "new_count_mode": {
+        "title": "Changements par cycle",
+        "description": "Choisissez de compter tous les changements correspondants ou seulement un nombre limité pendant chaque cycle de réinitialisation.",
+        "data": {"count_mode": "Changements à compter"}
+      },
+      "new_max_changes": {
+        "title": "Limite de changements",
+        "description": "Définissez le nombre maximal de changements correspondants comptés pendant chaque cycle de réinitialisation.",
+        "data": {"max_changes_per_cycle": "Maximum de changements par cycle"}
+      },
       "select_edit": {
         "title": "Modifier un Compteur",
         "description": "Sélectionnez le compteur que vous souhaitez modifier.",
@@ -178,6 +204,16 @@
         "title": "Fréquence de réinitialisation",
         "description": "Modification du compteur : {counter_name}\n\nChoisissez la fréquence de remise à zéro.",
         "data": {"reset_cycle": "Fréquence de réinitialisation"}
+      },
+      "edit_count_mode": {
+        "title": "Changements par cycle",
+        "description": "Modification du compteur : {counter_name}\n\nChoisissez de compter tous les changements correspondants ou seulement un nombre limité par cycle. Les compteurs existants conservent tous les changements par défaut.",
+        "data": {"count_mode": "Changements à compter"}
+      },
+      "edit_max_changes": {
+        "title": "Limite de changements",
+        "description": "Modification du compteur : {counter_name}\n\nDéfinissez le nombre maximal de changements correspondants comptés par cycle.",
+        "data": {"max_changes_per_cycle": "Maximum de changements par cycle"}
       },
       "select_delete": {
         "title": "Supprimer un Compteur",

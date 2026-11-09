@@ -7,6 +7,12 @@
         "bimonthly": "A cada dois meses", "quarterly": "Trimestralmente",
         "yearly": "Anualmente", "none": "Sem reinício automático"
       }
+    },
+    "count_mode": {
+      "options": {
+        "all": "Contar todas as alterações",
+        "limited": "Contar um número limitado de alterações"
+      }
     }
   },
   "entity": {"button": {"reset": {"name": "Reiniciar"}}},
@@ -55,6 +61,16 @@
         "title": "Frequência de reinício",
         "description": "Escolha com que frequência o contador volta a zero.",
         "data": {"reset_cycle": "Frequência de reinício"}
+      },
+      "count_mode": {
+        "title": "Alterações por ciclo",
+        "description": "Escolha entre contar todas as alterações correspondentes ou apenas um número limitado durante cada ciclo de reinício.",
+        "data": {"count_mode": "Alterações a contar"}
+      },
+      "max_changes": {
+        "title": "Limite de alterações",
+        "description": "Defina o número máximo de alterações correspondentes contadas durante cada ciclo de reinício.",
+        "data": {"max_changes_per_cycle": "Máximo de alterações por ciclo"}
       },
       "finish": {
         "title": "Finalizar Contador",
@@ -129,6 +145,16 @@
         "description": "Escolha com que frequência o contador volta a zero.",
         "data": {"reset_cycle": "Frequência de reinício"}
       },
+      "new_count_mode": {
+        "title": "Alterações por ciclo",
+        "description": "Escolha entre contar todas as alterações correspondentes ou apenas um número limitado durante cada ciclo de reinício.",
+        "data": {"count_mode": "Alterações a contar"}
+      },
+      "new_max_changes": {
+        "title": "Limite de alterações",
+        "description": "Defina o número máximo de alterações correspondentes contadas durante cada ciclo de reinício.",
+        "data": {"max_changes_per_cycle": "Máximo de alterações por ciclo"}
+      },
       "select_edit": {
         "title": "Editar Contador",
         "description": "Selecione o contador que pretende editar.",
@@ -178,6 +204,16 @@
         "title": "Frequência de reinício",
         "description": "Editando contador: {counter_name}\n\nEscolha com que frequência ele volta a zero.",
         "data": {"reset_cycle": "Frequência de reinício"}
+      },
+      "edit_count_mode": {
+        "title": "Alterações por ciclo",
+        "description": "Editando contador: {counter_name}\n\nEscolha entre contar todas as alterações correspondentes ou apenas um número limitado por ciclo. Os contadores existentes mantêm todas as alterações por predefinição.",
+        "data": {"count_mode": "Alterações a contar"}
+      },
+      "edit_max_changes": {
+        "title": "Limite de alterações",
+        "description": "Editando contador: {counter_name}\n\nDefina o número máximo de alterações correspondentes contadas por ciclo.",
+        "data": {"max_changes_per_cycle": "Máximo de alterações por ciclo"}
       },
       "select_delete": {
         "title": "Eliminar Contador",
