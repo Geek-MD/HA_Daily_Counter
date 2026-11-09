@@ -4,7 +4,9 @@
 
 [![GitHub Release](https://img.shields.io/github/release/Geek-MD/HA_Daily_Counter?include_prereleases&sort=semver&color=blue)](https://github.com/Geek-MD/HA_Daily_Counter/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/Geek-MD/HA_Daily_Counter/blob/main/LICENSE)
-[![HACS Custom Repository](https://img.shields.io/badge/HACS-Custom%20Repository-blue)](https://hacs.xyz/)
+<!-- ha-marketplace:exclude-start -->
+[![Open your Home Assistant instance and open HA Daily Counter in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Geek-MD&repository=HA_Daily_Counter&category=integration)
+<!-- ha-marketplace:exclude-end -->
 
 [![Ruff + Mypy + Hassfest](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/validate.yaml/badge.svg)](https://github.com/Geek-MD/HA_Daily_Counter/actions/workflows/validate.yaml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -56,23 +58,39 @@
 
 ## 🛠 Installation
 
-### Option 1: Installation via HACS
-1. Go to **HACS → Integrations → Custom Repositories**.  
-2. Add the repository URL:  
-   ```
-   https://github.com/Geek-MD/HA_Daily_Counter
-   ```
-3. Select category **Integration**.  
-4. Search for **HA Daily Counter** in HACS and install it.  
-5. Restart Home Assistant.  
+<!-- ha-marketplace:exclude-start -->
 
-### Option 2: Manual installation
+### Option 1: Marketplace (Home Assistant 2026.11 or newer)
+
+Marketplace is included with Home Assistant; no separate store installation or GitHub connection is required for this catalog integration.
+
+1. Go to **Settings → Marketplace**.
+2. Search for **HA Daily Counter** and open its repository page.
+3. Select **Install**, review the version, and select **Install** again.
+4. When installation finishes, complete the integration setup page that Home Assistant opens. If you close it, go to **Settings → Devices & services → Add integration → HA Daily Counter**.
+
+Home Assistant will tell you through **Settings → System → Repairs** if a restart is required. A restart is no longer an unconditional installation step.
+
+### Option 2: HACS (Home Assistant 2026.9–2026.10 only)
+
+Marketplace replaced HACS in Home Assistant 2026.11. Use these legacy instructions only on an older supported Home Assistant release where HACS is already installed.
+
+1. Open **HACS → Integrations**.
+2. Search for **HA Daily Counter** and download it.
+3. Restart Home Assistant.
+4. Go to **Settings → Devices & services → Add integration → HA Daily Counter**.
+
+### Option 3: Manual installation
+
 1. Download the latest release from [GitHub](https://github.com/Geek-MD/HA_Daily_Counter/releases).  
 2. Copy the `ha_daily_counter` folder into:  
    ```
    /config/custom_components/ha_daily_counter/
    ```
-3. Restart Home Assistant.  
+3. Restart Home Assistant.
+4. Go to **Settings → Devices & services → Add integration → HA Daily Counter**.
+
+<!-- ha-marketplace:exclude-end -->
 
 ---
 
