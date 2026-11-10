@@ -17,9 +17,9 @@
 
 # HA Daily Counter
 
-**HA Daily Counter** is a custom integration for Home Assistant that provides **automatically resettable counters** and optional **usage-time sensors**, perfect for tracking repetitive actions and how long equipment remains active. Now with **configurable reset cycles**, **multiple trigger support**, and **custom logic operators**.
+**Version 1.9.2** restores the HA Daily Counter card in **Settings → Devices & Services → Integrations**, with access to existing entities and counter configuration. After updating, restart Home Assistant to apply the fix.
 
-Version **1.9.1** declares the helper classification used by the Home Assistant 2026.11 Marketplace.
+**HA Daily Counter** is a custom integration for Home Assistant that provides **automatically resettable counters** and optional **usage-time sensors**, perfect for tracking repetitive actions and how long equipment remains active. Now with **configurable reset cycles**, **multiple trigger support**, and **custom logic operators**.
 
 ---
 
@@ -126,7 +126,15 @@ Marketplace replaced HACS in Home Assistant 2026.11. Use these legacy instructio
    - Configure the **logic operator** (AND/OR) when adding the second trigger.
    - The same logic applies to all subsequent triggers.  
 
-To migrate an existing counter, open **Settings → Devices & Services → HA Daily Counter → Configure**. Complete the reconfiguration flow and select the desired mode under **Changes per Cycle**. Existing counters default to **Count all changes**, so upgrading does not change their behaviour until the user opts into a limit.
+### List and reconfigure existing counters
+
+Open **Settings → Devices & Services → Integrations → HA Daily Counter**. The integration page groups the configured entries and provides access to their entities, including counter sensors, Reset buttons, and optional usage-time sensors. Open an entry's **Configure** (options) action to edit its counter. If an older entry contains several counters, the options flow first lets you select which counter to edit.
+
+HA Daily Counter explicitly declares the `hub` integration type so Home Assistant includes it in the Integrations view. Its Helpers category describes its purpose and is separate from this integration type. After installing an update, restart Home Assistant so it reloads the manifest. Existing entries and entity IDs are retained; do not delete and recreate counters to apply this metadata change.
+
+Version 1.9.1 was published with `integration_type: helper`. Home Assistant 2026.11.1 excludes that type from the Integrations view, even though its entities remain registered. Changing the manifest type to `hub` restores access to the integration page and its existing options flow after a restart.
+
+To migrate an existing counter, open its **Configure** action. Complete the reconfiguration flow and select the desired mode under **Changes per Cycle**. Existing counters default to **Count all changes**, so upgrading does not change their behaviour until the user opts into a limit.
 
 The same reconfiguration flow can enable or disable Diagnostic classification and usage-time tracking. Changing the usage entity or state starts a fresh duration measurement; disabling usage-time tracking removes the optional entity.
 

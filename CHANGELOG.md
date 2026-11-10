@@ -5,6 +5,14 @@ All notable changes to HA Daily Counter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-11-10
+
+### Fixed
+- Declare the `hub` integration type so HA Daily Counter appears in Home Assistant's Integrations view. Published version 1.9.1 declares `helper`, which Home Assistant 2026.11.1 excludes from that view. Existing configuration entries, entity IDs, and device associations are preserved.
+
+### Changed
+- Document how to list entities and access the existing counter options flow from the HA Daily Counter integration page.
+
 ## [1.9.1] - 2026-11-09
 
 ### Changed
